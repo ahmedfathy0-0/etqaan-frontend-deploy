@@ -1,5 +1,7 @@
 "use client";
 
+import { getStudentAvatar } from "@/lib/avatarGenerator";
+
 interface StudentCardProps {
   id: number;
   name: string;
@@ -7,28 +9,6 @@ interface StudentCardProps {
   points: number;
   rank?: number;
   onClick?: () => void;
-}
-
-// Cartoon animal avatars with colors
-const avatars = [
-  { emoji: "🦁", bg: "from-amber-400 to-orange-500", name: "أسد" },
-  { emoji: "🐻", bg: "from-amber-600 to-amber-800", name: "دب" },
-  { emoji: "🦉", bg: "from-purple-400 to-purple-600", name: "بومة" },
-  { emoji: "🐰", bg: "from-pink-300 to-pink-500", name: "أرنب" },
-  { emoji: "🐱", bg: "from-orange-300 to-orange-500", name: "قطة" },
-  { emoji: "🐶", bg: "from-yellow-400 to-amber-500", name: "كلب" },
-  { emoji: "🐼", bg: "from-gray-400 to-gray-600", name: "باندا" },
-  { emoji: "🐯", bg: "from-orange-400 to-orange-600", name: "نمر" },
-  { emoji: "🐨", bg: "from-gray-300 to-gray-500", name: "كوالا" },
-  { emoji: "🦊", bg: "from-orange-500 to-red-500", name: "ثعلب" },
-  { emoji: "🐸", bg: "from-green-400 to-green-600", name: "ضفدع" },
-  { emoji: "🐧", bg: "from-gray-700 to-gray-900", name: "بطريق" },
-];
-
-// Generate consistent avatar based on student ID
-function getAvatar(id: number, avatarIndex?: number) {
-  const index = avatarIndex ?? id % avatars.length;
-  return avatars[index];
 }
 
 // Get rank decoration
@@ -66,7 +46,7 @@ export default function StudentCard({
   rank,
   onClick,
 }: StudentCardProps) {
-  const avatar = getAvatar(id, avatarIndex);
+  const avatar = getStudentAvatar(id, avatarIndex);
   const rankDeco = getRankDecoration(rank);
 
   return (
@@ -86,7 +66,8 @@ export default function StudentCard({
       <div className="flex items-center gap-4">
         {/* Avatar */}
         <div
-          className={`w-16 h-16 bg-gradient-to-br ${avatar.bg} rounded-2xl flex items-center justify-center shadow-md group-hover:scale-110 group-hover:rotate-6 transition-all duration-300`}
+          style={{ background: avatar.bgStyle }}
+          className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-md group-hover:scale-110 group-hover:rotate-6 transition-all duration-300"
         >
           <span className="text-3xl">{avatar.emoji}</span>
         </div>
