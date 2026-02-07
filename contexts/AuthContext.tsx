@@ -74,7 +74,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            ...(CHOREO_API_KEY && { "API-Key": CHOREO_API_KEY }),
+            ...(CHOREO_API_KEY && {
+              Authorization: `Bearer ${CHOREO_API_KEY}`,
+            }),
           },
           body: JSON.stringify({ email, password }),
         });
