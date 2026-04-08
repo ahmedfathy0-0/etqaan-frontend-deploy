@@ -419,7 +419,7 @@ export default function BatchDetailsPage() {
                   required
                   value={newStudentData.full_name}
                   onChange={(e) => setNewStudentData({ ...newStudentData, full_name: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-gray-900 placeholder-gray-400 bg-white"
                   placeholder="مثال: أحمد محمد محمود"
                 />
               </div>
@@ -429,7 +429,7 @@ export default function BatchDetailsPage() {
                   type="text"
                   value={newStudentData.guardian_name}
                   onChange={(e) => setNewStudentData({ ...newStudentData, guardian_name: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-gray-900 placeholder-gray-400 bg-white"
                   placeholder="اختياري"
                 />
               </div>
@@ -439,7 +439,7 @@ export default function BatchDetailsPage() {
                   type="tel"
                   value={newStudentData.guardian_phone}
                   onChange={(e) => setNewStudentData({ ...newStudentData, guardian_phone: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-left"
+                  className="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-gray-900 placeholder-gray-400 bg-white text-left"
                   placeholder="010XXXXXXXX"
                   dir="ltr"
                 />
@@ -449,7 +449,7 @@ export default function BatchDetailsPage() {
                 <select
                   value={newStudentData.gender}
                   onChange={(e) => setNewStudentData({ ...newStudentData, gender: e.target.value as "male" | "female" })}
-                  className="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-gray-900 bg-white"
                 >
                   <option value="male">ذكر</option>
                   <option value="female">أنثى</option>
