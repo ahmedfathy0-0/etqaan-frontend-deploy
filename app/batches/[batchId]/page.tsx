@@ -76,6 +76,20 @@ export default function BatchDetailsPage() {
   const [formLoading, setFormLoading] = useState(false);
   const [formError, setFormError] = useState("");
 
+  const [showCreateStudentForm, setShowCreateStudentForm] = useState(false);
+  const [newStudentData, setNewStudentData] = useState<{
+    full_name: string;
+    guardian_name: string;
+    guardian_phone: string;
+    gender: "male" | "female";
+  }>({
+    full_name: "",
+    guardian_name: "",
+    guardian_phone: "",
+    gender: "male",
+  });
+  const [createStudentLoading, setCreateStudentLoading] = useState(false);
+
   const API_URL =
     process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api-v1";
 
@@ -238,6 +252,44 @@ export default function BatchDetailsPage() {
     setShowHistoryModal(true);
   };
 
+  // Create new student
+  const handleCreateStudent = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newStudentData.full_name) return;
+    setCreateStudentLoading(true);
+    setFormError("");
+    try {
+      const res = await fetch(`${API_URL}/students`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(newStudentData),
+      });
+      if (res.ok) {
+        const createdStudent = await res.json();
+        setAvailableStudents((prev) => [...prev, createdStudent]);
+        setSelectedStudentIds((prev) => [...prev, createdStudent.id]);
+        setShowCreateStudentForm(false);
+        setNewStudentData({
+          full_name: "",
+          guardian_name: "",
+          guardian_phone: "",
+          gender: "male",
+        });
+        toast.success("تم إنشاء الطالب وتحديده بنجاح");
+      } else {
+        const error = await res.json();
+        setFormError(error.message || "فشل إنشاء الطالب");
+      }
+    } catch (err) {
+      setFormError("حدث خطأ أثناء إنشاء الطالب");
+    } finally {
+      setCreateStudentLoading(false);
+    }
+  };
+
   // Enroll student in batch
   const handleEnrollStudent = async () => {
     if (selectedStudentIds.length === 0 || !token) return;
@@ -276,7 +328,10 @@ export default function BatchDetailsPage() {
       {/* Add Student Modal */}
       <Modal
         isOpen={showAddStudentModal}
-        onClose={() => setShowAddStudentModal(false)}
+        onClose={() => {
+          setShowAddStudentModal(false);
+          setShowCreateStudentForm(false);
+        }}
         title="👨‍🎓 إضافة طالب للحلقة"
         headerColorClass="bg-gradient-to-r from-blue-600 to-purple-600"
       >
@@ -286,61 +341,138 @@ export default function BatchDetailsPage() {
               {formError}
             </div>
           )}
-          <div>
-            <label className="block font-arabic text-gray-700 mb-2">
-              اختر الطلاب ({selectedStudentIds.length})
-            </label>
-            <div className="border border-gray-300 rounded-xl max-h-60 overflow-y-auto">
-              {availableStudents.length === 0 ? (
-                <p className="p-4 text-center text-gray-500 font-arabic">
-                  لا يوجد طلاب متاحين للإضافة
-                </p>
-              ) : (
-                availableStudents.map((s) => (
-                  <label
-                    key={s.id}
-                    className="flex items-center gap-3 p-3 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-b-0"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={selectedStudentIds.includes(s.id)}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setSelectedStudentIds([...selectedStudentIds, s.id]);
-                        } else {
-                          setSelectedStudentIds(
-                            selectedStudentIds.filter((id) => id !== s.id),
-                          );
-                        }
-                      }}
-                      className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                    />
-                    <span className="font-arabic text-gray-700">
-                      {s.full_name}{" "}
-                      {s.guardian_name ? `(${s.guardian_name})` : ""}
-                    </span>
-                  </label>
-                ))
-              )}
-            </div>
-          </div>
-          <div className="flex gap-3 pt-4">
-            <button
-              onClick={handleEnrollStudent}
-              disabled={selectedStudentIds.length === 0 || formLoading}
-              className="flex-1 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-arabic font-semibold hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 transition-all"
-            >
-              {formLoading
-                ? "جاري الإضافة..."
-                : `إضافة ${selectedStudentIds.length} طالب`}
-            </button>
-            <button
-              onClick={() => setShowAddStudentModal(false)}
-              className="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl font-arabic hover:bg-gray-200 transition-colors"
-            >
-              إلغاء
-            </button>
-          </div>
+          
+          {!showCreateStudentForm ? (
+            <>
+              <div>
+                <label className="block font-arabic text-gray-700 mb-2">
+                  اختر الطلاب ({selectedStudentIds.length})
+                </label>
+                <div className="border border-gray-300 rounded-xl max-h-60 overflow-y-auto">
+                  {availableStudents.length === 0 ? (
+                    <p className="p-4 text-center text-gray-500 font-arabic">
+                      لا يوجد طلاب متاحين للإضافة
+                    </p>
+                  ) : (
+                    availableStudents.map((s) => (
+                      <label
+                        key={s.id}
+                        className="flex items-center gap-3 p-3 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selectedStudentIds.includes(s.id)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedStudentIds([...selectedStudentIds, s.id]);
+                            } else {
+                              setSelectedStudentIds(
+                                selectedStudentIds.filter((id) => id !== s.id),
+                              );
+                            }
+                          }}
+                          className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                        />
+                        <span className="font-arabic text-gray-700">
+                          {s.full_name}{" "}
+                          {s.guardian_name ? `(${s.guardian_name})` : ""}
+                        </span>
+                      </label>
+                    ))
+                  )}
+                </div>
+              </div>
+              <div className="pt-2 pb-2 text-center">
+                <button
+                  type="button"
+                  onClick={() => setShowCreateStudentForm(true)}
+                  className="text-blue-600 hover:text-blue-700 font-arabic text-sm hover:underline flex items-center justify-center gap-1 mx-auto"
+                >
+                  <span>+</span>
+                  إنشاء طالب جديد غير موجود بالقائمة
+                </button>
+              </div>
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={handleEnrollStudent}
+                  disabled={selectedStudentIds.length === 0 || formLoading}
+                  className="flex-1 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-arabic font-semibold hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 transition-all"
+                >
+                  {formLoading
+                    ? "جاري الإضافة..."
+                    : `إضافة ${selectedStudentIds.length} طالب`}
+                </button>
+                <button
+                  onClick={() => setShowAddStudentModal(false)}
+                  className="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl font-arabic hover:bg-gray-200 transition-colors"
+                >
+                  إلغاء
+                </button>
+              </div>
+            </>
+          ) : (
+            <form onSubmit={handleCreateStudent} className="space-y-3 font-arabic">
+              <div>
+                <label className="block text-gray-700 mb-1">اسم الطالب رباعي *</label>
+                <input
+                  type="text"
+                  required
+                  value={newStudentData.full_name}
+                  onChange={(e) => setNewStudentData({ ...newStudentData, full_name: e.target.value })}
+                  className="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  placeholder="مثال: أحمد محمد محمود"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-700 mb-1">اسم ولي الأمر</label>
+                <input
+                  type="text"
+                  value={newStudentData.guardian_name}
+                  onChange={(e) => setNewStudentData({ ...newStudentData, guardian_name: e.target.value })}
+                  className="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  placeholder="اختياري"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-700 mb-1">رقم هاتف ولي الأمر</label>
+                <input
+                  type="tel"
+                  value={newStudentData.guardian_phone}
+                  onChange={(e) => setNewStudentData({ ...newStudentData, guardian_phone: e.target.value })}
+                  className="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-left"
+                  placeholder="010XXXXXXXX"
+                  dir="ltr"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-700 mb-1">النوع *</label>
+                <select
+                  value={newStudentData.gender}
+                  onChange={(e) => setNewStudentData({ ...newStudentData, gender: e.target.value as "male" | "female" })}
+                  className="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                >
+                  <option value="male">ذكر</option>
+                  <option value="female">أنثى</option>
+                </select>
+              </div>
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="submit"
+                  disabled={createStudentLoading || !newStudentData.full_name}
+                  className="flex-1 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-arabic font-semibold hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 transition-all"
+                >
+                  {createStudentLoading ? "جاري الإنشاء..." : "إنشاء وتحديد الطالب"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowCreateStudentForm(false)}
+                  className="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl font-arabic hover:bg-gray-200 transition-colors"
+                >
+                  رجوع
+                </button>
+              </div>
+            </form>
+          )}
         </div>
       </Modal>
 
