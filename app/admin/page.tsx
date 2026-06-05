@@ -34,7 +34,7 @@ interface Batch {
 }
 
 export default function AdminDashboard() {
-  const { user, token } = useAuth();
+  const { user, token, logout } = useAuth();
   const { data: stats = {
     totalUsers: 0,
     totalStudents: 0,
@@ -387,11 +387,7 @@ export default function AdminDashboard() {
                 </p>
               </div>
               <button
-                onClick={() => {
-                  localStorage.removeItem("etqaan_token");
-                  localStorage.removeItem("etqaan_user");
-                  window.location.href = "/login";
-                }}
+                onClick={logout}
                 className="px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-xl font-arabic transition-colors flex items-center gap-2"
               >
                 <span>🚪</span>
