@@ -198,24 +198,24 @@ export default function BatchDetailsPage() {
   const visibleStudents = useMemo(() => {
     let visible = rankedStudents;
 
-    if (!user || user.role === "student") {
-      // For students and guests, show only top 3
-      const top3 = rankedStudents.slice(0, 3);
+    // if (!user || user.role === "student") {
+    //   // For students and guests, show only top 3
+    //   const top3 = rankedStudents.slice(0, 3);
 
-      // If student logged in, ensure they are also visible
-      if (user && user.role === "student") {
-        const myStudent = rankedStudents.find((s) => s.id === user.id);
-        if (myStudent && !top3.find((s) => s.id === myStudent.id)) {
-          // Add detailed student record if not in top 3
-          // We need to keep the array sorted or just append?
-          // The UI renders a grid, appending is fine.
-          // But maybe we should re-sort just in case, or just append.
-          // Appending puts them at the end visually.
-          return [...top3, myStudent];
-        }
-      }
-      return top3;
-    }
+    //   // If student logged in, ensure they are also visible
+    //   if (user && user.role === "student") {
+    //     const myStudent = rankedStudents.find((s) => s.id === user.id);
+    //     if (myStudent && !top3.find((s) => s.id === myStudent.id)) {
+    //       // Add detailed student record if not in top 3
+    //       // We need to keep the array sorted or just append?
+    //       // The UI renders a grid, appending is fine.
+    //       // But maybe we should re-sort just in case, or just append.
+    //       // Appending puts them at the end visually.
+    //       return [...top3, myStudent];
+    //     }
+    //   }
+    //   return top3;
+    // }
 
     return visible;
   }, [rankedStudents, user]);
