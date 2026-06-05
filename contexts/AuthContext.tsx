@@ -1,109 +1,38 @@
 "use client";
 
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  useCallback,
-} from "react";
+import React, { useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { useAuthStore, User, UserRole } from "@/stores/authStore";
+import { api } from "@/lib/api";
 
-// Types
-export type UserRole = "super_admin" | "admin" | "sheikh" | "student";
+export type { User, UserRole };
 
-export interface User {
-  id: number;
-  name: string;
-  email: string;
-  role: UserRole;
-}
-
-interface AuthContextType {
-  user: User | null;
-  token: string | null;
-  isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  logout: () => void;
-  isAuthenticated: boolean;
-}
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api-v1";
-const CHOREO_API_KEY = process.env.NEXT_PUBLIC_CHOREO_API_KEY || "";
-
+// We keep AuthProvider for backward compatibility, although it doesn't need to wrap children with a Context anymore.
+// We can use it to initialize some global things if needed, or just return children.
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  // In Zustand persist, hydration happens automatically, so we don't need the old useEffect for localStorage.
+  return <>{children}</>;
+}
+
+export function useAuth() {
+  const { user, token, isLoading, logout: zustandLogout, setAuth } = useAuthStore();
   const router = useRouter();
 
-  // Load user from localStorage on mount
-  useEffect(() => {
-    try {
-      const storedToken = localStorage.getItem("etqaan_token");
-      const storedUser = localStorage.getItem("etqaan_user");
-
-      if (storedToken && storedUser) {
-        const parsedUser = JSON.parse(storedUser);
-        if (parsedUser && parsedUser.role) {
-          setToken(storedToken);
-          setUser(parsedUser);
-        } else {
-          // Invalid user data, clear storage
-          localStorage.removeItem("etqaan_token");
-          localStorage.removeItem("etqaan_user");
-        }
-      }
-    } catch (error) {
-      // Invalid JSON in localStorage, clear it
-      console.error("Error parsing stored user:", error);
-      localStorage.removeItem("etqaan_token");
-      localStorage.removeItem("etqaan_user");
-    }
-    setIsLoading(false);
-  }, []);
-
+  // Backward compatible login function (although we will migrate to React Query mutations later)
   const login = useCallback(
     async (email: string, password: string) => {
-      setIsLoading(true);
       try {
-        const response = await fetch(`${API_URL}/auth/login`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            ...(CHOREO_API_KEY && {
-              Authorization: `Bearer ${CHOREO_API_KEY}`,
-            }),
-          },
-          body: JSON.stringify({ email, password }),
-        });
-
-        if (!response.ok) {
-          const error = await response.json();
-          throw new Error(error.message || "فشل تسجيل الدخول");
-        }
-
-        const data = await response.json();
-        // Backend returns: { name, role, accessToken }
-        const { name, role, accessToken } = data;
-
-        // Construct user data from response
+        const response = await api.post('/auth/login', { email, password });
+        const { name, role, accessToken } = response.data;
+        
         const userData: User = {
-          id: 0, // ID not returned by login, but not critical for frontend
+          id: 0, 
           name,
           email,
           role,
         };
 
-        // Store in localStorage
-        localStorage.setItem("etqaan_token", accessToken);
-        localStorage.setItem("etqaan_user", JSON.stringify(userData));
-
-        setToken(accessToken);
-        setUser(userData);
+        setAuth(userData, accessToken);
 
         // Redirect based on role
         switch (role) {
@@ -122,43 +51,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       } catch (error) {
         throw error;
-      } finally {
-        setIsLoading(false);
       }
     },
-    [router],
+    [router, setAuth]
   );
 
   const logout = useCallback(() => {
-    localStorage.removeItem("etqaan_token");
-    localStorage.removeItem("etqaan_user");
-    setToken(null);
-    setUser(null);
+    zustandLogout();
     router.push("/");
-  }, [router]);
+  }, [router, zustandLogout]);
 
-  return (
-    <AuthContext.Provider
-      value={{
-        user,
-        token,
-        isLoading,
-        login,
-        logout,
-        isAuthenticated: !!token && !!user,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
-  );
-}
-
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
-  return context;
+  return {
+    user,
+    token,
+    isLoading,
+    login,
+    logout,
+    isAuthenticated: !!token && !!user,
+  };
 }
 
 // Helper hook for role checks
@@ -167,6 +77,7 @@ export function useRequireAuth(allowedRoles?: UserRole[]) {
   const router = useRouter();
 
   useEffect(() => {
+    // Wait for hydration before redirecting
     if (!isLoading) {
       if (!isAuthenticated) {
         router.push("/login");

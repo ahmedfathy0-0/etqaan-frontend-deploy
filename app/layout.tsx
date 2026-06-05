@@ -3,6 +3,7 @@ import { Inter, Noto_Sans_Arabic, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { Toaster } from "react-hot-toast";
+import ReactQueryProvider from "@/providers/ReactQueryProvider";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -35,14 +36,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ar" dir="rtl">
+    <html lang="ar" dir="rtl" suppressHydrationWarning>
       <body
+        suppressHydrationWarning
         className={`${inter.variable} ${notoSansArabic.variable} ${geistMono.variable} font-arabic antialiased`}
       >
-        <AuthProvider>
-          {children}
-          <Toaster position="top-center" />
-        </AuthProvider>
+        <ReactQueryProvider>
+          <AuthProvider>
+            {children}
+            <Toaster position="top-center" />
+          </AuthProvider>
+        </ReactQueryProvider>
       </body>
     </html>
   );

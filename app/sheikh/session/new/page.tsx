@@ -8,6 +8,8 @@ import toast from "react-hot-toast";
 import { SURAHS } from "@/constants/surahs";
 import SearchableSelect from "@/components/ui/SearchableSelect";
 import BackButton from "@/components/ui/BackButton";
+import { useBatches, useBatchDetails } from "@/queries/useBatches";
+import { useCreateSession } from "@/queries/useSessions";
 
 interface Batch {
   id: number;
@@ -48,100 +50,37 @@ export default function NewSessionPage() {
   const searchParams = useSearchParams();
   const { user, token } = useAuth();
 
-  const [batches, setBatches] = useState<Batch[]>([]);
-  const [selectedBatchId, setSelectedBatchId] = useState<number | null>(
-    searchParams.get("batchId") ? Number(searchParams.get("batchId")) : null,
-  );
-  const [students, setStudents] = useState<Student[]>([]);
-  const [sessionDate, setSessionDate] = useState(
-    new Date().toISOString().split("T")[0],
-  );
-  const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
-  const [savingStudent, setSavingStudent] = useState<Record<number, boolean>>(
-    {},
-  );
-  const [records, setRecords] = useState<Record<number, AttendanceRecord>>({});
-  const [error, setError] = useState("");
+  const { data: batches = [] } = useBatches();
+  const { data: batchDetails, isLoading: loadingStudents } = useBatchDetails(selectedBatchId || "");
+  const students = batchDetails?.students || [];
+  
+  const { mutateAsync: createSessionMutate } = useCreateSession();
 
-  const API_URL =
-    process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api-v1";
-
-  // Fetch batches on mount
+  // Initialize records when students load
   useEffect(() => {
-    if (!token) return;
-    const fetchBatches = async () => {
-      try {
-        const res = await fetch(`${API_URL}/batches`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (res.ok) {
-          const data = await res.json();
-          setBatches(data);
-        }
-      } catch (err) {
-        console.error("Error fetching batches:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchBatches();
-  }, [token, API_URL]);
-
-  // Fetch students when batch is selected
-  useEffect(() => {
-    if (!selectedBatchId || !token) return;
-
-    const fetchStudents = async () => {
-      setLoading(true);
-      try {
-        const res = await fetch(`${API_URL}/batches/${selectedBatchId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (res.ok) {
-          const data = await res.json();
-          // Map batch_students to simple student objects
-          const studentsList =
-            data.batch_students?.map((bs: any) => ({
-              id: bs.student.id,
-              full_name: bs.student.full_name,
-              batch_student_id: bs.id,
-            })) || [];
-
-          setStudents(studentsList);
-
-          // Initialize records
-          const initialRecords: Record<number, AttendanceRecord> = {};
-          studentsList.forEach((s: Student) => {
-            initialRecords[s.id] = {
-              studentId: s.id,
-              status: "present",
-              jadeedStartSurahId: "",
-              jadeedStartAyah: "",
-              jadeedEndSurahId: "",
-              jadeedEndAyah: "",
-              jadeedGrade: "",
-              murajaStartSurahId: "",
-              murajaStartAyah: "",
-              murajaEndSurahId: "",
-              murajaEndAyah: "",
-              murajaGrade: "",
-              behaviorNote: "",
-              bonus: "",
-            };
-          });
-          setRecords(initialRecords);
-        }
-      } catch (err) {
-        console.error("Error fetching students:", err);
-        setError("حدث خطأ أثناء تحميل الطلاب");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchStudents();
-  }, [selectedBatchId, token, API_URL]);
+    if (students.length > 0 && Object.keys(records).length === 0) {
+      const initialRecords: Record<number, AttendanceRecord> = {};
+      students.forEach((s: any) => {
+        initialRecords[s.id] = {
+          studentId: s.id,
+          status: "present",
+          jadeedStartSurahId: "",
+          jadeedStartAyah: "",
+          jadeedEndSurahId: "",
+          jadeedEndAyah: "",
+          jadeedGrade: "",
+          murajaStartSurahId: "",
+          murajaStartAyah: "",
+          murajaEndSurahId: "",
+          murajaEndAyah: "",
+          murajaGrade: "",
+          behaviorNote: "",
+          bonus: "",
+        };
+      });
+      setRecords(initialRecords);
+    }
+  }, [students]);
 
   const handleRecordChange = (
     studentId: number,
@@ -238,28 +177,16 @@ export default function NewSessionPage() {
     };
 
     try {
-      const res = await fetch(`${API_URL}/sessions`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
-      });
+      await createSessionMutate(payload);
 
-      if (res.ok) {
-        if (!studentId) {
-          toast.success("تم حفظ الحضور بنجاح");
-          router.push(`/batches/${selectedBatchId}`);
-        } else {
-          toast.success("تم الحفظ الطالب");
-        }
+      if (!studentId) {
+        toast.success("تم حفظ الحضور بنجاح");
+        router.push(`/batches/${selectedBatchId}`);
       } else {
-        const err = await res.json();
-        setError(err.message || "فشل حفظ الحضور");
+        toast.success("تم حفظ الطالب");
       }
-    } catch (err) {
-      setError("حدث خطأ أثناء حفظ البيانات");
+    } catch (err: any) {
+      setError(err.response?.data?.message || "فشل حفظ الحضور");
     } finally {
       if (studentId) {
         setSavingStudent((prev) => ({ ...prev, [studentId]: false }));
@@ -667,7 +594,7 @@ export default function NewSessionPage() {
             </div>
           )}
 
-          {selectedBatchId && !loading && students.length === 0 && (
+          {selectedBatchId && !loadingStudents && students.length === 0 && (
             <div className="text-center py-10 text-gray-500">
               لا يوجد طلاب في هذه الحلقة
             </div>

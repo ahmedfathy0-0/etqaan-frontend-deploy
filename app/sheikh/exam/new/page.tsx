@@ -6,17 +6,15 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-interface Batch {
-  id: number;
-  name: string;
-}
+import { useBatches } from "@/queries/useBatches";
+import { useCreateExam } from "@/queries/useExams";
+import toast from "react-hot-toast";
 
 export default function NewExamPage() {
   const { token } = useAuth();
   const router = useRouter();
-  const [batches, setBatches] = useState<Batch[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
+  const { data: batches = [], isLoading } = useBatches();
+  const { mutateAsync: createExamMutate } = useCreateExam();
 
   const [formData, setFormData] = useState({
     batch_id: "",
@@ -25,45 +23,25 @@ export default function NewExamPage() {
     exam_date: new Date().toISOString().split("T")[0],
   });
 
-  const API_URL =
-    process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api-v1";
-
-  useEffect(() => {
-    // Mock batches
-    setTimeout(() => {
-      setBatches([
-        { id: 1, name: "حلقة الأسود 🦁" },
-        { id: 2, name: "حلقة النجوم ⭐" },
-      ]);
-      setIsLoading(false);
-    }, 300);
-  }, []);
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
 
     try {
-      // API call would go here
-      // const response = await fetch(`${API_URL}/exams`, {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //     Authorization: `Bearer ${token}`,
-      //   },
-      //   body: JSON.stringify({
-      //     batch_id: parseInt(formData.batch_id),
-      //     title: formData.title,
-      //     max_score: parseInt(formData.max_score),
-      //     exam_date: formData.exam_date,
-      //   }),
-      // });
+      await createExamMutate({
+        batch_id: parseInt(formData.batch_id),
+        title: formData.title,
+        max_score: parseInt(formData.max_score),
+        exam_date: formData.exam_date,
+      } as any);
 
-      // Simulate success
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      toast.success("تم إنشاء الامتحان بنجاح");
       router.push("/sheikh?success=exam_created");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error creating exam:", error);
+      toast.error(error.response?.data?.message || "حدث خطأ أثناء إنشاء الامتحان");
     } finally {
       setIsSaving(false);
     }

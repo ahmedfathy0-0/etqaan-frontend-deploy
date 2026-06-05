@@ -1,22 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import BatchCard from "@/components/public/BatchCard";
 import RandomStars from "@/components/RandomStars";
 import Link from "next/link";
 import PageLoader from "@/components/ui/PageLoader";
 import { useAuth } from "@/contexts/AuthContext";
-
-interface Batch {
-  id: number;
-  name: string;
-  schedule_description?: string;
-  term_id: number;
-  _count?: {
-    batch_students: number;
-  };
-}
+import { useBatches } from "@/queries/useBatches";
 
 const batchColors = ["purple", "blue", "emerald", "orange", "pink", "cyan"];
 const batchMascots = [
@@ -30,64 +20,44 @@ const batchMascots = [
   "tiger",
 ];
 
+// Fallback mock data in case of error, just to preserve old behavior for dev
+const MOCK_BATCHES = [
+  {
+    id: 1,
+    name: "حلقة الأسود 🦁",
+    schedule_description: "السبت والاثنين والأربعاء",
+    term_id: 1,
+    _count: { batch_students: 15 },
+  },
+  {
+    id: 2,
+    name: "حلقة النجوم ⭐",
+    schedule_description: "الأحد والثلاثاء والخميس",
+    term_id: 1,
+    _count: { batch_students: 12 },
+  },
+  {
+    id: 3,
+    name: "حلقة الأبطال 🏆",
+    schedule_description: "السبت والاثنين والأربعاء",
+    term_id: 1,
+    _count: { batch_students: 18 },
+  },
+  {
+    id: 4,
+    name: "حلقة الورد 🌹",
+    schedule_description: "الأحد والثلاثاء والخميس",
+    term_id: 1,
+    _count: { batch_students: 10 },
+  },
+];
+
 export default function BatchesPage() {
   const { user } = useAuth();
-  const [batches, setBatches] = useState<Batch[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState("");
+  const { data: fetchedBatches, isLoading, error } = useBatches();
 
-  const API_URL =
-    process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api-v1";
+  const batches = error ? MOCK_BATCHES : (fetchedBatches || []);
 
-  useEffect(() => {
-    const fetchBatches = async () => {
-      try {
-        const response = await fetch(`${API_URL}/batches`);
-        if (!response.ok) {
-          throw new Error("فشل في تحميل الحلقات");
-        }
-        const data = await response.json();
-        setBatches(data);
-      } catch (err: any) {
-        setError(err.message);
-        // Mock data for development
-        setBatches([
-          {
-            id: 1,
-            name: "حلقة الأسود 🦁",
-            schedule_description: "السبت والاثنين والأربعاء",
-            term_id: 1,
-            _count: { batch_students: 15 },
-          },
-          {
-            id: 2,
-            name: "حلقة النجوم ⭐",
-            schedule_description: "الأحد والثلاثاء والخميس",
-            term_id: 1,
-            _count: { batch_students: 12 },
-          },
-          {
-            id: 3,
-            name: "حلقة الأبطال 🏆",
-            schedule_description: "السبت والاثنين والأربعاء",
-            term_id: 1,
-            _count: { batch_students: 18 },
-          },
-          {
-            id: 4,
-            name: "حلقة الورد 🌹",
-            schedule_description: "الأحد والثلاثاء والخميس",
-            term_id: 1,
-            _count: { batch_students: 10 },
-          },
-        ]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchBatches();
-  }, [API_URL]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-purple-50 to-blue-50 relative">

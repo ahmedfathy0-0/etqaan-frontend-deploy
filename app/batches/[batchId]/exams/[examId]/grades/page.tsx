@@ -7,6 +7,8 @@ import Header from "@/components/Header";
 import BackButton from "@/components/ui/BackButton";
 import { toast } from "react-hot-toast";
 import PageLoader from "@/components/ui/PageLoader";
+import { useBatchDetails } from "@/queries/useBatches";
+import { useExamDetails, useSaveExamGrades } from "@/queries/useExams";
 
 interface Student {
   id: number;
@@ -50,14 +52,17 @@ export default function ExamGradesPage() {
   // and useRequireAuth returns user/isLoading only.
   // Actually we can check user role here.
 
-  const [exam, setExam] = useState<Exam | null>(null);
-  const [batch, setBatch] = useState<Batch | null>(null);
-  const [scores, setScores] = useState<Record<number, string>>({}); // batch_student_id -> score
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
+  const { data: batchDetails, isLoading: isBatchLoading } = useBatchDetails(batchId);
+  const { data: examData, isLoading: isExamLoading } = useExamDetails(examId);
+  const { mutateAsync: saveGradesMutate } = useSaveExamGrades();
 
-  const API_URL =
-    process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api-v1";
+  const batch = batchDetails?.batch || null;
+  const exam = examData || null;
+
+  const [scores, setScores] = useState<Record<number, string>>({}); // batch_student_id -> score
+  const [isSaving, setIsSaving] = useState(false);
+  
+  const isLoading = isBatchLoading || isExamLoading;
 
   // Redirect if not authorized
   useEffect(() => {
@@ -71,45 +76,14 @@ export default function ExamGradesPage() {
   }, [user, authLoading, router]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (!token) return;
-
-      try {
-        // Fetch Exam
-        const examRes = await fetch(`${API_URL}/exams/${examId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!examRes.ok) throw new Error("فشل تحميل بيانات الامتحان");
-        const examData = await examRes.json();
-        setExam(examData);
-
-        // Fetch Batch (for students)
-        const batchRes = await fetch(`${API_URL}/batches/${batchId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!batchRes.ok) throw new Error("فشل تحميل بيانات الحلقة");
-        const batchData = await batchRes.json();
-        setBatch(batchData);
-
-        // Initialize scores if results exist
-        if (examData.exam_results && examData.exam_results.length > 0) {
-          const initialScores: Record<number, string> = {};
-          examData.exam_results.forEach((r: any) => {
-            initialScores[r.batch_student_id] = r.score.toString();
-          });
-          setScores(initialScores);
-        }
-      } catch (err: any) {
-        toast.error(err.message);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    if (token) {
-      fetchData();
+    if (examData && examData.exam_results && examData.exam_results.length > 0) {
+      const initialScores: Record<number, string> = {};
+      examData.exam_results.forEach((r: any) => {
+        initialScores[r.batch_student_id] = r.score.toString();
+      });
+      setScores(initialScores);
     }
-  }, [batchId, examId, API_URL, token]);
+  }, [examData]);
 
   const handleScoreChange = (batchStudentId: number, value: string) => {
     // Validate max score
@@ -145,24 +119,12 @@ export default function ExamGradesPage() {
 
     try {
       setIsSaving(true);
-      const res = await fetch(`${API_URL}/exams/${examId}/results`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ results: validResults }),
-      });
-
-      if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.message || "فشل حفظ الدرجات");
-      }
+      await saveGradesMutate({ examId, grades: validResults, batchId });
 
       toast.success("تم حفظ الدرجات وتحديث النقاط بنجاح! 🎉");
       router.push(`/batches/${batchId}`);
     } catch (err: any) {
-      toast.error(err.message);
+      toast.error(err.response?.data?.message || "فشل حفظ الدرجات");
     } finally {
       setIsSaving(false);
     }

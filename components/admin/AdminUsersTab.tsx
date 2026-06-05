@@ -1,0 +1,151 @@
+import { useState } from "react";
+
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+  created_at: string;
+}
+
+interface AdminUsersTabProps {
+  users: User[];
+  onDeleteConfirm: (userId: number) => void;
+  deleteConfirm: number | null;
+  setDeleteConfirm: (id: number | null) => void;
+  setShowUserModal: (show: boolean) => void;
+}
+
+export default function AdminUsersTab({
+  users,
+  onDeleteConfirm,
+  deleteConfirm,
+  setDeleteConfirm,
+  setShowUserModal,
+}: AdminUsersTabProps) {
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const filteredUsers = users.filter(
+    (u) =>
+      u.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      u.email.toLowerCase().includes(searchTerm.toLowerCase()),
+  );
+
+  return (
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="p-6 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div className="w-full sm:w-96 relative">
+          <input
+            type="text"
+            placeholder="بحث عن مستخدم..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-arabic text-gray-900"
+          />
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+            🔍
+          </span>
+        </div>
+        <button
+          onClick={() => setShowUserModal(true)}
+          className="w-full sm:w-auto px-6 py-3 bg-blue-600 text-white rounded-xl font-arabic font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+        >
+          <span>+</span>
+          إضافة مستخدم
+        </button>
+      </div>
+
+      <div className="overflow-x-auto">
+        <table className="w-full text-right">
+          <thead className="bg-gray-50 text-gray-600 font-arabic text-sm">
+            <tr>
+              <th className="p-4 font-semibold">الاسم</th>
+              <th className="p-4 font-semibold">البريد الإلكتروني</th>
+              <th className="p-4 font-semibold">الدور</th>
+              <th className="p-4 font-semibold">تاريخ الانضمام</th>
+              <th className="p-4 font-semibold">إجراءات</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-50">
+            {filteredUsers.map((user) => (
+              <tr key={user.id} className="hover:bg-gray-50/50 transition-colors">
+                <td className="p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold">
+                      {user.name.charAt(0)}
+                    </div>
+                    <span className="font-semibold text-gray-800">
+                      {user.name}
+                    </span>
+                  </div>
+                </td>
+                <td className="p-4 text-gray-600" dir="ltr">
+                  {user.email}
+                </td>
+                <td className="p-4">
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs font-bold font-arabic
+                    ${
+                      user.role === "admin" || user.role === "super_admin"
+                        ? "bg-red-100 text-red-700"
+                        : user.role === "sheikh"
+                        ? "bg-emerald-100 text-emerald-700"
+                        : "bg-blue-100 text-blue-700"
+                    }`}
+                  >
+                    {user.role === "admin"
+                      ? "مشرف"
+                      : user.role === "super_admin"
+                      ? "مدير عام"
+                      : user.role === "sheikh"
+                      ? "شيخ"
+                      : "طالب"}
+                  </span>
+                </td>
+                <td className="p-4 text-gray-500 text-sm">
+                  {new Date(user.created_at).toLocaleDateString("ar-EG")}
+                </td>
+                <td className="p-4">
+                  <div className="flex items-center gap-2">
+                    {deleteConfirm === user.id ? (
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => onDeleteConfirm(user.id)}
+                          className="px-3 py-1 bg-red-600 text-white rounded text-xs font-bold hover:bg-red-700"
+                        >
+                          تأكيد
+                        </button>
+                        <button
+                          onClick={() => setDeleteConfirm(null)}
+                          className="px-3 py-1 bg-gray-200 text-gray-700 rounded text-xs font-bold hover:bg-gray-300"
+                        >
+                          إلغاء
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setDeleteConfirm(user.id)}
+                        className="text-red-500 hover:text-red-700 p-2 hover:bg-red-50 rounded-lg transition-colors"
+                        title="حذف"
+                        disabled={user.role === "super_admin"}
+                      >
+                        🗑️
+                      </button>
+                    )}
+                  </div>
+                </td>
+              </tr>
+            ))}
+            {filteredUsers.length === 0 && (
+              <tr>
+                <td colSpan={5} className="p-8 text-center text-gray-500 font-arabic">
+                  لا يوجد مستخدمين بهذا البحث
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}

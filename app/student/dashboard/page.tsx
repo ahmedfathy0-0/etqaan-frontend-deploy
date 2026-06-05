@@ -6,6 +6,10 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import LeaderboardPreview from "@/components/public/LeaderboardPreview";
 import Link from "next/link";
 import PageLoader from "@/components/ui/PageLoader";
+import StudentStatsCards from "@/components/student/StudentStatsCards";
+import RecentSessionsList from "@/components/student/RecentSessionsList";
+import MyBatchesList from "@/components/student/MyBatchesList";
+import QuickTips from "@/components/student/QuickTips";
 
 interface Batch {
   id: number;
@@ -78,19 +82,6 @@ export default function StudentDashboardPage() {
     }, 500);
   }, []);
 
-  const getAttendanceStyle = (attendance: string) => {
-    switch (attendance) {
-      case "حاضر":
-        return "bg-green-100 text-green-700";
-      case "غائب":
-        return "bg-red-100 text-red-700";
-      case "متأخر":
-        return "bg-yellow-100 text-yellow-700";
-      default:
-        return "bg-gray-100 text-gray-700";
-    }
-  };
-
   return (
     <ProtectedRoute allowedRoles={["student"]}>
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
@@ -124,145 +115,20 @@ export default function StudentDashboardPage() {
           ) : (
             <>
               {/* Stats Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div className="bg-white rounded-2xl p-6 shadow-lg border-2 border-yellow-100">
-                  <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 bg-yellow-100 rounded-xl flex items-center justify-center">
-                      <span className="text-3xl">⭐</span>
-                    </div>
-                    <div>
-                      <p className="text-gray-500 font-arabic text-sm">نقاطي</p>
-                      <p className="text-3xl font-bold text-gray-800">
-                        {totalPoints}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-white rounded-2xl p-6 shadow-lg border-2 border-purple-100">
-                  <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 bg-purple-100 rounded-xl flex items-center justify-center">
-                      <span className="text-3xl">🏆</span>
-                    </div>
-                    <div>
-                      <p className="text-gray-500 font-arabic text-sm">
-                        ترتيبي
-                      </p>
-                      <p className="text-3xl font-bold text-gray-800">
-                        #{myRank}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-white rounded-2xl p-6 shadow-lg border-2 border-green-100">
-                  <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 bg-green-100 rounded-xl flex items-center justify-center">
-                      <span className="text-3xl">📚</span>
-                    </div>
-                    <div>
-                      <p className="text-gray-500 font-arabic text-sm">
-                        حلقاتي
-                      </p>
-                      <p className="text-3xl font-bold text-gray-800">
-                        {batches.length}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <StudentStatsCards
+                totalPoints={totalPoints}
+                myRank={myRank}
+                batchesCount={batches.length}
+              />
 
               {/* Main Content */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Recent Sessions */}
                 <div className="lg:col-span-2">
-                  <div className="bg-white rounded-2xl p-6 shadow-lg">
-                    <h2 className="text-xl font-bold text-gray-800 font-arabic mb-4 flex items-center gap-2">
-                      <span>📅</span>
-                      آخر الجلسات
-                    </h2>
-
-                    <div className="space-y-3">
-                      {recentSessions.map((session) => (
-                        <div
-                          key={session.id}
-                          className="border border-gray-100 rounded-xl p-4 hover:shadow-md transition-shadow"
-                        >
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="font-arabic text-gray-800 font-semibold">
-                              {new Date(session.date).toLocaleDateString(
-                                "ar-EG",
-                                {
-                                  weekday: "long",
-                                  day: "numeric",
-                                  month: "long",
-                                },
-                              )}
-                            </span>
-                            <span
-                              className={`px-3 py-1 rounded-full text-sm font-arabic ${getAttendanceStyle(
-                                session.attendance,
-                              )}`}
-                            >
-                              {session.attendance}
-                            </span>
-                          </div>
-                          <div className="flex gap-4 text-sm text-gray-600 font-arabic">
-                            {session.jadeed_grade && (
-                              <span>
-                                الحفظ:{" "}
-                                <span className="font-semibold">
-                                  {session.jadeed_grade}
-                                </span>
-                              </span>
-                            )}
-                            {session.muraja_grade && (
-                              <span>
-                                المراجعة:{" "}
-                                <span className="font-semibold">
-                                  {session.muraja_grade}
-                                </span>
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                  <RecentSessionsList sessions={recentSessions} />
 
                   {/* My Batches */}
-                  <div className="bg-white rounded-2xl p-6 shadow-lg mt-6">
-                    <h2 className="text-xl font-bold text-gray-800 font-arabic mb-4 flex items-center gap-2">
-                      <span>📚</span>
-                      حلقاتي
-                    </h2>
-
-                    <div className="space-y-3">
-                      {batches.map((batch) => (
-                        <div
-                          key={batch.id}
-                          className="border-2 border-blue-100 rounded-xl p-4 bg-blue-50/50"
-                        >
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <h3 className="font-bold text-gray-800 font-arabic text-lg">
-                                {batch.name}
-                              </h3>
-                              <p className="text-gray-500 font-arabic text-sm">
-                                {batch.schedule_description}
-                              </p>
-                            </div>
-                            <div className="text-center">
-                              <span className="text-2xl">🥉</span>
-                              <p className="text-sm font-arabic text-gray-600">
-                                المركز {batch.rank}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                  <MyBatchesList batches={batches} />
                 </div>
 
                 {/* Sidebar - Leaderboard */}
@@ -270,30 +136,7 @@ export default function StudentDashboardPage() {
                   <LeaderboardPreview students={leaderboard} />
 
                   {/* Quick Tips */}
-                  <div className="bg-white rounded-2xl p-6 shadow-lg mt-6">
-                    <h3 className="text-lg font-bold text-gray-800 font-arabic mb-4 flex items-center gap-2">
-                      <span>💡</span>
-                      نصائح للتميز
-                    </h3>
-                    <ul className="space-y-3 text-gray-600 font-arabic text-sm">
-                      <li className="flex items-start gap-2">
-                        <span>✅</span>
-                        احرص على الحضور في موعدك
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <span>📖</span>
-                        راجع حفظك يومياً
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <span>🎯</span>
-                        ضع هدفاً للحفظ كل أسبوع
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <span>🤲</span>
-                        ادع الله بالتوفيق
-                      </li>
-                    </ul>
-                  </div>
+                  <QuickTips />
                 </div>
               </div>
             </>

@@ -9,6 +9,8 @@ import Modal from "@/components/ui/Modal";
 import Link from "next/link";
 import { toast } from "react-hot-toast";
 import PageLoader from "@/components/ui/PageLoader";
+import { useBatchDetails } from "@/queries/useBatches";
+import { useCreateExam } from "@/queries/useExams";
 
 interface Exam {
   id: number;
@@ -29,8 +31,10 @@ export default function ExamDashboardPage() {
   const batchId = params.batchId as string;
   const { user, token, isLoading: authLoading } = useAuth();
 
-  const [batch, setBatch] = useState<Batch | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { data: batchDetails, isLoading: isBatchLoading } = useBatchDetails(batchId);
+  const batch = batchDetails?.batch || null;
+  const exams = batch?.exams || [];
+  const isLoading = isBatchLoading;
 
   // Create Exam State
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -39,10 +43,8 @@ export default function ExamDashboardPage() {
     examDate: "",
     maxScore: 100,
   });
-  const [formLoading, setFormLoading] = useState(false);
-
-  const API_URL =
-    process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api-v1";
+  
+  const { mutateAsync: createExamMutate } = useCreateExam();
 
   // Auth check
   useEffect(() => {
@@ -54,63 +56,25 @@ export default function ExamDashboardPage() {
     }
   }, [user, authLoading, router]);
 
-  // Fetch Data
-  const fetchBatch = async () => {
-    if (!token) return;
-    try {
-      const res = await fetch(`${API_URL}/batches/${batchId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-        cache: "no-store",
-      });
-      if (!res.ok) throw new Error("فشل تحميل البيانات");
-      const data = await res.json();
-      console.log("Batch Data:", data); // DEBUG
-      setBatch(data);
-    } catch (err: any) {
-      toast.error(err.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (token) fetchBatch();
-  }, [batchId, token]);
+  // Empty chunk to remove old fetchBatch effect
 
   // Handle Create Exam
   const handleCreateExam = async () => {
     if (!examForm.title || !examForm.examDate) return;
 
     try {
-      setFormLoading(true);
-      const res = await fetch(`${API_URL}/exams`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          batchId: parseInt(batchId),
-          title: examForm.title,
-          examDate: examForm.examDate,
-          maxScore: examForm.maxScore,
-        }),
-      });
+      await createExamMutate({
+        batch_id: parseInt(batchId),
+        title: examForm.title,
+        exam_date: examForm.examDate,
+        max_score: examForm.maxScore,
+      } as any);
 
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.message || "فشل إنشاء الامتحان");
-      }
-
-      const newExam = await res.json();
       toast.success("تم إنشاء الامتحان بنجاح");
       setShowCreateModal(false);
       setExamForm({ title: "", examDate: "", maxScore: 100 });
-      fetchBatch(); // Refresh list
     } catch (err: any) {
-      toast.error(err.message);
-    } finally {
-      setFormLoading(false);
+      toast.error(err.response?.data?.message || "فشل إنشاء الامتحان");
     }
   };
 
@@ -150,7 +114,7 @@ export default function ExamDashboardPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {batch?.exams?.map((exam) => (
+          {exams.map((exam) => (
             <div
               key={exam.id}
               className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all flex flex-col justify-between group"
@@ -183,7 +147,7 @@ export default function ExamDashboardPage() {
             </div>
           ))}
 
-          {(!batch?.exams || batch.exams.length === 0) && (
+          {exams.length === 0 && (
             <div className="col-span-full py-20 bg-white rounded-2xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center text-center">
               <span className="text-6xl mb-4 opacity-50">📭</span>
               <h3 className="text-xl font-bold text-gray-400 mb-2">
@@ -254,10 +218,10 @@ export default function ExamDashboardPage() {
           <div className="flex gap-3 pt-4">
             <button
               onClick={handleCreateExam}
-              disabled={!examForm.title || !examForm.examDate || formLoading}
+              disabled={!examForm.title || !examForm.examDate}
               className="flex-1 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl font-arabic font-semibold hover:from-orange-600 hover:to-red-600 disabled:opacity-50 transition-all shadow-lg hover:shadow-xl hover:-translate-y-1"
             >
-              {formLoading ? "جاري الإنشاء..." : "إنشاء الامتحان"}
+              إنشاء الامتحان
             </button>
             <button
               onClick={() => setShowCreateModal(false)}

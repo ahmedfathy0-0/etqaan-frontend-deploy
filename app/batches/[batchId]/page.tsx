@@ -14,6 +14,13 @@ import Modal from "@/components/ui/Modal";
 import BackButton from "@/components/ui/BackButton";
 import { toast } from "react-hot-toast";
 import PageLoader from "@/components/ui/PageLoader";
+import { useBatchDetails, useEnrollStudents } from "@/queries/useBatches";
+import { useStudents, useCreateStudent } from "@/queries/useStudents";
+import BatchHeader from "@/components/batches/BatchHeader";
+import BatchStats from "@/components/batches/BatchStats";
+import BatchAdminActions from "@/components/batches/BatchAdminActions";
+import AddStudentModal from "@/components/batches/AddStudentModal";
+
 
 interface Student {
   id: number;
@@ -56,10 +63,7 @@ export default function BatchDetailsPage() {
   const batchId = params.batchId as string;
   const { user, token } = useAuth();
 
-  const [batch, setBatch] = useState<Batch | null>(null);
-  const [students, setStudents] = useState<Student[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [showHistoryModal, setShowHistoryModal] = useState(false);
 
@@ -98,93 +102,33 @@ export default function BatchDetailsPage() {
     user?.role === "super_admin" ||
     user?.role === "sheikh";
 
-  const fetchBatchDetails = async () => {
-    try {
-      const response = await fetch(`${API_URL}/batches/${batchId}`);
-      if (!response.ok) throw new Error("فشل في تحميل بيانات الحلقة");
-      const data = await response.json();
-      setBatch(data);
-
-      // Extract students from batch_students
-      const studentsList =
-        data.batch_students?.map((bs: any, index: number) => ({
-          id: bs.student.id,
-          batch_student_id: bs.id,
-          name: bs.student.full_name,
-          points: bs.league_points || 0,
-          avatarIndex: index % 12,
-        })) || [];
-
-      // Sort by points for ranking
-      studentsList.sort((a: Student, b: Student) => b.points - a.points);
-      setStudents(studentsList);
-    } catch (err) {
-      // Mock data for development
-      setBatch({
-        id: parseInt(batchId),
-        name: "حلقة الأسود 🦁",
-        schedule_description: "السبت والاثنين والأربعاء - 5:00 م",
-        term: { name: "الفصل الأول 2026" },
-        batch_sheikhs: [
-          { sheikh: { name: "أحمد محمد" }, is_head_sheikh: true },
-        ],
-      });
-      setStudents([
-        {
-          id: 1,
-          batch_student_id: 1,
-          name: "عبدالرحمن أحمد",
-          points: 150,
-          avatarIndex: 0,
-        },
-        {
-          id: 2,
-          batch_student_id: 2,
-          name: "محمد علي",
-          points: 135,
-          avatarIndex: 1,
-        },
-        {
-          id: 3,
-          batch_student_id: 3,
-          name: "يوسف خالد",
-          points: 120,
-          avatarIndex: 2,
-        },
-      ]);
-    } finally {
-      setIsLoading(false);
-    }
+  const MOCK_BATCH = {
+    id: parseInt(batchId),
+    name: "حلقة الأسود 🦁",
+    schedule_description: "السبت والاثنين والأربعاء - 5:00 م",
+    term: { name: "الفصل الأول 2026" },
+    batch_sheikhs: [
+      { sheikh: { name: "أحمد محمد" }, is_head_sheikh: true },
+    ],
   };
 
-  useEffect(() => {
-    if (batchId) {
-      fetchBatchDetails();
-    }
-  }, [batchId, API_URL]);
 
-  // Fetch available students when add student modal opens
+  const { data, isLoading } = useBatchDetails(batchId);
+
+  const batch = data?.batch || MOCK_BATCH;
+  const students = data?.students || [];
+
+
+  const { data: allStudents } = useStudents();
+  
+  // Update available students when allStudents changes
   useEffect(() => {
-    const fetchAvailableStudents = async () => {
-      if (!showAddStudentModal || !token) return;
-      try {
-        const response = await fetch(`${API_URL}/students`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (response.ok) {
-          const data = await response.json();
-          // Filter out already enrolled students
-          const enrolled = new Set(students.map((s) => s.id));
-          setAvailableStudents(
-            data.filter((s: AvailableStudent) => !enrolled.has(s.id)),
-          );
-        }
-      } catch (err) {
-        console.error("Error fetching students:", err);
-      }
-    };
-    fetchAvailableStudents();
-  }, [showAddStudentModal, token, students, API_URL]);
+    if (!showAddStudentModal || !allStudents) return;
+    const enrolled = new Set(students.map((s) => s.id));
+    setAvailableStudents(
+      allStudents.filter((s: AvailableStudent) => !enrolled.has(s.id)),
+    );
+  }, [showAddStudentModal, students, allStudents]);
 
   // Add rank to students
   const rankedStudents = useMemo(() => {
@@ -197,26 +141,6 @@ export default function BatchDetailsPage() {
   // Filter visible students based on role
   const visibleStudents = useMemo(() => {
     let visible = rankedStudents;
-
-    // if (!user || user.role === "student") {
-    //   // For students and guests, show only top 3
-    //   const top3 = rankedStudents.slice(0, 3);
-
-    //   // If student logged in, ensure they are also visible
-    //   if (user && user.role === "student") {
-    //     const myStudent = rankedStudents.find((s) => s.id === user.id);
-    //     if (myStudent && !top3.find((s) => s.id === myStudent.id)) {
-    //       // Add detailed student record if not in top 3
-    //       // We need to keep the array sorted or just append?
-    //       // The UI renders a grid, appending is fine.
-    //       // But maybe we should re-sort just in case, or just append.
-    //       // Appending puts them at the end visually.
-    //       return [...top3, myStudent];
-    //     }
-    //   }
-    //   return top3;
-    // }
-
     return visible;
   }, [rankedStudents, user]);
 
@@ -252,6 +176,8 @@ export default function BatchDetailsPage() {
     setShowHistoryModal(true);
   };
 
+  const { mutateAsync: createStudentMutate } = useCreateStudent();
+
   // Create new student
   const handleCreateStudent = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -259,36 +185,25 @@ export default function BatchDetailsPage() {
     setCreateStudentLoading(true);
     setFormError("");
     try {
-      const res = await fetch(`${API_URL}/students`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(newStudentData),
+      const createdStudent = await createStudentMutate(newStudentData as any);
+      setAvailableStudents((prev) => [...prev, createdStudent]);
+      setSelectedStudentIds((prev) => [...prev, createdStudent.id]);
+      setShowCreateStudentForm(false);
+      setNewStudentData({
+        full_name: "",
+        guardian_name: "",
+        guardian_phone: "",
+        gender: "male",
       });
-      if (res.ok) {
-        const createdStudent = await res.json();
-        setAvailableStudents((prev) => [...prev, createdStudent]);
-        setSelectedStudentIds((prev) => [...prev, createdStudent.id]);
-        setShowCreateStudentForm(false);
-        setNewStudentData({
-          full_name: "",
-          guardian_name: "",
-          guardian_phone: "",
-          gender: "male",
-        });
-        toast.success("تم إنشاء الطالب وتحديده بنجاح");
-      } else {
-        const error = await res.json();
-        setFormError(error.message || "فشل إنشاء الطالب");
-      }
-    } catch (err) {
-      setFormError("حدث خطأ أثناء إنشاء الطالب");
+      toast.success("تم إنشاء الطالب وتحديده بنجاح");
+    } catch (err: any) {
+      setFormError(err.response?.data?.message || "حدث خطأ أثناء إنشاء الطالب");
     } finally {
       setCreateStudentLoading(false);
     }
   };
+
+  const { mutateAsync: enrollStudentsMutate } = useEnrollStudents();
 
   // Enroll student in batch
   const handleEnrollStudent = async () => {
@@ -296,24 +211,11 @@ export default function BatchDetailsPage() {
     setFormLoading(true);
     setFormError("");
     try {
-      const res = await fetch(`${API_URL}/batches/${batchId}/bulk-enroll`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ studentIds: selectedStudentIds }),
-      });
-      if (res.ok) {
-        setShowAddStudentModal(false);
-        setSelectedStudentIds([]);
-        fetchBatchDetails();
-      } else {
-        const error = await res.json();
-        setFormError(error.message || "فشل إضافة الطلاب");
-      }
-    } catch (err) {
-      setFormError("حدث خطأ أثناء إضافة الطلاب");
+      await enrollStudentsMutate({ batchId, studentIds: selectedStudentIds });
+      setShowAddStudentModal(false);
+      setSelectedStudentIds([]);
+    } catch (err: any) {
+      setFormError(err.response?.data?.message || "حدث خطأ أثناء إضافة الطلاب");
     } finally {
       setFormLoading(false);
     }
@@ -326,155 +228,25 @@ export default function BatchDetailsPage() {
       <RandomStars count={30} />
 
       {/* Add Student Modal */}
-      <Modal
+      <AddStudentModal
         isOpen={showAddStudentModal}
         onClose={() => {
           setShowAddStudentModal(false);
           setShowCreateStudentForm(false);
         }}
-        title="👨‍🎓 إضافة طالب للحلقة"
-        headerColorClass="bg-gradient-to-r from-blue-600 to-purple-600"
-      >
-        <div className="space-y-4">
-          {formError && (
-            <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-xl font-arabic text-sm">
-              {formError}
-            </div>
-          )}
-          
-          {!showCreateStudentForm ? (
-            <>
-              <div>
-                <label className="block font-arabic text-gray-700 mb-2">
-                  اختر الطلاب ({selectedStudentIds.length})
-                </label>
-                <div className="border border-gray-300 rounded-xl max-h-60 overflow-y-auto">
-                  {availableStudents.length === 0 ? (
-                    <p className="p-4 text-center text-gray-500 font-arabic">
-                      لا يوجد طلاب متاحين للإضافة
-                    </p>
-                  ) : (
-                    availableStudents.map((s) => (
-                      <label
-                        key={s.id}
-                        className="flex items-center gap-3 p-3 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-b-0"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={selectedStudentIds.includes(s.id)}
-                          onChange={(e) => {
-                            if (e.target.checked) {
-                              setSelectedStudentIds([...selectedStudentIds, s.id]);
-                            } else {
-                              setSelectedStudentIds(
-                                selectedStudentIds.filter((id) => id !== s.id),
-                              );
-                            }
-                          }}
-                          className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                        />
-                        <span className="font-arabic text-gray-700">
-                          {s.full_name}{" "}
-                          {s.guardian_name ? `(${s.guardian_name})` : ""}
-                        </span>
-                      </label>
-                    ))
-                  )}
-                </div>
-              </div>
-              <div className="pt-2 pb-2 text-center">
-                <button
-                  type="button"
-                  onClick={() => setShowCreateStudentForm(true)}
-                  className="text-blue-600 hover:text-blue-700 font-arabic text-sm hover:underline flex items-center justify-center gap-1 mx-auto"
-                >
-                  <span>+</span>
-                  إنشاء طالب جديد غير موجود بالقائمة
-                </button>
-              </div>
-              <div className="flex gap-3 pt-2">
-                <button
-                  onClick={handleEnrollStudent}
-                  disabled={selectedStudentIds.length === 0 || formLoading}
-                  className="flex-1 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-arabic font-semibold hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 transition-all"
-                >
-                  {formLoading
-                    ? "جاري الإضافة..."
-                    : `إضافة ${selectedStudentIds.length} طالب`}
-                </button>
-                <button
-                  onClick={() => setShowAddStudentModal(false)}
-                  className="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl font-arabic hover:bg-gray-200 transition-colors"
-                >
-                  إلغاء
-                </button>
-              </div>
-            </>
-          ) : (
-            <form onSubmit={handleCreateStudent} className="space-y-3 font-arabic">
-              <div>
-                <label className="block text-gray-700 mb-1">اسم الطالب رباعي *</label>
-                <input
-                  type="text"
-                  required
-                  value={newStudentData.full_name}
-                  onChange={(e) => setNewStudentData({ ...newStudentData, full_name: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-gray-900 placeholder-gray-400 bg-white"
-                  placeholder="مثال: أحمد محمد محمود"
-                />
-              </div>
-              <div>
-                <label className="block text-gray-700 mb-1">اسم ولي الأمر</label>
-                <input
-                  type="text"
-                  value={newStudentData.guardian_name}
-                  onChange={(e) => setNewStudentData({ ...newStudentData, guardian_name: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-gray-900 placeholder-gray-400 bg-white"
-                  placeholder="اختياري"
-                />
-              </div>
-              <div>
-                <label className="block text-gray-700 mb-1">رقم هاتف ولي الأمر</label>
-                <input
-                  type="tel"
-                  value={newStudentData.guardian_phone}
-                  onChange={(e) => setNewStudentData({ ...newStudentData, guardian_phone: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-gray-900 placeholder-gray-400 bg-white text-left"
-                  placeholder="010XXXXXXXX"
-                  dir="ltr"
-                />
-              </div>
-              <div>
-                <label className="block text-gray-700 mb-1">النوع *</label>
-                <select
-                  value={newStudentData.gender}
-                  onChange={(e) => setNewStudentData({ ...newStudentData, gender: e.target.value as "male" | "female" })}
-                  className="w-full px-3 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-gray-900 bg-white"
-                >
-                  <option value="male">ذكر</option>
-                  <option value="female">أنثى</option>
-                </select>
-              </div>
-              <div className="flex gap-3 pt-4">
-                <button
-                  type="submit"
-                  disabled={createStudentLoading || !newStudentData.full_name}
-                  className="flex-1 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-arabic font-semibold hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 transition-all"
-                >
-                  {createStudentLoading ? "جاري الإنشاء..." : "إنشاء وتحديد الطالب"}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowCreateStudentForm(false)}
-                  className="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl font-arabic hover:bg-gray-200 transition-colors"
-                >
-                  رجوع
-                </button>
-              </div>
-            </form>
-          )}
-        </div>
-      </Modal>
+        availableStudents={availableStudents}
+        selectedStudentIds={selectedStudentIds}
+        setSelectedStudentIds={setSelectedStudentIds}
+        formError={formError}
+        formLoading={formLoading}
+        onEnroll={handleEnrollStudent}
+        showCreateStudentForm={showCreateStudentForm}
+        setShowCreateStudentForm={setShowCreateStudentForm}
+        newStudentData={newStudentData}
+        setNewStudentData={setNewStudentData}
+        onCreateStudent={handleCreateStudent}
+        createStudentLoading={createStudentLoading}
+      />
 
       {/* Add Session Modal */}
       <Modal
@@ -518,67 +290,20 @@ export default function BatchDetailsPage() {
           ) : (
             <>
               {/* Batch Header */}
-              <div className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-3xl p-6 mb-8 relative overflow-hidden text-white">
-                <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full"></div>
-                <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-white/10 rounded-full"></div>
-
-                <div className="relative z-10">
-                  <h1 className="text-3xl md:text-4xl font-bold font-arabic mb-4">
-                    {batch?.name}
-                  </h1>
-
-                  <div className="flex flex-wrap gap-4">
-                    {batch?.schedule_description && (
-                      <span className="bg-white/20 px-4 py-2 rounded-full font-arabic flex items-center gap-2">
-                        <span>📅</span>
-                        {batch.schedule_description}
-                      </span>
-                    )}
-                    {headSheikh && (
-                      <span className="bg-white/20 px-4 py-2 rounded-full font-arabic flex items-center gap-2">
-                        <span>👨‍🏫</span>
-                        الشيخ {headSheikh.sheikh.name}
-                      </span>
-                    )}
-                    <span className="bg-white/20 px-4 py-2 rounded-full font-arabic flex items-center gap-2">
-                      <span>👨‍🎓</span>
-                      {students.length} طالب
-                    </span>
-                  </div>
-                </div>
-              </div>
+              <BatchHeader
+                name={batch?.name || ""}
+                scheduleDescription={batch?.schedule_description}
+                headSheikhName={headSheikh?.sheikh.name}
+                studentsCount={students.length}
+              />
 
               {/* Admin/Sheikh Action Buttons */}
               {canManage && (
-                <div className="bg-white rounded-2xl p-4 mb-8 shadow-lg">
-                  <h3 className="text-lg font-bold text-gray-800 font-arabic mb-4 flex items-center gap-2">
-                    <span>⚙️</span>
-                    إدارة الحلقة
-                  </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <button
-                      onClick={() => setShowAddStudentModal(true)}
-                      className="flex items-center justify-center gap-2 p-4 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-xl font-arabic transition-colors"
-                    >
-                      <span className="text-2xl">👨‍🎓</span>
-                      إضافة طالب
-                    </button>
-                    <Link
-                      href={`/batches/${batchId}/exams`}
-                      className="flex items-center justify-center gap-2 p-4 bg-orange-50 hover:bg-orange-100 text-orange-700 rounded-xl font-arabic transition-colors"
-                    >
-                      <span className="text-2xl">📝</span>
-                      إدارة الامتحانات
-                    </Link>
-                    <button
-                      onClick={() => setShowAddSessionModal(true)}
-                      className="flex items-center justify-center gap-2 p-4 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-xl font-arabic transition-colors"
-                    >
-                      <span className="text-2xl">📋</span>
-                      تسجيل الحضور
-                    </button>
-                  </div>
-                </div>
+                <BatchAdminActions
+                  batchId={batchId}
+                  onAddStudentClick={() => setShowAddStudentModal(true)}
+                  onAddSessionClick={() => setShowAddSessionModal(true)}
+                />
               )}
 
               {/* Main Content Grid */}
@@ -629,42 +354,14 @@ export default function BatchDetailsPage() {
                   <LeaderboardPreview students={students.slice(0, 3)} />
 
                   {/* Quick Stats */}
-                  <div className="bg-white rounded-2xl p-6 mt-6 shadow-lg">
-                    <h3 className="text-xl font-bold text-gray-800 font-arabic mb-4 flex items-center gap-2">
-                      <span>📊</span>
-                      إحصائيات الحلقة
-                    </h3>
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
-                        <span className="text-gray-600 font-arabic">
-                          إجمالي الطلاب
-                        </span>
-                        <span className="font-bold text-gray-800">
-                          {students.length}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between p-3 bg-yellow-50 rounded-xl">
-                        <span className="text-gray-600 font-arabic">
-                          أعلى نقاط
-                        </span>
-                        <span className="font-bold text-yellow-600 flex items-center gap-1">
-                          <span>⭐</span>
-                          {students[0]?.points || 0}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between p-3 bg-purple-50 rounded-xl">
-                        <span className="text-gray-600 font-arabic">
-                          متوسط النقاط
-                        </span>
-                        <span className="font-bold text-purple-600">
-                          {Math.round(
-                            students.reduce((acc, s) => acc + s.points, 0) /
-                              (students.length || 1),
-                          )}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
+                  <BatchStats
+                    studentsCount={students.length}
+                    highestScore={students[0]?.points || 0}
+                    averageScore={Math.round(
+                      students.reduce((acc, s) => acc + s.points, 0) /
+                        (students.length || 1),
+                    )}
+                  />
                 </div>
               </div>
             </>
