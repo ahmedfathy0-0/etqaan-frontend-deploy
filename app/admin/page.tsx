@@ -368,7 +368,7 @@ export default function AdminDashboard() {
               </label>
               <MultiSearchableSelect
                 options={users
-                  .filter((u) => u.role === "sheikh")
+                  .filter((u) => ["sheikh", "admin", "super_admin"].includes(u.role))
                   .map((u) => ({ id: u.id, label: u.name }))}
                 value={newBatch.sheikh_ids}
                 onChange={(val) =>
