@@ -21,6 +21,7 @@ interface AdminBatchesTabProps {
   deleteConfirm: number | null;
   setDeleteConfirm: (id: number | null) => void;
   setShowBatchModal: (show: boolean) => void;
+  onEditBatch: (batch: Batch) => void;
 }
 
 export default function AdminBatchesTab({
@@ -29,6 +30,7 @@ export default function AdminBatchesTab({
   deleteConfirm,
   setDeleteConfirm,
   setShowBatchModal,
+  onEditBatch,
 }: AdminBatchesTabProps) {
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -66,7 +68,7 @@ export default function AdminBatchesTab({
             key={batch.id}
             className="border border-gray-100 rounded-xl p-6 hover:shadow-lg transition-shadow relative group"
           >
-            <div className="absolute top-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="absolute top-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
               {deleteConfirm === batch.id ? (
                 <div className="flex gap-2">
                   <button
@@ -83,12 +85,22 @@ export default function AdminBatchesTab({
                   </button>
                 </div>
               ) : (
-                <button
-                  onClick={() => setDeleteConfirm(batch.id)}
-                  className="text-red-500 hover:text-red-700 p-2 bg-red-50 rounded-lg"
-                >
-                  🗑️
-                </button>
+                <>
+                  <button
+                    onClick={() => onEditBatch(batch)}
+                    className="text-blue-500 hover:text-blue-700 p-2 bg-blue-50 rounded-lg"
+                    title="تعديل الحلقة"
+                  >
+                    ✏️
+                  </button>
+                  <button
+                    onClick={() => setDeleteConfirm(batch.id)}
+                    className="text-red-500 hover:text-red-700 p-2 bg-red-50 rounded-lg"
+                    title="حذف الحلقة"
+                  >
+                    🗑️
+                  </button>
+                </>
               )}
             </div>
 

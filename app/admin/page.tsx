@@ -8,7 +8,7 @@ import MultiSearchableSelect from "@/components/ui/MultiSearchableSelect";
 import Modal from "@/components/ui/Modal";
 import { useAdminStats } from "@/queries/useAdmin";
 import { useUsers, useCreateUser, useDeleteUser } from "@/queries/useUsers";
-import { useBatches, useCreateBatch, useDeleteBatch } from "@/queries/useBatches";
+import { useBatches, useCreateBatch, useDeleteBatch, useUpdateBatch } from "@/queries/useBatches";
 import AdminStatsCards from "@/components/admin/AdminStatsCards";
 import AdminUsersTab from "@/components/admin/AdminUsersTab";
 import AdminBatchesTab from "@/components/admin/AdminBatchesTab";
@@ -56,6 +56,7 @@ export default function AdminDashboard() {
 
   const [showUserModal, setShowUserModal] = useState(false);
   const [showBatchModal, setShowBatchModal] = useState(false);
+  const [editBatchId, setEditBatchId] = useState<number | null>(null);
 
   const [newUser, setNewUser] = useState({
     name: "",
@@ -74,8 +75,20 @@ export default function AdminDashboard() {
 
   const { mutateAsync: createUserMutate } = useCreateUser();
   const { mutateAsync: createBatchMutate } = useCreateBatch();
+  const { mutateAsync: updateBatchMutate } = useUpdateBatch();
   const { mutateAsync: deleteUserMutate } = useDeleteUser();
   const { mutateAsync: deleteBatchMutate } = useDeleteBatch();
+
+  const handleEditBatch = (batch: any) => {
+    setEditBatchId(batch.id);
+    setNewBatch({
+      name: batch.name,
+      schedule_description: batch.schedule_description || "",
+      term_id: batch.term_id || 1,
+      sheikh_ids: batch.batch_sheikhs?.map((bs: any) => bs.sheikh?.id).filter(Boolean) || [],
+    });
+    setShowBatchModal(true);
+  };
 
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -104,8 +117,13 @@ export default function AdminDashboard() {
     setFormError("");
 
     try {
-      await createBatchMutate(newBatch);
+      if (editBatchId) {
+        await updateBatchMutate({ batchId: editBatchId, data: newBatch });
+      } else {
+        await createBatchMutate(newBatch);
+      }
       setShowBatchModal(false);
+      setEditBatchId(null);
       setNewBatch({
         name: "",
         schedule_description: "",
@@ -113,11 +131,22 @@ export default function AdminDashboard() {
         sheikh_ids: [],
       });
     } catch (err: any) {
-      console.error("Error creating batch:", err);
-      setFormError(err.response?.data?.message || "حدث خطأ أثناء إنشاء الحلقة");
+      console.error("Error saving batch:", err);
+      setFormError(err.response?.data?.message || "حدث خطأ أثناء حفظ الحلقة");
     } finally {
       setFormLoading(false);
     }
+  };
+
+  const closeBatchModal = () => {
+    setShowBatchModal(false);
+    setEditBatchId(null);
+    setNewBatch({
+      name: "",
+      schedule_description: "",
+      term_id: 1,
+      sheikh_ids: [],
+    });
   };
 
   const handleDeleteUser = async (userId: number) => {
@@ -288,8 +317,8 @@ export default function AdminDashboard() {
 
         <Modal
           isOpen={showBatchModal}
-          onClose={() => setShowBatchModal(false)}
-          title="📚 إنشاء حلقة جديدة"
+          onClose={closeBatchModal}
+          title={editBatchId ? "✏️ تحديث الحلقة" : "📚 إنشاء حلقة جديدة"}
           headerColorClass="bg-gradient-to-r from-emerald-600 to-blue-600"
         >
           <form onSubmit={handleCreateBatch} className="space-y-4">
@@ -361,11 +390,11 @@ export default function AdminDashboard() {
                 disabled={formLoading}
                 className="flex-1 py-3 bg-gradient-to-r from-emerald-600 to-blue-600 text-white rounded-xl font-arabic font-semibold hover:from-emerald-700 hover:to-blue-700 disabled:opacity-50 transition-all"
               >
-                {formLoading ? "جاري الإنشاء..." : "إنشاء الحلقة"}
+                {formLoading ? (editBatchId ? "جاري التحديث..." : "جاري الإنشاء...") : (editBatchId ? "تحديث الحلقة" : "إنشاء الحلقة")}
               </button>
               <button
                 type="button"
-                onClick={() => setShowBatchModal(false)}
+                onClick={closeBatchModal}
                 className="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl font-arabic hover:bg-gray-200 transition-colors"
               >
                 إلغاء
@@ -449,6 +478,7 @@ export default function AdminDashboard() {
                   deleteConfirm={deleteConfirm}
                   setDeleteConfirm={setDeleteConfirm}
                   setShowBatchModal={setShowBatchModal}
+                  onEditBatch={handleEditBatch}
                 />
               )}
             </>

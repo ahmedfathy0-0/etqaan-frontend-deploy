@@ -30,6 +30,11 @@ export const createBatch = async (data: any) => {
   return response.data;
 };
 
+export const updateBatch = async (batchId: number | string, data: any) => {
+  const response = await api.put(`/batches/${batchId}`, data);
+  return response.data;
+};
+
 export const deleteBatch = async (batchId: number) => {
   const response = await api.delete(`/batches/${batchId}`);
   return response.data;
