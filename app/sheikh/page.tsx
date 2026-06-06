@@ -1,10 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+
 import { useAuth } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Link from "next/link";
 import PageLoader from "@/components/ui/PageLoader";
+
+import { useBatches } from "@/queries/useBatches";
 
 interface Batch {
   id: number;
@@ -15,47 +17,18 @@ interface Batch {
   };
 }
 
-interface Stats {
-  totalStudents: number;
-  todaySessions: number;
-  upcomingExams: number;
-}
-
 export default function SheikhDashboard() {
   const { user, logout } = useAuth();
-  const [batches, setBatches] = useState<Batch[]>([]);
-  const [stats, setStats] = useState<Stats>({
-    totalStudents: 0,
+  
+  const { data: fetchedBatches = [], isLoading } = useBatches();
+  
+  const batches: Batch[] = fetchedBatches || [];
+  
+  const stats = {
+    totalStudents: batches.reduce((acc: number, batch: Batch) => acc + (batch._count?.batch_students || 0), 0),
     todaySessions: 0,
     upcomingExams: 0,
-  });
-  const [isLoading, setIsLoading] = useState(true);
-
-  const API_URL =
-    process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api-v1";
-
-  useEffect(() => {
-    // Mock data for now
-    setTimeout(() => {
-      setBatches([
-        {
-          id: 1,
-          name: "حلقة الأسود 🦁",
-          schedule_description: "السبت والاثنين والأربعاء",
-          _count: { batch_students: 15 },
-        },
-        {
-          id: 2,
-          name: "حلقة النجوم ⭐",
-          schedule_description: "الأحد والثلاثاء والخميس",
-          _count: { batch_students: 12 },
-        },
-      ]);
-      setStats({ totalStudents: 27, todaySessions: 5, upcomingExams: 2 });
-      setIsLoading(false);
-    }, 500);
-  }, [API_URL]);
-
+  };
   return (
     <ProtectedRoute allowedRoles={["sheikh"]}>
       <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50">

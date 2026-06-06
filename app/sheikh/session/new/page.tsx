@@ -49,6 +49,14 @@ export default function NewSessionPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, token } = useAuth();
+  const [selectedBatchId, setSelectedBatchId] = useState<number | "">(
+    searchParams.get("batchId") ? Number(searchParams.get("batchId")) : ""
+  );
+  const [records, setRecords] = useState<Record<number, AttendanceRecord>>({});
+  const [savingStudent, setSavingStudent] = useState<Record<number, boolean>>({});
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
+  const [sessionDate, setSessionDate] = useState(new Date().toISOString().split("T")[0]);
 
   const { data: batches = [] } = useBatches();
   const { data: batchDetails, isLoading: loadingStudents } = useBatchDetails(selectedBatchId || "");
@@ -271,7 +279,7 @@ export default function NewSessionPage() {
 
               {/* Students List */}
               <div className="space-y-4">
-                {students.map((student) => {
+                {students.map((student: any) => {
                   const record = records[student.id];
                   if (!record) return null;
 

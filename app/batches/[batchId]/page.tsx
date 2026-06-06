@@ -116,7 +116,7 @@ export default function BatchDetailsPage() {
   const { data, isLoading } = useBatchDetails(batchId);
 
   const batch = data?.batch || MOCK_BATCH;
-  const students = data?.students || [];
+  const students: Student[] = data?.students || [];
 
 
   const { data: allStudents } = useStudents();
@@ -221,7 +221,7 @@ export default function BatchDetailsPage() {
     }
   };
 
-  const headSheikh = batch?.batch_sheikhs?.find((bs) => bs.is_head_sheikh);
+  const headSheikh = batch?.batch_sheikhs?.find((bs: any) => bs.is_head_sheikh);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-purple-50 to-blue-50 relative">

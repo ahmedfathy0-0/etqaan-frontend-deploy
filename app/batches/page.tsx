@@ -93,7 +93,7 @@ export default function BatchesPage() {
           {error && !isLoading && batches.length === 0 && (
             <div className="text-center py-20">
               <span className="text-6xl mb-4 block">😔</span>
-              <p className="text-gray-600 font-arabic text-lg">{error}</p>
+              <p className="text-gray-600 font-arabic text-lg">{error?.message || String(error)}</p>
               <button
                 onClick={() => window.location.reload()}
                 className="mt-4 px-6 py-3 bg-purple-600 text-white rounded-xl font-arabic hover:bg-purple-700 transition-colors"

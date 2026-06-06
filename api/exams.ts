@@ -10,7 +10,7 @@ export interface Exam {
 }
 
 export interface ExamWithDetails extends Exam {
-  exam_grades: any[];
+  exam_results?: any[];
 }
 
 export const getBatchExams = async (batchId: number | string) => {

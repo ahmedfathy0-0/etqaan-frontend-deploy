@@ -10,6 +10,8 @@ import PageLoader from "@/components/ui/PageLoader";
 import { useBatchDetails } from "@/queries/useBatches";
 import { useExamDetails, useSaveExamGrades } from "@/queries/useExams";
 
+import ProtectedRoute from "@/components/ProtectedRoute";
+
 interface Student {
   id: number;
   full_name: string;
@@ -56,24 +58,15 @@ export default function ExamGradesPage() {
   const { data: examData, isLoading: isExamLoading } = useExamDetails(examId);
   const { mutateAsync: saveGradesMutate } = useSaveExamGrades();
 
-  const batch = batchDetails?.batch || null;
-  const exam = examData || null;
+  const batch: Batch | null = batchDetails?.batch || null;
+  const exam: Exam | null = examData || null;
 
   const [scores, setScores] = useState<Record<number, string>>({}); // batch_student_id -> score
   const [isSaving, setIsSaving] = useState(false);
   
   const isLoading = isBatchLoading || isExamLoading;
 
-  // Redirect if not authorized
-  useEffect(() => {
-    if (!authLoading) {
-      if (!user) {
-        router.push("/login");
-      } else if (!["admin", "super_admin", "sheikh"].includes(user.role)) {
-        router.push("/unauthorized");
-      }
-    }
-  }, [user, authLoading, router]);
+
 
   useEffect(() => {
     if (examData && examData.exam_results && examData.exam_results.length > 0) {
@@ -137,93 +130,95 @@ export default function ExamGradesPage() {
   if (!exam || !batch) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50 font-arabic">
-      <Header />
+    <ProtectedRoute allowedRoles={["admin", "super_admin", "sheikh"]}>
+      <div className="min-h-screen bg-gray-50 font-arabic">
+        <Header />
 
-      <main className="max-w-5xl mx-auto px-4 py-8">
-        <div className="mb-6">
-          <BackButton href={`/batches/${batchId}`} label="العودة للحلقة" />
-        </div>
-
-        <div className="bg-white rounded-2xl shadow-lg p-6 mb-8 border-t-4 border-orange-500">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-                <span>📝</span>
-                رصد درجات: {exam.title}
-              </h1>
-              <p className="text-gray-500 mt-1">
-                تاريخ الامتحان:{" "}
-                {new Date(exam.exam_date).toLocaleDateString("ar-EG")} | الدرجة
-                العظمى: {exam.max_score}
-              </p>
-            </div>
-            <button
-              onClick={handleSave}
-              disabled={isSaving}
-              className="px-6 py-3 bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-xl font-bold hover:shadow-lg transition-all disabled:opacity-50 flex items-center gap-2"
-            >
-              {isSaving ? (
-                <>
-                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                  جاري الحفظ...
-                </>
-              ) : (
-                <>
-                  <span>💾</span>
-                  حفظ الدرجات
-                </>
-              )}
-            </button>
+        <main className="max-w-5xl mx-auto px-4 py-8">
+          <div className="mb-6">
+            <BackButton href={`/batches/${batchId}`} label="العودة للحلقة" />
           </div>
 
-          <div className="overflow-hidden rounded-xl border border-gray-200">
-            <table className="w-full text-right">
-              <thead className="bg-gray-50 text-gray-700">
-                <tr>
-                  <th className="p-4 font-bold border-b">#</th>
-                  <th className="p-4 font-bold border-b">اسم الطالب</th>
-                  <th className="p-4 font-bold border-b w-48">
-                    الدرجة (من {exam.max_score})
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {batch.batch_students.map((bs, index) => (
-                  <tr
-                    key={bs.id}
-                    className="hover:bg-gray-50 transition-colors"
-                  >
-                    <td className="p-4 text-gray-500">{index + 1}</td>
-                    <td className="p-4 font-medium text-gray-800">
-                      {bs.student.full_name}
-                    </td>
-                    <td className="p-4">
-                      <input
-                        type="number"
-                        min="0"
-                        max={exam.max_score}
-                        value={scores[bs.id] || ""}
-                        onChange={(e) =>
-                          handleScoreChange(bs.id, e.target.value)
-                        }
-                        placeholder="0"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all font-bold text-center text-gray-900"
-                      />
-                    </td>
+          <div className="bg-white rounded-2xl shadow-lg p-6 mb-8 border-t-4 border-orange-500">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+              <div>
+                <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                  <span>📝</span>
+                  رصد درجات: {exam.title}
+                </h1>
+                <p className="text-gray-500 mt-1">
+                  تاريخ الامتحان:{" "}
+                  {new Date(exam.exam_date).toLocaleDateString("ar-EG")} | الدرجة
+                  العظمى: {exam.max_score}
+                </p>
+              </div>
+              <button
+                onClick={handleSave}
+                disabled={isSaving}
+                className="px-6 py-3 bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-xl font-bold hover:shadow-lg transition-all disabled:opacity-50 flex items-center gap-2"
+              >
+                {isSaving ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                    جاري الحفظ...
+                  </>
+                ) : (
+                  <>
+                    <span>💾</span>
+                    حفظ الدرجات
+                  </>
+                )}
+              </button>
+            </div>
+
+            <div className="overflow-hidden rounded-xl border border-gray-200">
+              <table className="w-full text-right">
+                <thead className="bg-gray-50 text-gray-700">
+                  <tr>
+                    <th className="p-4 font-bold border-b">#</th>
+                    <th className="p-4 font-bold border-b">اسم الطالب</th>
+                    <th className="p-4 font-bold border-b w-48">
+                      الدرجة (من {exam.max_score})
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {batch.batch_students.length === 0 && (
-            <div className="p-8 text-center text-gray-500">
-              لا يوجد طلاب في هذه الحلقة
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {batch.batch_students.map((bs, index) => (
+                    <tr
+                      key={bs.id}
+                      className="hover:bg-gray-50 transition-colors"
+                    >
+                      <td className="p-4 text-gray-500">{index + 1}</td>
+                      <td className="p-4 font-medium text-gray-800">
+                        {bs.student.full_name}
+                      </td>
+                      <td className="p-4">
+                        <input
+                          type="number"
+                          min="0"
+                          max={exam.max_score}
+                          value={scores[bs.id] || ""}
+                          onChange={(e) =>
+                            handleScoreChange(bs.id, e.target.value)
+                          }
+                          placeholder="0"
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all font-bold text-center text-gray-900"
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-          )}
-        </div>
-      </main>
-    </div>
+
+            {batch.batch_students.length === 0 && (
+              <div className="p-8 text-center text-gray-500">
+                لا يوجد طلاب في هذه الحلقة
+              </div>
+            )}
+          </div>
+        </main>
+      </div>
+    </ProtectedRoute>
   );
 }

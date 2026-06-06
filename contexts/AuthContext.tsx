@@ -23,10 +23,10 @@ export function useAuth() {
     async (email: string, password: string) => {
       try {
         const response = await api.post('/auth/login', { email, password });
-        const { name, role, accessToken } = response.data;
+        const { id, name, role, accessToken } = response.data;
         
         const userData: User = {
-          id: 0, 
+          id: id || 0, 
           name,
           email,
           role,

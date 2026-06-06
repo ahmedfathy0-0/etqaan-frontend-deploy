@@ -11,6 +11,7 @@ import { toast } from "react-hot-toast";
 import PageLoader from "@/components/ui/PageLoader";
 import { useBatchDetails } from "@/queries/useBatches";
 import { useCreateExam } from "@/queries/useExams";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 interface Exam {
   id: number;
@@ -32,7 +33,7 @@ export default function ExamDashboardPage() {
   const { user, token, isLoading: authLoading } = useAuth();
 
   const { data: batchDetails, isLoading: isBatchLoading } = useBatchDetails(batchId);
-  const batch = batchDetails?.batch || null;
+  const batch: Batch | null = batchDetails?.batch || null;
   const exams = batch?.exams || [];
   const isLoading = isBatchLoading;
 
@@ -45,18 +46,6 @@ export default function ExamDashboardPage() {
   });
   
   const { mutateAsync: createExamMutate } = useCreateExam();
-
-  // Auth check
-  useEffect(() => {
-    if (!authLoading) {
-      if (!user) router.push("/login");
-      else if (!["admin", "super_admin", "sheikh"].includes(user.role)) {
-        router.push("/unauthorized");
-      }
-    }
-  }, [user, authLoading, router]);
-
-  // Empty chunk to remove old fetchBatch effect
 
   // Handle Create Exam
   const handleCreateExam = async () => {
@@ -87,7 +76,8 @@ export default function ExamDashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 font-arabic">
+    <ProtectedRoute allowedRoles={["admin", "super_admin", "sheikh"]}>
+      <div className="min-h-screen bg-gray-50 font-arabic">
       <Header />
       <main className="max-w-6xl mx-auto px-6 py-8">
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-8">
@@ -232,6 +222,7 @@ export default function ExamDashboardPage() {
           </div>
         </div>
       </Modal>
-    </div>
+      </div>
+    </ProtectedRoute>
   );
 }

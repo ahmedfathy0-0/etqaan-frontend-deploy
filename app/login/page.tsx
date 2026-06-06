@@ -1,36 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import GuestRoute from "@/components/GuestRoute";
 
 export default function LoginPage() {
-  const { login, isLoading, isAuthenticated, user } = useAuth();
-  const router = useRouter();
+  const { login, isLoading } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-
-  useEffect(() => {
-    if (isAuthenticated && user && !isLoading) {
-      switch (user.role) {
-        case "super_admin":
-        case "admin":
-          router.push("/admin");
-          break;
-        case "sheikh":
-          router.push("/sheikh");
-          break;
-        case "student":
-          router.push("/student/dashboard");
-          break;
-        default:
-          router.push("/");
-      }
-    }
-  }, [isAuthenticated, user, isLoading, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,7 +24,8 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-purple-600 via-blue-600 to-emerald-500 flex items-center justify-center p-4 relative">
+    <GuestRoute>
+      <div className="min-h-screen w-full bg-gradient-to-br from-purple-600 via-blue-600 to-emerald-500 flex items-center justify-center p-4 relative">
       {/* Decorative elements - Fixed Background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-white/10 rounded-full blur-3xl"></div>
@@ -192,7 +173,8 @@ export default function LoginPage() {
             العودة للرئيسية
           </Link>
         </div>
+        </div>
       </div>
-    </div>
+    </GuestRoute>
   );
 }
