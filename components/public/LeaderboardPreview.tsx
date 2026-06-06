@@ -1,6 +1,6 @@
 "use client";
 
-import { getStudentAvatar } from "@/lib/avatarGenerator";
+import Avatar from "@/components/ui/Avatar";
 
 interface LeaderboardPreviewProps {
   students: {
@@ -89,8 +89,6 @@ export default function LeaderboardPreview({
           const student = topThree[config.position - 1];
           if (!student) return null;
 
-          const avatar = getStudentAvatar(student.id, student.avatarIndex);
-
           return (
             <div
               key={config.position}
@@ -98,12 +96,10 @@ export default function LeaderboardPreview({
               style={{ order: config.order }}
             >
               {/* Avatar */}
-              <div
-                style={{ background: avatar.bgStyle }}
-                className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg mb-2 transform hover:scale-110 transition-transform"
-              >
-                <span className="text-3xl">{avatar.emoji}</span>
-              </div>
+              <Avatar 
+                name={student.name} 
+                className="w-16 h-16 rounded-2xl text-2xl mb-2 transform hover:scale-110 transition-transform" 
+              />
 
               {/* Medal */}
               <span className="text-4xl mb-2">{config.medal}</span>

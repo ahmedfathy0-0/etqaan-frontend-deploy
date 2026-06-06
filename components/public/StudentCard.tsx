@@ -1,6 +1,6 @@
 "use client";
 
-import { getStudentAvatar } from "@/lib/avatarGenerator";
+import Avatar from "@/components/ui/Avatar";
 
 interface StudentCardProps {
   id: number;
@@ -46,7 +46,6 @@ export default function StudentCard({
   rank,
   onClick,
 }: StudentCardProps) {
-  const avatar = getStudentAvatar(id, avatarIndex);
   const rankDeco = getRankDecoration(rank);
 
   return (
@@ -65,12 +64,10 @@ export default function StudentCard({
 
       <div className="flex items-center gap-4">
         {/* Avatar */}
-        <div
-          style={{ background: avatar.bgStyle }}
-          className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-md group-hover:scale-110 group-hover:rotate-6 transition-all duration-300"
-        >
-          <span className="text-3xl">{avatar.emoji}</span>
-        </div>
+        <Avatar 
+          name={name} 
+          className="w-16 h-16 rounded-2xl text-2xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-300" 
+        />
 
         {/* Info */}
         <div className="flex-1 min-w-0">

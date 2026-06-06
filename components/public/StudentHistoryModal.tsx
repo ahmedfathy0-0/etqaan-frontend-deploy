@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import Modal from "@/components/ui/Modal";
-import { getStudentAvatar } from "@/lib/avatarGenerator";
+import Avatar from "@/components/ui/Avatar";
 
 interface DailyRecord {
   id: number;
@@ -114,20 +114,16 @@ export default function StudentHistoryModal({
 
   if (!isOpen || !student) return null;
 
-  const avatar = getStudentAvatar(student.id, student.avatarIndex);
-
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
       title={
         <div className="flex items-center gap-4">
-          <div
-            style={{ background: avatar.bgStyle }}
-            className="w-12 h-12 rounded-xl flex items-center justify-center shadow-lg"
-          >
-            <span className="text-2xl">{avatar.emoji}</span>
-          </div>
+          <Avatar 
+            name={student.name} 
+            className="w-12 h-12 rounded-xl text-xl" 
+          />
           <div>
             <div className="text-lg md:text-xl font-bold text-white font-arabic">
               {student.name}

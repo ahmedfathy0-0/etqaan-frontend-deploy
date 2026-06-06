@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { AvailableStudent } from "@/api/students";
+import Avatar from "@/components/ui/Avatar";
 
 interface AdminStudentsTabProps {
   students: AvailableStudent[];
@@ -67,9 +68,7 @@ export default function AdminStudentsTab({
               <tr key={student.id} className="hover:bg-gray-50/50 transition-colors">
                 <td className="p-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold">
-                      {student.full_name.charAt(0)}
-                    </div>
+                    <Avatar name={student.full_name} className="w-10 h-10 text-base rounded-full" />
                     <span className="font-semibold text-gray-800">
                       {student.full_name}
                     </span>
