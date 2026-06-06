@@ -13,6 +13,9 @@ interface Batch {
       name: string;
     };
   }>;
+  _count?: {
+    batch_students: number;
+  };
 }
 
 interface AdminBatchesTabProps {
