@@ -37,49 +37,7 @@ export default function StudentDashboardPage() {
   const [myRank, setMyRank] = useState(0);
 
   useEffect(() => {
-    // Mock data for development
-    setTimeout(() => {
-      setBatches([
-        {
-          id: 1,
-          name: "حلقة الأسود 🦁",
-          schedule_description: "السبت والاثنين والأربعاء",
-          rank: 3,
-          points: 120,
-        },
-      ]);
-      setRecentSessions([
-        {
-          id: 1,
-          date: "2026-02-05",
-          attendance: "حاضر",
-          jadeed_grade: "ممتاز",
-          muraja_grade: "جيد جداً",
-        },
-        {
-          id: 2,
-          date: "2026-02-03",
-          attendance: "حاضر",
-          jadeed_grade: "جيد جداً",
-          muraja_grade: "ممتاز",
-        },
-        {
-          id: 3,
-          date: "2026-02-01",
-          attendance: "متأخر",
-          jadeed_grade: "جيد",
-          muraja_grade: "-",
-        },
-      ]);
-      setLeaderboard([
-        { id: 1, name: "عبدالرحمن أحمد", points: 150, avatarIndex: 0 },
-        { id: 2, name: "محمد علي", points: 135, avatarIndex: 1 },
-        { id: 3, name: "يوسف خالد", points: 120, avatarIndex: 2 },
-      ]);
-      setTotalPoints(120);
-      setMyRank(3);
-      setIsLoading(false);
-    }, 500);
+    setIsLoading(false);
   }, []);
 
   return (

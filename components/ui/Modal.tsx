@@ -8,6 +8,7 @@ interface ModalProps {
   children: React.ReactNode;
   headerColorClass?: string; // e.g. "bg-gradient-to-r from-blue-600 to-purple-600"
   maxWidth?: string; // e.g. "max-w-md", "max-w-2xl"
+  overflowVisible?: boolean; // Allow dropdowns to escape modal bounds
 }
 
 export default function Modal({
@@ -17,6 +18,7 @@ export default function Modal({
   children,
   headerColorClass = "bg-gradient-to-r from-blue-600 to-purple-600",
   maxWidth = "max-w-md",
+  overflowVisible = false,
 }: ModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
 
@@ -57,12 +59,12 @@ export default function Modal({
     >
       <div
         ref={modalRef}
-        className={`bg-white rounded-2xl w-full ${maxWidth} shadow-2xl overflow-hidden transform transition-all animate-scaleIn`}
+        className={`bg-white rounded-2xl w-full ${maxWidth} shadow-2xl ${overflowVisible ? 'overflow-visible' : 'overflow-hidden'} transform transition-all animate-scaleIn`}
         role="dialog"
         aria-modal="true"
       >
         {/* Header */}
-        <div className={`${headerColorClass} p-6 text-white`}>
+        <div className={`${headerColorClass} p-6 text-white ${overflowVisible ? 'rounded-t-2xl' : ''}`}>
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold font-arabic flex items-center gap-2">
               {title}
@@ -91,7 +93,7 @@ export default function Modal({
         </div>
 
         {/* Body */}
-        <div className="p-6 max-h-[80vh] overflow-y-auto custom-scrollbar">
+        <div className={`p-6 ${overflowVisible ? 'overflow-visible' : 'max-h-[80vh] overflow-y-auto custom-scrollbar'}`}>
           {children}
         </div>
       </div>

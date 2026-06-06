@@ -10,7 +10,7 @@ export default function AboutSection() {
     <section className="py-16 px-6">
       <div className="max-w-6xl mx-auto">
         <h2 className="text-4xl font-bold text-center text-gray-800 mb-12">
-          لماذا تختار أكاديمية إتقان؟
+          لماذا تختار دار الرحمن ؟
         </h2>
 
         {/* Statistics */}

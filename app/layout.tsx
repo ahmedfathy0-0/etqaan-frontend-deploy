@@ -23,11 +23,11 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    template: "أكاديمية إتقان | %s",
-    default: "أكاديمية إتقان - تحفيظ القرآن الكريم",
+    template: "دار الرحمن | %s",
+    default: "دار الرحمن - تحفيظ القرآن الكريم",
   },
   description:
-    "أكاديمية إتقان لتحفيظ القرآن الكريم - تعليم قرآني متميز مع متابعة شخصية",
+    "دار الرحمن لتحفيظ القرآن الكريم - تعليم قرآني متميز مع متابعة شخصية",
 };
 
 export default function RootLayout({

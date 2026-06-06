@@ -23,3 +23,8 @@ export const deleteUser = async (userId: number) => {
   const response = await api.delete(`/user/${userId}`);
   return response.data;
 };
+
+export const updateUser = async (userId: number, data: Partial<User>) => {
+  const response = await api.put<User>(`/user/${userId}`, data);
+  return response.data;
+};

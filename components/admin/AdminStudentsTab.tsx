@@ -1,37 +1,30 @@
 import { useState } from "react";
+import { AvailableStudent } from "@/api/students";
 
-interface User {
-  id: number;
-  name: string;
-  email: string;
-  role: string;
-  created_at: string;
-}
-
-interface AdminUsersTabProps {
-  users: User[];
-  onDeleteConfirm: (userId: number) => void;
+interface AdminStudentsTabProps {
+  students: AvailableStudent[];
+  onDeleteConfirm: (studentId: number) => void;
   deleteConfirm: number | null;
   setDeleteConfirm: (id: number | null) => void;
-  setShowUserModal: (show: boolean) => void;
-  onEditUser: (user: User) => void;
+  setShowStudentModal: (show: boolean) => void;
+  onEditStudent: (student: AvailableStudent) => void;
 }
 
-export default function AdminUsersTab({
-  users,
+export default function AdminStudentsTab({
+  students,
   onDeleteConfirm,
   deleteConfirm,
   setDeleteConfirm,
-  setShowUserModal,
-  onEditUser,
-}: AdminUsersTabProps) {
+  setShowStudentModal,
+  onEditStudent,
+}: AdminStudentsTabProps) {
   const [searchTerm, setSearchTerm] = useState("");
 
-  const filteredUsers = users.filter(
-    (u) =>
-      u.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      u.email.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
+  const filteredStudents = students?.filter(
+    (s) =>
+      s.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (s.guardian_name && s.guardian_name.toLowerCase().includes(searchTerm.toLowerCase())),
+  ) || [];
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
@@ -39,7 +32,7 @@ export default function AdminUsersTab({
         <div className="w-full sm:w-96 relative">
           <input
             type="text"
-            placeholder="بحث عن مستخدم..."
+            placeholder="بحث عن طالب..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-arabic text-gray-900"
@@ -49,11 +42,11 @@ export default function AdminUsersTab({
           </span>
         </div>
         <button
-          onClick={() => setShowUserModal(true)}
+          onClick={() => setShowStudentModal(true)}
           className="w-full sm:w-auto px-6 py-3 bg-blue-600 text-white rounded-xl font-arabic font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
         >
           <span>+</span>
-          إضافة مستخدم
+          إضافة طالب
         </button>
       </div>
 
@@ -61,58 +54,54 @@ export default function AdminUsersTab({
         <table className="w-full text-right">
           <thead className="bg-gray-50 text-gray-600 font-arabic text-sm">
             <tr>
-              <th className="p-4 font-semibold">الاسم</th>
-              <th className="p-4 font-semibold">البريد الإلكتروني</th>
-              <th className="p-4 font-semibold">الدور</th>
-              <th className="p-4 font-semibold">تاريخ الانضمام</th>
+              <th className="p-4 font-semibold">اسم الطالب</th>
+              <th className="p-4 font-semibold">اسم ولي الأمر</th>
+              <th className="p-4 font-semibold">رقم التواصل</th>
+              <th className="p-4 font-semibold">الجنس</th>
+              <th className="p-4 font-semibold">تاريخ الإضافة</th>
               <th className="p-4 font-semibold">إجراءات</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
-            {filteredUsers.map((user) => (
-              <tr key={user.id} className="hover:bg-gray-50/50 transition-colors">
+            {filteredStudents.map((student: any) => (
+              <tr key={student.id} className="hover:bg-gray-50/50 transition-colors">
                 <td className="p-4">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold">
-                      {user.name.charAt(0)}
+                      {student.full_name.charAt(0)}
                     </div>
                     <span className="font-semibold text-gray-800">
-                      {user.name}
+                      {student.full_name}
                     </span>
                   </div>
                 </td>
+                <td className="p-4 text-gray-600">
+                  {student.guardian_name || "-"}
+                </td>
                 <td className="p-4 text-gray-600" dir="ltr">
-                  {user.email}
+                  {student.guardian_phone || "-"}
                 </td>
                 <td className="p-4">
                   <span
                     className={`px-3 py-1 rounded-full text-xs font-bold font-arabic
                     ${
-                      user.role === "admin" || user.role === "super_admin"
-                        ? "bg-red-100 text-red-700"
-                        : user.role === "sheikh"
-                        ? "bg-emerald-100 text-emerald-700"
+                      student.gender === "female"
+                        ? "bg-pink-100 text-pink-700"
                         : "bg-blue-100 text-blue-700"
                     }`}
                   >
-                    {user.role === "admin"
-                      ? "مشرف"
-                      : user.role === "super_admin"
-                      ? "مدير عام"
-                      : user.role === "sheikh"
-                      ? "شيخ"
-                      : "طالب"}
+                    {student.gender === "female" ? "أنثى" : "ذكر"}
                   </span>
                 </td>
                 <td className="p-4 text-gray-500 text-sm">
-                  {new Date(user.created_at).toLocaleDateString("ar-EG")}
+                  {new Date(student.created_at || Date.now()).toLocaleDateString("ar-EG")}
                 </td>
                 <td className="p-4">
                   <div className="flex items-center gap-2">
-                    {deleteConfirm === user.id ? (
+                    {deleteConfirm === student.id ? (
                       <div className="flex items-center gap-2">
                         <button
-                          onClick={() => onDeleteConfirm(user.id)}
+                          onClick={() => onDeleteConfirm(student.id)}
                           className="px-3 py-1 bg-red-600 text-white rounded text-xs font-bold hover:bg-red-700"
                         >
                           تأكيد
@@ -127,17 +116,16 @@ export default function AdminUsersTab({
                     ) : (
                       <div className="flex gap-1">
                         <button
-                          onClick={() => onEditUser(user)}
+                          onClick={() => onEditStudent(student)}
                           className="text-blue-500 hover:text-blue-700 p-2 hover:bg-blue-50 rounded-lg transition-colors"
                           title="تعديل"
                         >
                           ✏️
                         </button>
                         <button
-                          onClick={() => setDeleteConfirm(user.id)}
+                          onClick={() => setDeleteConfirm(student.id)}
                           className="text-red-500 hover:text-red-700 p-2 hover:bg-red-50 rounded-lg transition-colors"
                           title="حذف"
-                          disabled={user.role === "super_admin"}
                         >
                           🗑️
                         </button>
@@ -147,10 +135,10 @@ export default function AdminUsersTab({
                 </td>
               </tr>
             ))}
-            {filteredUsers.length === 0 && (
+            {filteredStudents.length === 0 && (
               <tr>
-                <td colSpan={5} className="p-8 text-center text-gray-500 font-arabic">
-                  لا يوجد مستخدمين بهذا البحث
+                <td colSpan={6} className="p-8 text-center text-gray-500 font-arabic">
+                  لا يوجد طلاب بهذا البحث
                 </td>
               </tr>
             )}

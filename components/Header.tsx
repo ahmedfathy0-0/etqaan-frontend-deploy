@@ -15,7 +15,7 @@ export default function Header() {
     if (pathname.startsWith("/admin")) {
       return {
         type: "admin",
-        title: "أكاديمية إتقان - لوحة المدير",
+        title: "دار الرحمن - لوحة المدير",
         gradient: "bg-gradient-to-r from-purple-700 to-indigo-800",
         navItems: [
           { href: "/", label: "الرئيسية", icon: "🏠" },
@@ -25,7 +25,7 @@ export default function Header() {
     } else if (pathname.startsWith("/sheikh")) {
       return {
         type: "sheikh",
-        title: "أكاديمية إتقان - لوحة الشيخ",
+        title: "دار الرحمن - لوحة الشيخ",
         gradient: "bg-gradient-to-r from-emerald-600 to-teal-700",
         navItems: [
           { href: "/", label: "الرئيسية", icon: "🏠" },
@@ -35,7 +35,7 @@ export default function Header() {
     } else if (pathname.startsWith("/student/dashboard")) {
       return {
         type: "student-dashboard",
-        title: "أكاديمية إتقان - لوحة الطالب",
+        title: "دار الرحمن - لوحة الطالب",
         gradient: "bg-gradient-to-r from-blue-600 to-indigo-700",
         navItems: [
           { href: "/", label: "الرئيسية", icon: "🏠" },
@@ -45,7 +45,7 @@ export default function Header() {
     } else if (pathname.startsWith("/batches")) {
       return {
         type: "batches",
-        title: "أكاديمية إتقان",
+        title: "دار الرحمن ",
         gradient: "bg-gradient-to-r from-purple-600 to-blue-600",
         navItems: [
           { href: "/", label: "الرئيسية", icon: "🏠" },
@@ -55,14 +55,14 @@ export default function Header() {
     } else if (pathname.startsWith("/login")) {
       return {
         type: "login",
-        title: "أكاديمية إتقان",
+        title: "دار الرحمن ",
         gradient: "bg-gradient-to-r from-purple-600 to-blue-600",
         navItems: [{ href: "/", label: "الرئيسية", icon: "🏠" }],
       };
     } else {
       return {
         type: "general",
-        title: "أكاديمية إتقان",
+        title: "دار الرحمن ",
         gradient: "bg-gradient-to-r from-purple-600 to-purple-700",
         navItems: [
           { href: "/", label: "الرئيسية", icon: "🏠" },
@@ -175,10 +175,9 @@ export default function Header() {
                   href={item.href}
                   className={`
                     flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 font-arabic font-medium
-                    ${
-                      isActiveLink(item.href)
-                        ? "bg-white/20 text-white shadow-md"
-                        : "hover:bg-white/10 text-white/90 hover:text-white"
+                    ${isActiveLink(item.href)
+                      ? "bg-white/20 text-white shadow-md"
+                      : "hover:bg-white/10 text-white/90 hover:text-white"
                     }
                   `}
                 >

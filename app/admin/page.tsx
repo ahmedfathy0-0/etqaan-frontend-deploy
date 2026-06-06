@@ -7,10 +7,12 @@ import PageLoader from "@/components/ui/PageLoader";
 import MultiSearchableSelect from "@/components/ui/MultiSearchableSelect";
 import Modal from "@/components/ui/Modal";
 import { useAdminStats } from "@/queries/useAdmin";
-import { useUsers, useCreateUser, useDeleteUser } from "@/queries/useUsers";
+import { useUsers, useCreateUser, useDeleteUser, useUpdateUser } from "@/queries/useUsers";
 import { useBatches, useCreateBatch, useDeleteBatch, useUpdateBatch } from "@/queries/useBatches";
+import { useStudents, useCreateStudent, useUpdateStudent, useDeleteStudent } from "@/queries/useStudents";
 import AdminStatsCards from "@/components/admin/AdminStatsCards";
 import AdminUsersTab from "@/components/admin/AdminUsersTab";
+import AdminStudentsTab from "@/components/admin/AdminStudentsTab";
 import AdminBatchesTab from "@/components/admin/AdminBatchesTab";
 
 interface User {
@@ -46,10 +48,11 @@ export default function AdminDashboard() {
   
   const { data: users = [], isLoading: loadingUsers } = useUsers();
   const { data: batches = [], isLoading: loadingBatches } = useBatches();
+  const { data: students = [], isLoading: loadingStudents } = useStudents();
   
-  const isLoading = loadingStats || loadingUsers || loadingBatches;
+  const isLoading = loadingStats || loadingUsers || loadingBatches || loadingStudents;
   const error = ""; 
-  const [activeTab, setActiveTab] = useState<"overview" | "users" | "batches">(
+  const [activeTab, setActiveTab] = useState<"overview" | "users" | "students" | "batches">(
     "overview",
   );
   const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
@@ -57,6 +60,17 @@ export default function AdminDashboard() {
   const [showUserModal, setShowUserModal] = useState(false);
   const [showBatchModal, setShowBatchModal] = useState(false);
   const [editBatchId, setEditBatchId] = useState<number | null>(null);
+
+  const [editUserId, setEditUserId] = useState<number | null>(null);
+
+  const [showStudentModal, setShowStudentModal] = useState(false);
+  const [editStudentId, setEditStudentId] = useState<number | null>(null);
+  const [newStudent, setNewStudent] = useState({
+    full_name: "",
+    guardian_name: "",
+    guardian_phone: "",
+    gender: "male" as "male" | "female",
+  });
 
   const [newUser, setNewUser] = useState({
     name: "",
@@ -74,10 +88,31 @@ export default function AdminDashboard() {
   const [formLoading, setFormLoading] = useState(false);
 
   const { mutateAsync: createUserMutate } = useCreateUser();
+  const { mutateAsync: updateUserMutate } = useUpdateUser();
   const { mutateAsync: createBatchMutate } = useCreateBatch();
   const { mutateAsync: updateBatchMutate } = useUpdateBatch();
   const { mutateAsync: deleteUserMutate } = useDeleteUser();
   const { mutateAsync: deleteBatchMutate } = useDeleteBatch();
+  const { mutateAsync: createStudentMutate } = useCreateStudent();
+  const { mutateAsync: updateStudentMutate } = useUpdateStudent();
+  const { mutateAsync: deleteStudentMutate } = useDeleteStudent();
+
+  const handleEditUser = (user: any) => {
+    setEditUserId(user.id);
+    setNewUser({
+      name: user.name,
+      email: user.email,
+      password: user.plain_password || "",
+      role: user.role,
+    });
+    setShowUserModal(true);
+  };
+
+  const closeUserModal = () => {
+    setShowUserModal(false);
+    setEditUserId(null);
+    setNewUser({ name: "", email: "", password: "", role: "sheikh" });
+  };
 
   const handleEditBatch = (batch: any) => {
     setEditBatchId(batch.id);
@@ -90,6 +125,50 @@ export default function AdminDashboard() {
     setShowBatchModal(true);
   };
 
+  const handleEditStudent = (student: any) => {
+    setEditStudentId(student.id);
+    setNewStudent({
+      full_name: student.full_name,
+      guardian_name: student.guardian_name || "",
+      guardian_phone: student.guardian_phone || "",
+      gender: student.gender || "male",
+    });
+    setShowStudentModal(true);
+  };
+
+  const closeStudentModal = () => {
+    setShowStudentModal(false);
+    setEditStudentId(null);
+    setNewStudent({
+      full_name: "",
+      guardian_name: "",
+      guardian_phone: "",
+      gender: "male",
+    });
+  };
+
+  const handleSaveStudent = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!token) return;
+
+    setFormLoading(true);
+    setFormError("");
+
+    try {
+      if (editStudentId) {
+        await updateStudentMutate({ id: editStudentId, data: newStudent });
+      } else {
+        await createStudentMutate(newStudent);
+      }
+      closeStudentModal();
+    } catch (err: any) {
+      console.error("Error saving student:", err);
+      setFormError(err.response?.data?.message || "حدث خطأ أثناء حفظ الطالب");
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!token) return;
@@ -98,12 +177,20 @@ export default function AdminDashboard() {
     setFormError("");
 
     try {
-      await createUserMutate(newUser);
-      setShowUserModal(false);
-      setNewUser({ name: "", email: "", password: "", role: "sheikh" });
+      if (editUserId) {
+        // If editing, only send password if it's not empty, otherwise don't send it to avoid overwriting with empty
+        const dataToUpdate = { ...newUser };
+        if (!dataToUpdate.password) {
+          delete (dataToUpdate as any).password;
+        }
+        await updateUserMutate({ id: editUserId, data: dataToUpdate });
+      } else {
+        await createUserMutate(newUser);
+      }
+      closeUserModal();
     } catch (err: any) {
-      console.error("Error creating user:", err);
-      setFormError(err.response?.data?.message || "حدث خطأ أثناء إنشاء المستخدم");
+      console.error("Error saving user:", err);
+      setFormError(err.response?.data?.message || "حدث خطأ أثناء حفظ المستخدم");
     } finally {
       setFormLoading(false);
     }
@@ -173,6 +260,18 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleDeleteStudent = async (studentId: number) => {
+    if (!token) return;
+
+    try {
+      await deleteStudentMutate(studentId);
+      setDeleteConfirm(null);
+    } catch (err: any) {
+      console.error("Error deleting student:", err);
+      alert(err.response?.data?.message || "حدث خطأ أثناء حذف الطالب");
+    }
+  };
+
   const getRoleLabel = (role: string) => {
     switch (role) {
       case "super_admin":
@@ -203,8 +302,8 @@ export default function AdminDashboard() {
       <div className="min-h-screen bg-gradient-to-br from-purple-50 via-indigo-50 to-blue-50">
         <Modal
           isOpen={showUserModal}
-          onClose={() => setShowUserModal(false)}
-          title="➕ إضافة مستخدم جديد"
+          onClose={closeUserModal}
+          title={editUserId ? "✏️ تعديل مستخدم" : "➕ إضافة مستخدم جديد"}
         >
           <form onSubmit={handleCreateUser} className="space-y-4">
             {formError && (
@@ -248,7 +347,7 @@ export default function AdminDashboard() {
 
             <div>
               <label className="block font-arabic text-gray-700 mb-1">
-                كلمة المرور
+                كلمة المرور {editUserId && "(اتركها فارغة لعدم التغيير)"}
               </label>
               <div className="flex gap-2">
                 <input
@@ -258,9 +357,9 @@ export default function AdminDashboard() {
                     setNewUser({ ...newUser, password: e.target.value })
                   }
                   className="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-900 bg-white"
-                  placeholder="كلمة المرور"
+                  placeholder={editUserId ? "كلمة المرور الجديدة" : "كلمة المرور"}
                   dir="ltr"
-                  required
+                  required={!editUserId}
                 />
                 <button
                   type="button"
@@ -298,18 +397,19 @@ export default function AdminDashboard() {
 
             <div className="flex gap-3 pt-4">
               <button
-                type="submit"
-                disabled={formLoading}
-                className="flex-1 py-3 bg-purple-600 text-white rounded-xl font-arabic font-semibold hover:bg-purple-700 disabled:opacity-50"
-              >
-                {formLoading ? "جاري الإنشاء..." : "إنشاء المستخدم"}
-              </button>
-              <button
                 type="button"
-                onClick={() => setShowUserModal(false)}
-                className="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl font-arabic hover:bg-gray-200"
+                onClick={closeUserModal}
+                className="flex-1 px-4 py-3 bg-gray-100 text-gray-700 rounded-xl font-arabic font-semibold hover:bg-gray-200 transition-colors"
+                disabled={formLoading}
               >
                 إلغاء
+              </button>
+              <button
+                type="submit"
+                className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-xl font-arabic font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50"
+                disabled={formLoading}
+              >
+                {formLoading ? "جاري الحفظ..." : editUserId ? "حفظ التعديلات" : "إضافة مستخدم"}
               </button>
             </div>
           </form>
@@ -428,6 +528,7 @@ export default function AdminDashboard() {
               {[
                 { id: "overview", label: "نظرة عامة", icon: "📊" },
                 { id: "users", label: "المستخدمين", icon: "👥" },
+                { id: "students", label: "الطلاب", icon: "👨‍🎓" },
                 { id: "batches", label: "الحلقات", icon: "📚" },
               ].map((tab) => (
                 <button
@@ -462,27 +563,140 @@ export default function AdminDashboard() {
               )}
 
               {activeTab === "users" && (
-                <AdminUsersTab
-                  users={users}
-                  onDeleteConfirm={handleDeleteUser}
-                  deleteConfirm={deleteConfirm}
-                  setDeleteConfirm={setDeleteConfirm}
-                  setShowUserModal={setShowUserModal}
-                />
+                <div className="animate-fadeIn">
+                  <AdminUsersTab
+                    users={users}
+                    onDeleteConfirm={handleDeleteUser}
+                    deleteConfirm={deleteConfirm}
+                    setDeleteConfirm={setDeleteConfirm}
+                    setShowUserModal={setShowUserModal}
+                    onEditUser={handleEditUser}
+                  />
+                </div>
+              )}
+
+              {activeTab === "students" && (
+                <div className="animate-fadeIn">
+                  <AdminStudentsTab
+                    students={students}
+                    onDeleteConfirm={handleDeleteStudent}
+                    deleteConfirm={deleteConfirm}
+                    setDeleteConfirm={setDeleteConfirm}
+                    setShowStudentModal={setShowStudentModal}
+                    onEditStudent={handleEditStudent}
+                  />
+                </div>
               )}
 
               {activeTab === "batches" && (
-                <AdminBatchesTab
-                  batches={batches}
-                  onDeleteConfirm={handleDeleteBatch}
-                  deleteConfirm={deleteConfirm}
-                  setDeleteConfirm={setDeleteConfirm}
-                  setShowBatchModal={setShowBatchModal}
-                  onEditBatch={handleEditBatch}
-                />
+                <div className="animate-fadeIn">
+                  <AdminBatchesTab
+                    batches={batches}
+                    onDeleteConfirm={handleDeleteBatch}
+                    deleteConfirm={deleteConfirm}
+                    setDeleteConfirm={setDeleteConfirm}
+                    setShowBatchModal={setShowBatchModal}
+                    onEditBatch={handleEditBatch}
+                  />
+                </div>
               )}
             </>
           )}
+
+          <Modal
+            isOpen={showStudentModal}
+            onClose={closeStudentModal}
+            title={editStudentId ? "✏️ تعديل طالب" : "➕ إضافة طالب جديد"}
+          >
+            <form onSubmit={handleSaveStudent} className="space-y-4">
+              {formError && (
+                <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-xl font-arabic text-sm">
+                  {formError}
+                </div>
+              )}
+
+              <div>
+                <label className="block font-arabic text-gray-700 mb-1">
+                  اسم الطالب
+                </label>
+                <input
+                  type="text"
+                  value={newStudent.full_name}
+                  onChange={(e) =>
+                    setNewStudent({ ...newStudent, full_name: e.target.value })
+                  }
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 font-arabic text-gray-900 bg-white"
+                  placeholder="أدخل اسم الطالب رباعي"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block font-arabic text-gray-700 mb-1">
+                  اسم ولي الأمر
+                </label>
+                <input
+                  type="text"
+                  value={newStudent.guardian_name}
+                  onChange={(e) =>
+                    setNewStudent({ ...newStudent, guardian_name: e.target.value })
+                  }
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 font-arabic text-gray-900 bg-white"
+                  placeholder="أدخل اسم ولي الأمر"
+                />
+              </div>
+
+              <div>
+                <label className="block font-arabic text-gray-700 mb-1">
+                  رقم جوال ولي الأمر
+                </label>
+                <input
+                  type="tel"
+                  value={newStudent.guardian_phone}
+                  onChange={(e) =>
+                    setNewStudent({ ...newStudent, guardian_phone: e.target.value })
+                  }
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 font-arabic text-gray-900 bg-white"
+                  placeholder="05XXXXXXXX"
+                  dir="ltr"
+                />
+              </div>
+
+              <div>
+                <label className="block font-arabic text-gray-700 mb-1">
+                  الجنس
+                </label>
+                <select
+                  value={newStudent.gender}
+                  onChange={(e) =>
+                    setNewStudent({ ...newStudent, gender: e.target.value as "male" | "female" })
+                  }
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 font-arabic text-gray-900 bg-white"
+                >
+                  <option value="male">ذكر</option>
+                  <option value="female">أنثى</option>
+                </select>
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={closeStudentModal}
+                  className="flex-1 px-4 py-3 bg-gray-100 text-gray-700 rounded-xl font-arabic font-semibold hover:bg-gray-200 transition-colors"
+                  disabled={formLoading}
+                >
+                  إلغاء
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-xl font-arabic font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50"
+                  disabled={formLoading}
+                >
+                  {formLoading ? "جاري الحفظ..." : editStudentId ? "حفظ التعديلات" : "إضافة طالب"}
+                </button>
+              </div>
+            </form>
+          </Modal>
         </main>
       </div>
     </ProtectedRoute>

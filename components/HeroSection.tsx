@@ -11,7 +11,7 @@ export default function HeroSection() {
           </span>
         </div>
         <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 font-arabic leading-tight">
-          أكاديمية إتقان لتحفيظ القرآن الكريم
+          دار الرحمن لتحفيظ القرآن الكريم
         </h1>
         <p className="text-xl md:text-2xl text-gray-700 mb-10 max-w-3xl mx-auto font-arabic leading-relaxed">
           نحن نقدم تعليم القرآن الكريم بأحدث الطرق التعليمية مع متابعة دقيقة

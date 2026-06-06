@@ -21,38 +21,6 @@ const batchMascots = [
   "tiger",
 ];
 
-// Fallback mock data in case of error, just to preserve old behavior for dev
-const MOCK_BATCHES = [
-  {
-    id: 1,
-    name: "حلقة الأسود 🦁",
-    schedule_description: "السبت والاثنين والأربعاء",
-    term_id: 1,
-    _count: { batch_students: 15 },
-  },
-  {
-    id: 2,
-    name: "حلقة النجوم ⭐",
-    schedule_description: "الأحد والثلاثاء والخميس",
-    term_id: 1,
-    _count: { batch_students: 12 },
-  },
-  {
-    id: 3,
-    name: "حلقة الأبطال 🏆",
-    schedule_description: "السبت والاثنين والأربعاء",
-    term_id: 1,
-    _count: { batch_students: 18 },
-  },
-  {
-    id: 4,
-    name: "حلقة الورد 🌹",
-    schedule_description: "الأحد والثلاثاء والخميس",
-    term_id: 1,
-    _count: { batch_students: 10 },
-  },
-];
-
 export default function BatchesPage() {
   const { user } = useAuth();
   const { data: fetchedBatches, isLoading, error } = useBatches();
@@ -60,7 +28,7 @@ export default function BatchesPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("name_asc");
 
-  const batches = error ? MOCK_BATCHES : (fetchedBatches || []);
+  const batches = fetchedBatches || [];
 
 
   return (

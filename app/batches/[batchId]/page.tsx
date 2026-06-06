@@ -80,19 +80,7 @@ export default function BatchDetailsPage() {
   const [formLoading, setFormLoading] = useState(false);
   const [formError, setFormError] = useState("");
 
-  const [showCreateStudentForm, setShowCreateStudentForm] = useState(false);
-  const [newStudentData, setNewStudentData] = useState<{
-    full_name: string;
-    guardian_name: string;
-    guardian_phone: string;
-    gender: "male" | "female";
-  }>({
-    full_name: "",
-    guardian_name: "",
-    guardian_phone: "",
-    gender: "male",
-  });
-  const [createStudentLoading, setCreateStudentLoading] = useState(false);
+
 
   const API_URL =
     process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api-v1";
@@ -102,20 +90,9 @@ export default function BatchDetailsPage() {
     user?.role === "super_admin" ||
     user?.role === "sheikh";
 
-  const MOCK_BATCH = {
-    id: parseInt(batchId),
-    name: "حلقة الأسود 🦁",
-    schedule_description: "السبت والاثنين والأربعاء - 5:00 م",
-    term: { name: "الفصل الأول 2026" },
-    batch_sheikhs: [
-      { sheikh: { name: "أحمد محمد" }, is_head_sheikh: true },
-    ],
-  };
-
-
   const { data, isLoading } = useBatchDetails(batchId);
 
-  const batch = data?.batch || MOCK_BATCH;
+  const batch = data?.batch;
   const students: Student[] = data?.students || [];
 
 
@@ -178,31 +155,6 @@ export default function BatchDetailsPage() {
 
   const { mutateAsync: createStudentMutate } = useCreateStudent();
 
-  // Create new student
-  const handleCreateStudent = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newStudentData.full_name) return;
-    setCreateStudentLoading(true);
-    setFormError("");
-    try {
-      const createdStudent = await createStudentMutate(newStudentData as any);
-      setAvailableStudents((prev) => [...prev, createdStudent]);
-      setSelectedStudentIds((prev) => [...prev, createdStudent.id]);
-      setShowCreateStudentForm(false);
-      setNewStudentData({
-        full_name: "",
-        guardian_name: "",
-        guardian_phone: "",
-        gender: "male",
-      });
-      toast.success("تم إنشاء الطالب وتحديده بنجاح");
-    } catch (err: any) {
-      setFormError(err.response?.data?.message || "حدث خطأ أثناء إنشاء الطالب");
-    } finally {
-      setCreateStudentLoading(false);
-    }
-  };
-
   const { mutateAsync: enrollStudentsMutate } = useEnrollStudents();
 
   // Enroll student in batch
@@ -230,22 +182,13 @@ export default function BatchDetailsPage() {
       {/* Add Student Modal */}
       <AddStudentModal
         isOpen={showAddStudentModal}
-        onClose={() => {
-          setShowAddStudentModal(false);
-          setShowCreateStudentForm(false);
-        }}
+        onClose={() => setShowAddStudentModal(false)}
         availableStudents={availableStudents}
         selectedStudentIds={selectedStudentIds}
         setSelectedStudentIds={setSelectedStudentIds}
         formError={formError}
         formLoading={formLoading}
         onEnroll={handleEnrollStudent}
-        showCreateStudentForm={showCreateStudentForm}
-        setShowCreateStudentForm={setShowCreateStudentForm}
-        newStudentData={newStudentData}
-        setNewStudentData={setNewStudentData}
-        onCreateStudent={handleCreateStudent}
-        createStudentLoading={createStudentLoading}
       />
 
       {/* Add Session Modal */}
