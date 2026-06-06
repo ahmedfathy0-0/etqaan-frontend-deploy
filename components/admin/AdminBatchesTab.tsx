@@ -33,25 +33,44 @@ export default function AdminBatchesTab({
   onEditBatch,
 }: AdminBatchesTabProps) {
   const [searchTerm, setSearchTerm] = useState("");
+  const [sortBy, setSortBy] = useState("name_asc");
 
-  const filteredBatches = batches.filter((b) =>
-    b.name.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
+  const filteredBatches = batches
+    .filter((b) => b.name.toLowerCase().includes(searchTerm.toLowerCase()))
+    .sort((a, b) => {
+      if (sortBy === "name_asc") return a.name.localeCompare(b.name, "ar");
+      if (sortBy === "name_desc") return b.name.localeCompare(a.name, "ar");
+      if (sortBy === "students_desc") return (b._count?.batch_students || 0) - (a._count?.batch_students || 0);
+      if (sortBy === "students_asc") return (a._count?.batch_students || 0) - (b._count?.batch_students || 0);
+      return 0;
+    });
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
       <div className="p-6 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4">
-        <div className="w-full sm:w-96 relative">
-          <input
-            type="text"
-            placeholder="بحث عن حلقة..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 font-arabic text-gray-900"
-          />
-          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-            🔍
-          </span>
+        <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto flex-1">
+          <div className="w-full sm:w-96 relative">
+            <input
+              type="text"
+              placeholder="بحث عن حلقة..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 font-arabic text-gray-900"
+            />
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+              🔍
+            </span>
+          </div>
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="w-full sm:w-auto px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 font-arabic text-gray-900 bg-white"
+          >
+            <option value="name_asc">الاسم (أ-ي)</option>
+            <option value="name_desc">الاسم (ي-أ)</option>
+            <option value="students_desc">عدد الطلاب (الأكثر)</option>
+            <option value="students_asc">عدد الطلاب (الأقل)</option>
+          </select>
         </div>
         <button
           onClick={() => setShowBatchModal(true)}
@@ -68,7 +87,7 @@ export default function AdminBatchesTab({
             key={batch.id}
             className="border border-gray-100 rounded-xl p-6 hover:shadow-lg transition-shadow relative group"
           >
-            <div className="absolute top-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
+            <div className="absolute top-4 left-4 flex gap-2">
               {deleteConfirm === batch.id ? (
                 <div className="flex gap-2">
                   <button

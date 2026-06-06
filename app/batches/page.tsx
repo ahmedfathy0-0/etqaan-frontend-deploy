@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Header from "@/components/Header";
 import BatchCard from "@/components/public/BatchCard";
 import RandomStars from "@/components/RandomStars";
@@ -55,6 +56,9 @@ const MOCK_BATCHES = [
 export default function BatchesPage() {
   const { user } = useAuth();
   const { data: fetchedBatches, isLoading, error } = useBatches();
+  
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortBy, setSortBy] = useState("name_asc");
 
   const batches = error ? MOCK_BATCHES : (fetchedBatches || []);
 
@@ -103,15 +107,52 @@ export default function BatchesPage() {
             </div>
           )}
 
+          {/* Search and Sort */}
+          {!isLoading && batches.length > 0 && (
+            <div className="flex flex-col md:flex-row gap-4 mb-8 max-w-2xl mx-auto">
+              <div className="relative flex-1">
+                <input
+                  type="text"
+                  placeholder="بحث عن حلقة..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 border border-purple-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 font-arabic text-gray-900 shadow-sm"
+                />
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                  🔍
+                </span>
+              </div>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="px-4 py-3 border border-purple-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 font-arabic text-gray-900 bg-white shadow-sm"
+              >
+                <option value="name_asc">الاسم (أ-ي)</option>
+                <option value="name_desc">الاسم (ي-أ)</option>
+                <option value="students_desc">عدد الطلاب (الأكثر)</option>
+                <option value="students_asc">عدد الطلاب (الأقل)</option>
+              </select>
+            </div>
+          )}
+
           {/* Batches Grid */}
           {!isLoading && batches.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {batches.map((batch, index) => (
+              {batches
+                .filter((b) => b.name.toLowerCase().includes(searchTerm.toLowerCase()))
+                .sort((a, b) => {
+                  if (sortBy === "name_asc") return a.name.localeCompare(b.name, "ar");
+                  if (sortBy === "name_desc") return b.name.localeCompare(a.name, "ar");
+                  if (sortBy === "students_desc") return (b._count?.batch_students || 0) - (a._count?.batch_students || 0);
+                  if (sortBy === "students_asc") return (a._count?.batch_students || 0) - (b._count?.batch_students || 0);
+                  return 0;
+                })
+                .map((batch, index) => (
                 <BatchCard
                   key={batch.id}
                   id={batch.id}
                   name={batch.name}
-                  description={batch.schedule_description}
+                  description={batch.schedule_description || ""}
                   studentCount={batch._count?.batch_students || 0}
                   color={batchColors[index % batchColors.length]}
                   mascot={batchMascots[index % batchMascots.length]}
