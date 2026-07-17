@@ -559,7 +559,12 @@ export default function AdminDashboard() {
           ) : (
             <>
               {activeTab === "overview" && (
-                <AdminStatsCards stats={stats} />
+                <AdminStatsCards 
+                  stats={stats} 
+                  onAddUser={() => setShowUserModal(true)}
+                  onAddBatch={() => setShowBatchModal(true)}
+                  onAddStudent={() => setShowStudentModal(true)}
+                />
               )}
 
               {activeTab === "users" && (

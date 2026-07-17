@@ -12,9 +12,17 @@ interface Stats {
 
 interface AdminStatsCardsProps {
   stats: Stats;
+  onAddUser?: () => void;
+  onAddBatch?: () => void;
+  onAddStudent?: () => void;
 }
 
-export default function AdminStatsCards({ stats }: AdminStatsCardsProps) {
+export default function AdminStatsCards({ 
+  stats,
+  onAddUser,
+  onAddBatch,
+  onAddStudent
+}: AdminStatsCardsProps) {
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -109,14 +117,27 @@ export default function AdminStatsCards({ stats }: AdminStatsCardsProps) {
             <span>⚡</span>
             إجراءات سريعة
           </h3>
-          <div className="grid grid-cols-2 gap-4">
-            <button className="p-4 bg-blue-50 text-blue-700 rounded-xl font-arabic font-semibold hover:bg-blue-100 transition-colors flex items-center justify-center gap-2">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <button 
+              onClick={onAddUser}
+              className="p-4 bg-blue-50 text-blue-700 rounded-xl font-arabic font-semibold hover:bg-blue-100 transition-colors flex items-center justify-center gap-2"
+            >
               <span>+</span>
               مستخدم جديد
             </button>
-            <button className="p-4 bg-emerald-50 text-emerald-700 rounded-xl font-arabic font-semibold hover:bg-emerald-100 transition-colors flex items-center justify-center gap-2">
+            <button 
+              onClick={onAddBatch}
+              className="p-4 bg-emerald-50 text-emerald-700 rounded-xl font-arabic font-semibold hover:bg-emerald-100 transition-colors flex items-center justify-center gap-2"
+            >
               <span>+</span>
               حلقة جديدة
+            </button>
+            <button 
+              onClick={onAddStudent}
+              className="p-4 bg-purple-50 text-purple-700 rounded-xl font-arabic font-semibold hover:bg-purple-100 transition-colors flex items-center justify-center gap-2"
+            >
+              <span>+</span>
+              طالب جديد
             </button>
           </div>
         </div>

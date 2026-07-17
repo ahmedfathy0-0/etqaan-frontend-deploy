@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";
 import GuestRoute from "@/components/GuestRoute";
+import { TextField } from "@/components/ui/TextField";
+import { Button } from "@/components/ui/Button";
 
 export default function LoginPage() {
   const { login, isLoading } = useAuth();
@@ -25,151 +27,140 @@ export default function LoginPage() {
 
   return (
     <GuestRoute>
-      <div className="min-h-screen w-full bg-gradient-to-br from-purple-600 via-blue-600 to-emerald-500 flex items-center justify-center p-4 relative">
-        {/* Decorative elements - Fixed Background */}
-        <div className="fixed inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-40 -right-40 w-80 h-80 bg-white/10 rounded-full blur-3xl"></div>
-          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-white/10 rounded-full blur-3xl"></div>
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-white/5 rounded-full blur-3xl"></div>
-
-          {/* Stars decoration */}
-          {[
-            { top: "10%", left: "15%", delay: "0s" },
-            { top: "20%", left: "80%", delay: "0.3s" },
-            { top: "35%", left: "25%", delay: "0.6s" },
-            { top: "15%", left: "60%", delay: "0.9s" },
-            { top: "45%", left: "10%", delay: "1.2s" },
-            { top: "50%", left: "90%", delay: "0.2s" },
-            { top: "65%", left: "35%", delay: "0.5s" },
-            { top: "70%", left: "75%", delay: "0.8s" },
-            { top: "80%", left: "20%", delay: "1.1s" },
-            { top: "85%", left: "85%", delay: "1.4s" },
-            { top: "25%", left: "45%", delay: "0.4s" },
-            { top: "55%", left: "55%", delay: "0.7s" },
-          ].map((pos, i) => (
-            <div
-              key={i}
-              className="absolute text-2xl animate-pulse"
-              style={{
-                top: pos.top,
-                left: pos.left,
-                animationDelay: pos.delay,
-              }}
-            >
-              ⭐
+      <div className="min-h-screen w-full bg-success-800 flex items-center justify-center p-4">
+        <div className="relative z-10 w-full max-w-md flex flex-col items-center">
+          {/* Logo */}
+          <div className="text-center mb-8 flex flex-col items-center">
+            <div className="w-[240px] h-[240px] mb-4 flex items-center justify-center">
+              <img 
+                src="/images/logo.png" 
+                alt="دار الرحمن" 
+                className="w-full h-full object-contain drop-shadow-2xl"
+              />
             </div>
-          ))}
-        </div>
-
-        <div className="relative z-10 w-full max-w-md">
-          {/* Logo/Mosque */}
-          <div className="text-center mb-8">
-            <div className="text-7xl mb-4 animate-bounce-gentle">🕌</div>
-            <h1 className="text-4xl font-bold text-white font-arabic mb-2">
+            <h1 className="text-4xl font-bold text-white font-cairo mb-2">
               دار الرحمن
             </h1>
-            <p className="text-white/80 font-arabic text-lg">
+            <p className="text-white/80 font-cairo text-lg">
               تسجيل الدخول إلى حسابك
             </p>
           </div>
 
           {/* Login Card */}
-          <div className="bg-white/95 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20">
-            <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="bg-white rounded-t-[16px] md:rounded-[16px] p-8 shadow-2xl w-full max-w-[520px]">
+            <form onSubmit={handleSubmit} className="flex flex-col items-center w-full gap-6">
               {error && (
-                <div className="bg-red-50 border-2 border-red-200 text-red-700 px-4 py-3 rounded-xl font-arabic text-center flex items-center justify-center gap-2">
+                <div className="w-full bg-danger-50 border-2 border-danger-200 text-danger-700 px-4 py-3 rounded-xl font-cairo text-center flex items-center justify-center gap-2">
                   <span>⚠️</span>
                   {error}
                 </div>
               )}
 
-              <div>
-                <label className="block text-gray-700 font-arabic font-semibold mb-2">
-                  البريد الإلكتروني
-                </label>
-                <div className="relative">
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-5 py-4 bg-gray-50 border-2 border-gray-200 rounded-xl font-arabic text-gray-800 placeholder-gray-400 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all"
-                    placeholder="example@email.com"
-                    required
-                    dir="ltr"
-                  />
-                  <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-xl">
-                    📧
-                  </span>
-                </div>
-              </div>
+              <TextField
+                label="البريد الإلكتروني"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="example@email.com"
+                required
+                dir="ltr"
+                icon={
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M4 7.00005L10.2 11.65C11.2667 12.45 12.7333 12.45 13.8 11.65L20 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                  </svg>
+                }
+              />
 
-              <div>
-                <label className="block text-gray-700 font-arabic font-semibold mb-2">
-                  كلمة المرور
-                </label>
-                <div className="relative">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full px-5 py-4 bg-gray-50 border-2 border-gray-200 rounded-xl font-arabic text-gray-800 placeholder-gray-400 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all"
-                    placeholder="••••••••"
-                    required
-                    dir="ltr"
-                  />
+              <TextField
+                label="كلمة المرور"
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                required
+                dir="ltr"
+                icon={
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 transform -translate-y-1/2 text-xl hover:scale-110 transition-transform"
+                    className="w-full h-full flex items-center justify-center hover:scale-110 transition-transform text-neutral-500 hover:text-neutral-800 focus:outline-none"
+                    aria-label={showPassword ? "إخفاء كلمة المرور" : "إظهار كلمة المرور"}
                   >
-                    {showPassword ? "🙈" : "👁️"}
+                    {showPassword ? (
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M2.99902 3L20.999 21M9.8433 9.91364C9.32066 10.4536 8.99902 11.1892 8.99902 12C8.99902 13.6569 10.3422 15 11.999 15C12.8215 15 13.5667 14.669 14.1086 14.133M6.49902 6.64715C4.59972 7.90034 3.15305 9.78394 2.45703 12C3.73128 16.0571 7.52159 19 11.9992 19C13.9881 19 15.8414 18.4194 17.3988 17.4184M10.999 5.04939C11.328 5.01673 11.6617 5 11.9992 5C16.4769 5 20.2672 7.94291 21.5414 12C20.9705 13.8161 19.8218 15.3995 18.3304 16.5165" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    ) : (
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M21.544 11.045C21.848 11.4713 22 11.6845 22 12C22 12.3155 21.848 12.5287 21.544 12.955C20.1779 14.8706 16.6892 19 12 19C7.31078 19 3.8221 14.8706 2.45604 12.955C2.15201 12.5287 2 12.3155 2 12C2 11.6845 2.15201 11.4713 2.45604 11.045C3.8221 9.12944 7.31078 5 12 5C16.6892 5 20.1779 9.12944 21.544 11.045Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M15 12C15 13.6569 13.6569 15 12 15C10.3431 15 9 13.6569 9 12C9 10.3431 10.3431 9 12 9C13.6569 9 15 10.3431 15 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    )}
                   </button>
-                </div>
-              </div>
+                }
+              />
 
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-arabic font-bold text-lg rounded-xl hover:from-purple-700 hover:to-blue-700 transform hover:scale-[1.02] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl flex items-center justify-center gap-3"
-              >
-                {isLoading ? (
-                  <>
-                    <div className="w-6 h-6 border-3 border-white/30 border-t-white rounded-full animate-spin"></div>
-                    جاري تسجيل الدخول...
-                  </>
-                ) : (
-                  <>
-                    <span>🚀</span>
-                    تسجيل الدخول
-                  </>
-                )}
-              </button>
+              <div className="w-full mt-4">
+                <Button
+                  type="submit"
+                  variant="primary"
+                  size="md"
+                  disabled={isLoading}
+                  icon={
+                    !isLoading && (
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M15 3H7C5.89543 3 5 3.89543 5 5V19C5 20.1046 5.89543 21 7 21H17C18.1046 21 19 20.1046 19 19V9L15 3Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M15 3V9H19M9 21V15H15V21M9 8H11" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    )
+                  }
+                >
+                  {isLoading ? (
+                    <div className="flex items-center gap-2">
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                      <span>جاري تسجيل الدخول...</span>
+                    </div>
+                  ) : (
+                    "تسجيل الدخول"
+                  )}
+                </Button>
+              </div>
             </form>
 
             {/* Divider */}
-            <div className="flex items-center gap-4 my-6">
-              <div className="flex-1 h-px bg-gray-200"></div>
-              <span className="text-gray-400 font-arabic text-sm">أو</span>
-              <div className="flex-1 h-px bg-gray-200"></div>
+            <div className="flex items-center gap-4 my-6 w-full">
+              <div className="flex-1 h-px bg-neutral-200"></div>
+              <span className="text-neutral-700 font-cairo text-sm">أو</span>
+              <div className="flex-1 h-px bg-neutral-200"></div>
             </div>
 
             {/* Guest Access */}
-            <Link
-              href="/batches"
-              className="block w-full py-4 bg-gray-100 text-gray-700 font-arabic font-semibold text-center rounded-xl hover:bg-gray-200 transition-all duration-300 border-2 border-gray-200 hover:border-gray-300"
+            <Button
+              variant="outline-primary"
+              size="md"
+              onClick={() => window.location.href = '/batches'}
+              icon={
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M21.544 11.045C21.848 11.4713 22 11.6845 22 12C22 12.3155 21.848 12.5287 21.544 12.955C20.1779 14.8706 16.6892 19 12 19C7.31078 19 3.8221 14.8706 2.45604 12.955C2.15201 12.5287 2 12.3155 2 12C2 11.6845 2.15201 11.4713 2.45604 11.045C3.8221 9.12944 7.31078 5 12 5C16.6892 5 20.1779 9.12944 21.544 11.045Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M15 12C15 13.6569 13.6569 15 12 15C10.3431 15 9 13.6569 9 12C9 10.3431 10.3431 9 12 9C13.6569 9 15 10.3431 15 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              }
             >
-              <span className="ml-2">👀</span>
               تصفح بدون حساب
-            </Link>
+            </Button>
           </div>
 
           {/* Back to home */}
           <div className="text-center mt-6">
             <Link
               href="/"
-              className="text-white/80 hover:text-white font-arabic transition-colors flex items-center justify-center gap-2"
+              className="text-white/80 hover:text-white font-cairo transition-colors flex items-center justify-center gap-2"
             >
-              <span>🏠</span>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 9L12 2L21 9V20C21 20.5523 20.5523 21 20 21H4C3.44772 21 3 20.5523 3 20V9Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M9 21V12H15V21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
               العودة للرئيسية
             </Link>
           </div>
