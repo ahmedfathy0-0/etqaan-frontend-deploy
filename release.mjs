@@ -67,8 +67,8 @@ async function updateFrontend() {
   }
 
   await execAsync(`git tag v${version}`, { cwd: FRONTEND_DIR });
-  // await execAsync(`git push`, { cwd: FRONTEND_DIR });
-  // await execAsync(`git push origin v${version}`, { cwd: FRONTEND_DIR });
+  await execAsync(`git push`, { cwd: FRONTEND_DIR });
+  await execAsync(`git push origin v${version}`, { cwd: FRONTEND_DIR });
   console.log(`  🎉 Frontend GitHub Actions release v${version} triggered!`);
 }
 
@@ -119,7 +119,7 @@ async function updateBackend() {
     // No changes to commit
   }
 
-  // await execAsync(`git push`, { cwd: BACKEND_DIR });
+  await execAsync(`git push`, { cwd: BACKEND_DIR });
   console.log(`  🎉 Backend update v${version} pushed!`);
 }
 
