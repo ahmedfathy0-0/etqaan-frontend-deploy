@@ -16,10 +16,22 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    signingConfigs {
+        etqaan {
+            storeFile file("etqaan.keystore")
+            storePassword "etqaan123"
+            keyAlias "etqaan"
+            keyPassword "etqaan123"
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.etqaan
+        }
+        debug {
+            signingConfig signingConfigs.etqaan
         }
     }
 }
