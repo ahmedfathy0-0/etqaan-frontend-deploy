@@ -96,55 +96,55 @@ export default function AdminStudentModal({
           )}
 
           <div className="flex flex-col items-end gap-[12px] w-full">
-            <label className="text-right text-[#17481B] font-medium text-[16px] leading-[150%] w-full">اسم الطالب</label>
+            <label className="text-right text-[#17481B] font-medium text-[24px] leading-[150%] w-full">اسم الطالب</label>
             <input
               type="text"
               value={newStudent.full_name}
               onChange={(e) =>
                 setNewStudent({ ...newStudent, full_name: e.target.value })
               }
-              className="box-border flex flex-row items-center p-[8px] gap-[8px] w-full h-[48px] border border-[#A3C3D7] rounded-[8px] focus:outline-none focus:border-[#17481B] text-[#79817A] bg-white placeholder:text-[#79817A] text-[14px] text-right leading-[150%] font-medium"
+              className="box-border flex flex-row items-center p-[8px] gap-[8px] w-full h-[48px] border border-[#A3C3D7] rounded-[8px] focus:outline-none focus:border-[#17481B] text-[#79817A] bg-white placeholder:text-[#79817A] text-[16px] text-right leading-[150%] font-medium"
               placeholder="مثال: أحمد محمد"
               required
             />
           </div>
 
           <div className="flex flex-col items-end gap-[12px] w-full">
-            <label className="text-right text-[#17481B] font-medium text-[16px] leading-[150%] w-full">اسم ولي الأمر</label>
+            <label className="text-right text-[#17481B] font-medium text-[24px] leading-[150%] w-full">اسم ولي الأمر</label>
             <input
               type="text"
               value={newStudent.guardian_name}
               onChange={(e) =>
                 setNewStudent({ ...newStudent, guardian_name: e.target.value })
               }
-              className="box-border flex flex-row items-center p-[8px] gap-[8px] w-full h-[48px] border border-[#A3C3D7] rounded-[8px] focus:outline-none focus:border-[#17481B] text-[#79817A] bg-white placeholder:text-[#79817A] text-[14px] text-right leading-[150%] font-medium"
+              className="box-border flex flex-row items-center p-[8px] gap-[8px] w-full h-[48px] border border-[#A3C3D7] rounded-[8px] focus:outline-none focus:border-[#17481B] text-[#79817A] bg-white placeholder:text-[#79817A] text-[16px] text-right leading-[150%] font-medium"
               placeholder="مثال: محمد علي"
             />
           </div>
 
           <div className="flex flex-col items-end gap-[12px] w-full">
-            <label className="text-right text-[#17481B] font-medium text-[16px] leading-[150%] w-full">رقم هاتف ولي الأمر</label>
+            <label className="text-right text-[#17481B] font-medium text-[24px] leading-[150%] w-full">رقم هاتف ولي الأمر</label>
             <input
               type="text"
               value={newStudent.guardian_phone}
               onChange={(e) =>
                 setNewStudent({ ...newStudent, guardian_phone: e.target.value })
               }
-              className="box-border flex flex-row items-center p-[8px] gap-[8px] w-full h-[48px] border border-[#A3C3D7] rounded-[8px] focus:outline-none focus:border-[#17481B] text-[#79817A] bg-white placeholder:text-[#79817A] text-[14px] text-right leading-[150%] font-medium"
+              className="box-border flex flex-row items-center p-[8px] gap-[8px] w-full h-[48px] border border-[#A3C3D7] rounded-[8px] focus:outline-none focus:border-[#17481B] text-[#79817A] bg-white placeholder:text-[#79817A] text-[16px] text-right leading-[150%] font-medium"
               placeholder="0500000000"
               dir="ltr"
             />
           </div>
 
           <div className="flex flex-col items-end gap-[12px] w-full">
-            <label className="text-right text-[#17481B] font-medium text-[16px] leading-[150%] w-full">الجنس</label>
+            <label className="text-right text-[#17481B] font-medium text-[24px] leading-[150%] w-full">الجنس</label>
             <div className="w-full relative">
               <select
                 value={newStudent.gender}
                 onChange={(e) =>
                   setNewStudent({ ...newStudent, gender: e.target.value as "male" | "female" })
                 }
-                className="box-border flex flex-row items-center p-[8px] gap-[8px] w-full h-[48px] border border-[#A3C3D7] rounded-[8px] focus:outline-none focus:border-[#17481B] text-[#79817A] bg-white text-[14px] text-right leading-[150%] font-medium appearance-none"
+                className="box-border flex flex-row items-center p-[8px] gap-[8px] w-full h-[48px] border border-[#A3C3D7] rounded-[8px] focus:outline-none focus:border-[#17481B] text-[#79817A] bg-white text-[16px] text-right leading-[150%] font-medium appearance-none"
                 dir="rtl"
               >
                 <option value="male">ذكر</option>

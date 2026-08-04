@@ -104,24 +104,24 @@ export default function AdminUserModal({
           )}
 
           <div className="flex flex-col items-end gap-[12px] w-full">
-            <label className="text-right text-[#17481B] font-medium text-[16px] leading-[150%] w-full">أسم المستخدم</label>
+            <label className="text-right text-[#17481B] font-medium text-[24px] leading-[150%] w-full">أسم المستخدم</label>
             <input
               type="text"
               value={newUser.name}
               onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
-              className="box-border flex flex-row items-center p-[8px] gap-[8px] w-full h-[48px] border border-[#A3C3D7] rounded-[8px] focus:outline-none focus:border-[#17481B] text-[#79817A] bg-white placeholder:text-[#79817A] text-[14px] text-right leading-[150%] font-medium"
+              className="box-border flex flex-row items-center p-[8px] gap-[8px] w-full h-[48px] border border-[#A3C3D7] rounded-[8px] focus:outline-none focus:border-[#17481B] text-[#79817A] bg-white placeholder:text-[#79817A] text-[16px] text-right leading-[150%] font-medium"
               placeholder="محمد عمرو"
               required
             />
           </div>
 
           <div className="flex flex-col items-end gap-[12px] w-full">
-            <label className="text-right text-[#17481B] font-medium text-[16px] leading-[150%] w-full">البريد الإلكتروني</label>
+            <label className="text-right text-[#17481B] font-medium text-[24px] leading-[150%] w-full">البريد الإلكتروني</label>
             <input
               type="email"
               value={newUser.email}
               onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
-              className="box-border flex flex-row items-center p-[8px] gap-[8px] w-full h-[48px] border border-[#A3C3D7] rounded-[8px] focus:outline-none focus:border-[#17481B] text-[#79817A] bg-white placeholder:text-[#79817A] text-[14px] text-right leading-[150%] font-medium"
+              className="box-border flex flex-row items-center p-[8px] gap-[8px] w-full h-[48px] border border-[#A3C3D7] rounded-[8px] focus:outline-none focus:border-[#17481B] text-[#79817A] bg-white placeholder:text-[#79817A] text-[16px] text-right leading-[150%] font-medium"
               placeholder="Example@gmail.com"
               dir="rtl"
               required
@@ -129,7 +129,7 @@ export default function AdminUserModal({
           </div>
 
           <div className="flex flex-col items-end gap-[12px] w-full">
-            <label className="text-right text-[#17481B] font-medium text-[16px] leading-[150%] w-full">
+            <label className="text-right text-[#17481B] font-medium text-[24px] leading-[150%] w-full">
               كلمة المرور
             </label>
             <div className="flex flex-row w-full gap-2">
@@ -137,7 +137,7 @@ export default function AdminUserModal({
                 type="text"
                 value={newUser.password}
                 onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
-                className="box-border flex-1 flex flex-row items-center p-[8px] gap-[8px] h-[48px] border border-[#A3C3D7] rounded-[8px] focus:outline-none focus:border-[#17481B] text-[#79817A] bg-white placeholder:text-[#79817A] text-[14px] text-right leading-[150%] font-medium"
+                className="box-border flex-1 flex flex-row items-center p-[8px] gap-[8px] h-[48px] border border-[#A3C3D7] rounded-[8px] focus:outline-none focus:border-[#17481B] text-[#79817A] bg-white placeholder:text-[#79817A] text-[16px] text-right leading-[150%] font-medium"
                 placeholder="********"
                 dir="rtl"
                 required={!editUserId}
@@ -154,12 +154,12 @@ export default function AdminUserModal({
           </div>
 
           <div className="flex flex-col items-end gap-[12px] w-full">
-            <label className="text-right text-[#17481B] font-medium text-[16px] leading-[150%] w-full">دور المستخدم</label>
+            <label className="text-right text-[#17481B] font-medium text-[24px] leading-[150%] w-full">دور المستخدم</label>
             <div className="w-full relative">
               <select
                 value={newUser.role}
                 onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}
-                className="box-border flex flex-row items-center p-[8px] gap-[8px] w-full h-[48px] border border-[#A3C3D7] rounded-[8px] focus:outline-none focus:border-[#17481B] text-[#79817A] bg-white text-[14px] text-right leading-[150%] font-medium appearance-none"
+                className="box-border flex flex-row items-center p-[8px] gap-[8px] w-full h-[48px] border border-[#A3C3D7] rounded-[8px] focus:outline-none focus:border-[#17481B] text-[#79817A] bg-white text-[16px] text-right leading-[150%] font-medium appearance-none"
                 dir="rtl"
               >
                 {user?.role === "super_admin" && (

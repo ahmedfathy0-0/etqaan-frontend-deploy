@@ -100,12 +100,12 @@ export default function AdminBatchModal({
 
           {/* text fieled */}
           <div className="flex flex-col items-end gap-[12px] w-full">
-            <label className="text-right text-[#17481B] font-medium text-[16px] leading-[150%] w-full">أسم الحلقة</label>
+            <label className="text-right text-[#17481B] font-medium text-[24px] leading-[150%] w-full">أسم الحلقة</label>
             <input
               type="text"
               value={newBatch.name}
               onChange={(e) => setNewBatch({ ...newBatch, name: e.target.value })}
-              className="box-border flex flex-row items-center p-[8px] gap-[8px] w-full h-[48px] border border-[#A3C3D7] rounded-[8px] focus:outline-none focus:border-[#17481B] text-[#79817A] bg-white placeholder:text-[#79817A] text-[14px] text-right leading-[150%] font-medium"
+              className="box-border flex flex-row items-center p-[8px] gap-[8px] w-full h-[48px] border border-[#A3C3D7] rounded-[8px] focus:outline-none focus:border-[#17481B] text-[#79817A] bg-white placeholder:text-[#79817A] text-[16px] text-right leading-[150%] font-medium"
               placeholder="حلقة المستوى الثاني"
               required
             />
@@ -113,7 +113,7 @@ export default function AdminBatchModal({
 
           {/* text fieled */}
           <div className="flex flex-col items-end gap-[12px] w-full">
-            <label className="text-right text-[#17481B] font-medium text-[16px] leading-[150%] w-full">أسم الشيخ / المعلمة</label>
+            <label className="text-right text-[#17481B] font-medium text-[24px] leading-[150%] w-full">أسم الشيخ / المعلمة</label>
             <div className="w-full relative">
               <MultiSearchableSelect
                 options={users
@@ -136,14 +136,14 @@ export default function AdminBatchModal({
 
           {/* text fieled */}
           <div className="flex flex-col items-end gap-[12px] w-full">
-            <label className="text-right text-[#17481B] font-medium text-[16px] leading-[150%] w-full">موعد الحلقة</label>
+            <label className="text-right text-[#17481B] font-medium text-[24px] leading-[150%] w-full">موعد الحلقة</label>
             <input
               type="text"
               value={newBatch.schedule_description}
               onChange={(e) =>
                 setNewBatch({ ...newBatch, schedule_description: e.target.value })
               }
-              className="box-border flex flex-row items-center p-[8px] gap-[8px] w-full h-[48px] border border-[#A3C3D7] rounded-[8px] focus:outline-none focus:border-[#17481B] text-[#79817A] bg-white placeholder:text-[#79817A] text-[14px] text-right leading-[150%] font-medium"
+              className="box-border flex flex-row items-center p-[8px] gap-[8px] w-full h-[48px] border border-[#A3C3D7] rounded-[8px] focus:outline-none focus:border-[#17481B] text-[#79817A] bg-white placeholder:text-[#79817A] text-[16px] text-right leading-[150%] font-medium"
               placeholder="السبت والإثنين: بعد صلاة المغرب"
             />
           </div>
