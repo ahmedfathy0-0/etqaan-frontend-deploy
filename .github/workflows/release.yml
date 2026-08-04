@@ -108,6 +108,9 @@ jobs:
       - name: Build Next.js (Static Export)
         run: npm run build
 
+      - name: Add Capacitor Android Platform
+        run: npx cap add android
+
       - name: Sync Capacitor Android
         run: npx cap sync android
 
