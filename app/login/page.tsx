@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Login01, View, ViewOff } from "@dga-icons/react/duotone-rounded";
 import GuestRoute from "@/components/GuestRoute";
 import { useAuth } from "@/contexts/AuthContext";
@@ -14,12 +14,32 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
+  const [savePassword, setSavePassword] = useState(false);
+
+  useEffect(() => {
+    const savedEmail = localStorage.getItem("savedEmail");
+    const savedPassword = localStorage.getItem("savedPassword");
+    if (savedEmail && savedPassword) {
+      setEmail(savedEmail);
+      setPassword(savedPassword);
+      setSavePassword(true);
+    }
+  }, []);
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setError("");
 
     try {
       await login(email, password);
+      
+      if (savePassword) {
+        localStorage.setItem("savedEmail", email);
+        localStorage.setItem("savedPassword", password);
+      } else {
+        localStorage.removeItem("savedEmail");
+        localStorage.removeItem("savedPassword");
+      }
     } catch (err: any) {
       setError(err.message || "حدث خطأ أثناء تسجيل الدخول");
     }
@@ -99,6 +119,19 @@ export default function LoginPage() {
                     )}
                   </button>
                 </div>
+              </div>
+
+              <div className="flex w-full items-center gap-3 px-1 mt-1">
+                <input
+                  id="savePassword"
+                  type="checkbox"
+                  checked={savePassword}
+                  onChange={(e) => setSavePassword(e.target.checked)}
+                  className="h-5 w-5 rounded border-[#A3C3D7] text-success-700 focus:ring-success-700 cursor-pointer"
+                />
+                <label htmlFor="savePassword" className="text-sm font-bold text-success-800 cursor-pointer select-none">
+                  حفظ كلمة المرور
+                </label>
               </div>
 
               <div className="mt-6 flex w-full flex-col gap-4 md:mt-0">
