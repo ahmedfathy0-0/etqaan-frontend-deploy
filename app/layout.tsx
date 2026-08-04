@@ -4,6 +4,7 @@ import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { Toaster } from "react-hot-toast";
 import ReactQueryProvider from "@/providers/ReactQueryProvider";
+import UpdateManager from "@/components/ui/UpdateManager";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -49,6 +50,7 @@ export default function RootLayout({
       >
         <ReactQueryProvider>
           <AuthProvider>
+            <UpdateManager />
             {children}
             <Toaster position="top-center" />
           </AuthProvider>
