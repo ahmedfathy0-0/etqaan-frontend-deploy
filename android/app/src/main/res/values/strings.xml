@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">دار الرحمن</string>
+    <string name="title_activity_main">دار الرحمن</string>
+    <string name="package_name">com.etqaan.rahman</string>
+    <string name="custom_url_scheme">com.etqaan.rahman</string>
+</resources>
