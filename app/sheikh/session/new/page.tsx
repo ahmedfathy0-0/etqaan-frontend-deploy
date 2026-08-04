@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import Header from "@/components/Header";
 import { useAuth } from "@/contexts/AuthContext";
 import toast from "react-hot-toast";
+import AdminHeader from "@/components/admin/AdminHeader";
+import { AdminSidebar, TabId } from "@/components/admin/AdminSidebar";
 import { SURAHS } from "@/constants/surahs";
 import SearchableSelect from "@/components/ui/SearchableSelect";
 import BackButton from "@/components/ui/BackButton";
@@ -57,6 +58,8 @@ export default function NewSessionPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [sessionDate, setSessionDate] = useState(new Date().toISOString().split("T")[0]);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const activeTab: TabId = "sessions";
 
   const { data: batches = [] } = useBatches();
   const { data: batchDetails, isLoading: loadingStudents } = useBatchDetails(selectedBatchId || "");
@@ -214,16 +217,50 @@ export default function NewSessionPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 font-arabic">
-      <Header />
+    <div className="min-h-screen bg-success-50 font-cairo flex flex-col">
+      <AdminHeader 
+        onLogout={() => {}} 
+        onToggleMenu={() => setMobileMenuOpen((open) => !open)}
+        activeTab={activeTab}
+      />
 
-      <main className="max-w-5xl mx-auto px-4 py-8">
-        <div className="mb-6">
-          <BackButton
-            href={selectedBatchId ? `/batches/${selectedBatchId}` : "/batches"}
-            label="العودة للحلقة"
-          />
+      {mobileMenuOpen && (
+        <div className="fixed inset-0 top-[149px] z-40 bg-black/30 lg:hidden" onClick={() => setMobileMenuOpen(false)}>
+          <div className="h-full w-[280px] bg-white" onClick={(event) => event.stopPropagation()}>
+            <AdminSidebar
+              activeTab={activeTab}
+              setActiveTab={(tab) => {
+                setMobileMenuOpen(false);
+                if (tab !== activeTab) router.push("/sheikh");
+              }}
+              mobile
+            />
+          </div>
         </div>
+      )}
+
+      <div className="flex flex-1 flex-col bg-success-50 lg:flex-row lg:gap-4 lg:bg-white lg:px-[10px] lg:py-2">
+        {/* Desktop Sidebar */}
+        <div className="hidden w-[250px] shrink-0 bg-white lg:block">
+          <div className="sticky top-[122px] h-[calc(100vh-130px)] min-h-[702px] overflow-y-auto overflow-x-hidden">
+            <AdminSidebar 
+              activeTab={activeTab} 
+              setActiveTab={(tab) => {
+                if (tab !== activeTab) router.push("/sheikh");
+              }} 
+            />
+          </div>
+        </div>
+
+        {/* Main Content Area */}
+        <main className="w-full min-w-0 flex-1 pb-[96px] lg:w-auto lg:pb-0">
+          <div className="max-w-5xl mx-auto px-4 py-8" dir="rtl">
+            <div className="mb-6 flex">
+              <BackButton
+                href={selectedBatchId ? `/batches/${selectedBatchId}` : "/batches"}
+                label="العودة للحلقة"
+              />
+            </div>
         <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
           <h1 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
             <span>📋</span>
@@ -608,7 +645,9 @@ export default function NewSessionPage() {
             </div>
           )}
         </div>
-      </main>
+          </div>
+        </main>
+      </div>
     </div>
   );
 }

@@ -7,23 +7,14 @@ import RandomStars from "@/components/RandomStars";
 import Link from "next/link";
 import PageLoader from "@/components/ui/PageLoader";
 import { useAuth } from "@/contexts/AuthContext";
-import { useBatches } from "@/queries/useBatches";
+import { usePublicBatches } from "@/queries/useBatches";
+import { BookOpen01, Search01, UserGroup, Login01, Alert02 } from "@dga-icons/react/duotone-rounded";
 
-const batchColors = ["purple", "blue", "emerald", "orange", "pink", "cyan"];
-const batchMascots = [
-  "lion",
-  "bear",
-  "owl",
-  "rabbit",
-  "cat",
-  "dog",
-  "panda",
-  "tiger",
-];
+
 
 export default function BatchesPage() {
   const { user } = useAuth();
-  const { data: fetchedBatches, isLoading, error } = useBatches();
+  const { data: fetchedBatches, isLoading, error } = usePublicBatches();
   
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("name_asc");
@@ -32,43 +23,38 @@ export default function BatchesPage() {
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-purple-50 to-blue-50 relative">
-      <RandomStars count={40} />
+    <div className="min-h-screen bg-success-50 font-cairo">
+      <Header />
 
-      <div className="relative z-10">
-        <Header />
-
-        <main className="max-w-6xl mx-auto px-6 py-8">
-          {/* Title Section */}
-          <div className="text-center mb-12">
-            <div className="flex items-center justify-center gap-4 mb-4">
-              <span className="text-5xl animate-bounce-gentle">📚</span>
-              <h1 className="text-4xl md:text-5xl font-bold text-gray-800 font-arabic">
-                اختر حلقتك
-              </h1>
-              <span
-                className="text-5xl animate-bounce-gentle"
-                style={{ animationDelay: "0.5s" }}
-              >
-                🎓
-              </span>
+      <main className="max-w-7xl mx-auto px-6 py-12">
+        {/* Title Section */}
+        <div className="text-center mb-16">
+          <div className="flex flex-col items-center justify-center gap-6 mb-6">
+            <div className="w-20 h-20 bg-success-100 text-success-800 rounded-full flex items-center justify-center shadow-md">
+              <BookOpen01 aria-hidden="true" size={48} />
             </div>
-            <p className="text-gray-600 font-arabic text-lg">
-              ابحث عن اسمك في الحلقة وتتبع تقدمك
-            </p>
+            <h1 className="text-4xl md:text-5xl font-bold text-success-900 leading-tight">
+              اختر حلقتك
+            </h1>
           </div>
+          <p className="text-neutral-700 text-lg md:text-xl font-medium max-w-2xl mx-auto">
+            ابحث عن اسمك في الحلقة وتتبع تقدمك نحو التميز
+          </p>
+        </div>
 
           {/* Loading State */}
           {isLoading && <PageLoader />}
 
           {/* Error State */}
           {error && !isLoading && batches.length === 0 && (
-            <div className="text-center py-20">
-              <span className="text-6xl mb-4 block">😔</span>
-              <p className="text-gray-600 font-arabic text-lg">{error?.message || String(error)}</p>
+            <div className="text-center py-20 bg-white rounded-[24px] shadow-sm max-w-2xl mx-auto border-[1.5px] border-danger-200">
+              <div className="flex justify-center mb-6 text-danger-500">
+                <Alert02 aria-hidden="true" size={64} />
+              </div>
+              <p className="text-danger-800 text-lg font-bold mb-6">{error?.message || String(error)}</p>
               <button
                 onClick={() => window.location.reload()}
-                className="mt-4 px-6 py-3 bg-purple-600 text-white rounded-xl font-arabic hover:bg-purple-700 transition-colors"
+                className="px-8 py-3 bg-danger-600 text-white rounded-xl font-bold hover:bg-danger-700 transition-colors shadow-md"
               >
                 حاول مرة أخرى
               </button>
@@ -77,28 +63,28 @@ export default function BatchesPage() {
 
           {/* Search and Sort */}
           {!isLoading && batches.length > 0 && (
-            <div className="flex flex-col md:flex-row gap-4 mb-8 max-w-2xl mx-auto">
+            <div className="flex flex-col md:flex-row gap-4 mb-12 max-w-3xl mx-auto">
               <div className="relative flex-1">
                 <input
                   type="text"
                   placeholder="بحث عن حلقة..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-purple-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 font-arabic text-gray-900 shadow-sm"
+                  className="w-full h-[52px] pl-12 pr-4 bg-white border-[1.5px] border-success-200 rounded-xl focus:outline-none focus:border-success-700 focus:ring-1 focus:ring-success-700 text-neutral-800 shadow-sm font-medium transition-all"
                 />
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                  🔍
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-success-800">
+                  <Search01 aria-hidden="true" size={24} />
                 </span>
               </div>
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="px-4 py-3 border border-purple-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 font-arabic text-gray-900 bg-white shadow-sm"
+                className="h-[52px] px-4 min-w-[200px] border-[1.5px] border-success-200 rounded-xl focus:outline-none focus:border-success-700 focus:ring-1 focus:ring-success-700 text-neutral-800 bg-white shadow-sm font-medium cursor-pointer transition-all"
               >
                 <option value="name_asc">الاسم (أ-ي)</option>
                 <option value="name_desc">الاسم (ي-أ)</option>
-                <option value="students_desc">عدد الطلاب (الأكثر)</option>
-                <option value="students_asc">عدد الطلاب (الأقل)</option>
+                <option value="students_desc">الأكثر طلاباً</option>
+                <option value="students_asc">الأقل طلاباً</option>
               </select>
             </div>
           )}
@@ -115,15 +101,13 @@ export default function BatchesPage() {
                   if (sortBy === "students_asc") return (a._count?.batch_students || 0) - (b._count?.batch_students || 0);
                   return 0;
                 })
-                .map((batch, index) => (
+                .map((batch) => (
                 <BatchCard
                   key={batch.id}
                   id={batch.id}
                   name={batch.name}
                   description={batch.schedule_description || ""}
                   studentCount={batch._count?.batch_students || 0}
-                  color={batchColors[index % batchColors.length]}
-                  mascot={batchMascots[index % batchMascots.length]}
                 />
               ))}
             </div>
@@ -131,23 +115,22 @@ export default function BatchesPage() {
 
           {/* Login CTA */}
           {!user && (
-            <div className="mt-16 text-center">
-              <div className="inline-block bg-white rounded-2xl p-6 shadow-lg">
-                <p className="text-gray-600 font-arabic mb-4">
+            <div className="mt-20 text-center flex justify-center">
+              <div className="bg-white rounded-[24px] p-8 shadow-[0_2px_10px_5px_rgba(0,10,1,0.15)] border-[1.5px] border-success-200 max-w-xl w-full">
+                <p className="text-neutral-800 text-lg font-bold mb-6">
                   هل لديك حساب؟ سجل دخولك للوصول لمميزات أكثر!
                 </p>
                 <Link
                   href="/login"
-                  className="inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-arabic font-bold rounded-xl hover:from-purple-700 hover:to-blue-700 transition-all transform hover:scale-105"
+                  className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-success-800 text-white font-bold rounded-2xl hover:bg-success-900 transition-colors shadow-md w-full sm:w-auto min-w-[200px]"
                 >
-                  <span>🔐</span>
+                  <Login01 aria-hidden="true" size={24} />
                   تسجيل الدخول
                 </Link>
               </div>
             </div>
           )}
         </main>
-      </div>
     </div>
   );
 }

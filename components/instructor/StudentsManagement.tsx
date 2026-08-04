@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import Image from "next/image";
+import { UserGroup, TickDouble01, Alert01, Cancel01, Search01 } from "@dga-icons/react/duotone-rounded";
 
 export default function StudentsManagement() {
   const [selectedLecture, setSelectedLecture] = useState("الكل");
@@ -94,26 +95,26 @@ export default function StudentsManagement() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "excellent":
-        return "border-green-300 bg-green-50";
+        return "border-success-300 bg-success-50";
       case "active":
-        return "border-blue-300 bg-blue-50";
+        return "border-primary-300 bg-primary-50";
       case "needs-attention":
-        return "border-yellow-300 bg-yellow-50";
+        return "border-warning-300 bg-warning-50";
       default:
-        return "border-gray-300 bg-gray-50";
+        return "border-neutral-300 bg-neutral-50";
     }
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "excellent":
-        return "🌟";
+        return <TickDouble01 aria-hidden="true" size={24} className="text-success-600" />;
       case "active":
-        return "✅";
+        return <TickDouble01 aria-hidden="true" size={24} className="text-primary-600" />;
       case "needs-attention":
-        return "⚠️";
+        return <Alert01 aria-hidden="true" size={24} className="text-warning-600" />;
       default:
-        return "👤";
+        return <UserGroup aria-hidden="true" size={24} className="text-neutral-500" />;
     }
   };
 
@@ -137,28 +138,28 @@ export default function StudentsManagement() {
 
   return (
     <>
-      <div className="bg-white rounded-2xl p-6 card-shadow-lg border border-gray-100">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="instructor-title font-arabic flex items-center">
-            <span className="text-3xl ml-3">👥</span>
+      <div className="bg-white rounded-[24px] p-6 shadow-[0_2px_10px_5px_rgba(0,10,1,0.15)] border-[1.5px] border-success-200 font-cairo">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
+          <h2 className="text-[28px] font-bold text-success-900 flex items-center gap-3">
+            <UserGroup aria-hidden="true" size={32} className="text-primary-600" />
             إدارة الطلاب
           </h2>
-          <div className="bg-emerald-50 px-4 py-2 rounded-lg">
-            <span className="instructor-body text-emerald-700 font-arabic">
+          <div className="bg-primary-50 px-4 py-2 rounded-xl border border-primary-100">
+            <span className="font-bold text-primary-700">
               {filteredStudents.length} طالب
             </span>
           </div>
         </div>
 
         {/* Enhanced Filter Section */}
-        <div className="mb-6 p-4 bg-gray-50 rounded-xl">
-          <label className="block instructor-subtitle text-primary font-arabic mb-3">
+        <div className="mb-6 p-5 bg-neutral-50 rounded-[20px] border border-neutral-100">
+          <label className="block font-bold text-neutral-800 mb-3">
             فلترة حسب المحاضرة:
           </label>
           <select
             value={selectedLecture}
             onChange={(e) => setSelectedLecture(e.target.value)}
-            className="w-full bg-white border-2 border-gray-200 rounded-xl px-4 py-3 font-arabic text-primary focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all"
+            className="w-full h-12 bg-white border-[1.5px] border-neutral-200 rounded-xl px-4 text-neutral-800 focus:ring-1 focus:ring-success-700 focus:border-success-700 transition-all font-bold cursor-pointer"
           >
             {lectureOptions.map((lecture) => (
               <option key={lecture} value={lecture}>
@@ -173,16 +174,14 @@ export default function StudentsManagement() {
         </div>
 
         {/* Students List */}
-        <div className="space-y-4 max-h-[600px] overflow-y-auto">
+        <div className="space-y-4 max-h-[600px] overflow-y-auto custom-scrollbar pr-2">
           {filteredStudents.map((student) => (
             <div
               key={student.id}
-              className={`border-2 rounded-xl p-5 transition-all duration-300 hover:shadow-lg ${getStatusColor(
-                student.status
-              )}`}
+              className={`border-[1.5px] rounded-2xl p-5 transition-all duration-300 hover:shadow-md bg-white hover:border-success-400`}
             >
-              <div className="flex items-start gap-4">
-                <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white shadow-md flex-shrink-0">
+              <div className="flex flex-col sm:flex-row items-start gap-4">
+                <div className="w-16 h-16 rounded-full overflow-hidden border-[3px] border-white shadow-sm shrink-0">
                   <Image
                     src={student.image}
                     alt={student.name}
@@ -192,33 +191,31 @@ export default function StudentsManagement() {
                   />
                 </div>
 
-                <div className="flex-1">
-                  <div className="flex items-center justify-between mb-3">
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-col sm:flex-row justify-between gap-4 mb-4">
                     <div>
-                      <h4 className="instructor-subtitle text-primary font-arabic mb-1">
+                      <h4 className="text-lg font-bold text-success-900 mb-1">
                         {student.name}
                       </h4>
                       <div className="flex items-center gap-2">
-                        <span className="text-lg">
-                          {getStatusIcon(student.status)}
-                        </span>
-                        <span className="instructor-caption text-secondary font-arabic">
+                        {getStatusIcon(student.status)}
+                        <span className="font-bold text-sm text-neutral-600">
                           {getStatusText(student.status)}
                         </span>
                       </div>
                     </div>
-                    <div className="text-left">
-                      <div className="instructor-body text-primary font-arabic mb-1">
+                    <div className="w-full sm:w-32">
+                      <div className="font-bold text-success-700 mb-1 text-left">
                         {student.progress}%
                       </div>
-                      <div className="w-20 h-2 bg-gray-200 rounded-full overflow-hidden">
+                      <div className="w-full h-2 bg-neutral-100 rounded-full overflow-hidden">
                         <div
                           className={`h-full rounded-full transition-all duration-500 ${
                             student.progress >= 90
-                              ? "bg-green-500"
+                              ? "bg-success-500"
                               : student.progress >= 75
-                              ? "bg-blue-500"
-                              : "bg-yellow-500"
+                              ? "bg-primary-500"
+                              : "bg-warning-500"
                           }`}
                           style={{ width: `${student.progress}%` }}
                         />
@@ -226,40 +223,40 @@ export default function StudentsManagement() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4 mb-4">
-                    <div className="instructor-body font-arabic">
-                      <span className="text-muted">الحضور: </span>
-                      <span className="text-primary font-semibold">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                    <div className="bg-neutral-50 p-3 rounded-xl border border-neutral-100 font-medium">
+                      <span className="text-neutral-500 ml-1">الحضور:</span>
+                      <span className="text-neutral-800 font-bold">
                         {student.attendance}
                       </span>
                     </div>
-                    <div className="instructor-body font-arabic">
-                      <span className="text-muted">آخر تقييم: </span>
-                      <span className="text-primary font-semibold">
+                    <div className="bg-neutral-50 p-3 rounded-xl border border-neutral-100 font-medium">
+                      <span className="text-neutral-500 ml-1">آخر تقييم:</span>
+                      <span className="text-neutral-800 font-bold">
                         {student.lastEvaluation}
                       </span>
                     </div>
-                    <div className="instructor-caption font-arabic">
-                      <span className="text-muted">تاريخ الانضمام: </span>
-                      <span className="text-secondary">{student.joinDate}</span>
+                    <div className="bg-neutral-50 p-3 rounded-xl border border-neutral-100 font-medium">
+                      <span className="text-neutral-500 ml-1">تاريخ الانضمام:</span>
+                      <span className="text-neutral-800 font-bold">{student.joinDate}</span>
                     </div>
-                    <div className="instructor-caption font-arabic">
-                      <span className="text-muted">رقم الهاتف: </span>
-                      <span className="text-secondary">
+                    <div className="bg-neutral-50 p-3 rounded-xl border border-neutral-100 font-medium">
+                      <span className="text-neutral-500 ml-1">رقم الهاتف:</span>
+                      <span className="text-neutral-800 font-bold" dir="ltr">
                         {student.phoneNumber}
                       </span>
                     </div>
                   </div>
 
-                  <div className="mb-4">
-                    <p className="instructor-caption text-muted font-arabic mb-2">
+                  <div className="mb-5">
+                    <p className="text-sm font-bold text-neutral-500 mb-2">
                       المحاضرات المسجلة:
                     </p>
                     <div className="flex flex-wrap gap-2">
                       {student.lectures.map((lecture, index) => (
                         <span
                           key={index}
-                          className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-lg text-sm font-arabic font-medium"
+                          className="bg-success-50 text-success-700 px-3 py-1 rounded-lg text-sm font-bold border border-success-200"
                         >
                           {lecture}
                         </span>
@@ -267,14 +264,14 @@ export default function StudentsManagement() {
                     </div>
                   </div>
 
-                  <div className="flex justify-end gap-3">
+                  <div className="flex flex-wrap justify-end gap-3">
                     <button
                       onClick={() => handleEvaluate(student)}
-                      className="btn-primary px-4 py-2 rounded-xl font-arabic transition-all hover:scale-105"
+                      className="h-10 px-5 bg-primary-600 text-white rounded-xl font-bold hover:bg-primary-700 transition-colors"
                     >
                       تقييم جديد
                     </button>
-                    <button className="btn-secondary px-4 py-2 rounded-xl font-arabic transition-all">
+                    <button className="h-10 px-5 bg-neutral-200 text-neutral-800 rounded-xl font-bold hover:bg-neutral-300 transition-colors">
                       عرض السجل
                     </button>
                   </div>
@@ -285,16 +282,18 @@ export default function StudentsManagement() {
         </div>
 
         {filteredStudents.length === 0 && (
-          <div className="text-center py-12">
-            <div className="text-6xl mb-4">👥</div>
-            <p className="instructor-subtitle text-muted font-arabic">
+          <div className="text-center py-12 bg-success-50 rounded-2xl border-[1.5px] border-dashed border-success-200">
+            <div className="text-success-300 mb-4 flex justify-center">
+              <Search01 aria-hidden="true" size={64} />
+            </div>
+            <p className="text-xl font-bold text-success-900">
               لا يوجد طلاب في هذه المحاضرة
             </p>
           </div>
         )}
 
-        <div className="mt-6 text-center">
-          <button className="btn-secondary px-8 py-3 rounded-xl font-arabic transition-all hover:scale-105">
+        <div className="mt-8 text-center">
+          <button className="h-12 px-8 bg-success-50 text-success-800 rounded-xl font-bold hover:bg-success-100 transition-colors border border-success-200">
             عرض جميع الطلاب
           </button>
         </div>
@@ -302,46 +301,48 @@ export default function StudentsManagement() {
 
       {/* Enhanced Evaluation Modal */}
       {showEvaluationModal && selectedStudent && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-8 max-w-lg w-full border border-gray-200 shadow-2xl">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 font-cairo">
+          <div className="bg-white rounded-[24px] p-8 max-w-lg w-full shadow-2xl border-[1.5px] border-success-200">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="instructor-title text-primary font-arabic">
+              <h3 className="text-2xl font-bold text-success-900">
                 تقييم الطالب
               </h3>
               <button
                 onClick={() => setShowEvaluationModal(false)}
-                className="text-gray-400 hover:text-gray-600 text-2xl"
+                className="text-neutral-400 hover:text-danger-600 transition-colors"
               >
-                ✕
+                <Cancel01 aria-hidden="true" size={28} />
               </button>
             </div>
 
-            <div className="mb-6 p-4 bg-emerald-50 rounded-xl">
-              <div className="flex items-center gap-3 mb-2">
-                <Image
-                  src={selectedStudent.image}
-                  alt={selectedStudent.name}
-                  width={40}
-                  height={40}
-                  className="rounded-full"
-                />
+            <div className="mb-6 p-4 bg-success-50 rounded-2xl border border-success-100">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full overflow-hidden border-[1.5px] border-white shadow-sm shrink-0">
+                  <Image
+                    src={selectedStudent.image}
+                    alt={selectedStudent.name}
+                    width={48}
+                    height={48}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
                 <div>
-                  <h4 className="instructor-subtitle text-primary font-arabic">
+                  <h4 className="text-lg font-bold text-success-900">
                     {selectedStudent.name}
                   </h4>
-                  <p className="instructor-caption text-secondary font-arabic">
+                  <p className="text-sm font-bold text-success-700">
                     التقدم الحالي: {selectedStudent.progress}%
                   </p>
                 </div>
               </div>
             </div>
 
-            <form className="space-y-6">
+            <form className="space-y-5">
               <div>
-                <label className="block instructor-subtitle text-primary font-arabic mb-3">
+                <label className="block font-bold text-neutral-800 mb-2">
                   المحاضرة:
                 </label>
-                <select className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 font-arabic text-primary focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                <select className="w-full h-12 bg-white border-[1.5px] border-neutral-200 rounded-xl px-4 text-neutral-800 focus:ring-1 focus:ring-success-700 focus:border-success-700 transition-all font-bold">
                   {selectedStudent.lectures.map(
                     (lecture: string, index: number) => (
                       <option key={index} value={lecture}>
@@ -353,10 +354,10 @@ export default function StudentsManagement() {
               </div>
 
               <div>
-                <label className="block instructor-subtitle text-primary font-arabic mb-3">
+                <label className="block font-bold text-neutral-800 mb-2">
                   نوع التقييم:
                 </label>
-                <select className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 font-arabic text-primary focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                <select className="w-full h-12 bg-white border-[1.5px] border-neutral-200 rounded-xl px-4 text-neutral-800 focus:ring-1 focus:ring-success-700 focus:border-success-700 transition-all font-bold">
                   <option>حفظ جديد</option>
                   <option>مراجعة</option>
                   <option>تجويد</option>
@@ -366,10 +367,10 @@ export default function StudentsManagement() {
               </div>
 
               <div>
-                <label className="block instructor-subtitle text-primary font-arabic mb-3">
+                <label className="block font-bold text-neutral-800 mb-2">
                   التقييم:
                 </label>
-                <select className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 font-arabic text-primary focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                <select className="w-full h-12 bg-white border-[1.5px] border-neutral-200 rounded-xl px-4 text-neutral-800 focus:ring-1 focus:ring-success-700 focus:border-success-700 transition-all font-bold">
                   <option>ممتاز جداً (95-100)</option>
                   <option>ممتاز (90-94)</option>
                   <option>جيد جداً (85-89)</option>
@@ -380,11 +381,11 @@ export default function StudentsManagement() {
               </div>
 
               <div>
-                <label className="block instructor-subtitle text-primary font-arabic mb-3">
+                <label className="block font-bold text-neutral-800 mb-2">
                   الملاحظات:
                 </label>
                 <textarea
-                  className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 font-arabic text-primary h-32 resize-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  className="w-full bg-white border-[1.5px] border-neutral-200 rounded-xl p-4 text-neutral-800 h-32 resize-none focus:ring-1 focus:ring-success-700 focus:border-success-700 transition-all font-medium"
                   placeholder="اكتب ملاحظاتك وتوجيهاتك للطالب..."
                 ></textarea>
               </div>
@@ -392,14 +393,14 @@ export default function StudentsManagement() {
               <div className="flex gap-4 pt-4">
                 <button
                   type="submit"
-                  className="flex-1 btn-primary py-3 rounded-xl font-arabic transition-all hover:scale-105"
+                  className="flex-1 h-12 bg-primary-600 text-white rounded-xl font-bold hover:bg-primary-700 transition-colors"
                 >
                   حفظ التقييم
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowEvaluationModal(false)}
-                  className="flex-1 btn-secondary py-3 rounded-xl font-arabic transition-all"
+                  className="flex-1 h-12 bg-neutral-200 text-neutral-800 rounded-xl font-bold hover:bg-neutral-300 transition-colors"
                 >
                   إلغاء
                 </button>

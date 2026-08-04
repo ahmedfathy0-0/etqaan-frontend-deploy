@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { createPortal } from "react-dom";
+import { Cancel01 } from "@dga-icons/react/duotone-rounded";
 
 interface ModalProps {
   isOpen: boolean;
@@ -14,9 +14,8 @@ interface ModalProps {
 export default function Modal({
   isOpen,
   onClose,
-  title,
+  title, // optional now, handled inline if needed
   children,
-  headerColorClass = "bg-gradient-to-r from-blue-600 to-purple-600",
   maxWidth = "max-w-md",
   overflowVisible = false,
 }: ModalProps) {
@@ -54,46 +53,31 @@ export default function Modal({
 
   return (
     <div
-      className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[100] p-4 animate-fadeIn"
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-end lg:items-center justify-center z-[100] lg:p-4 animate-fadeIn"
       onClick={handleBackdropClick}
     >
       <div
         ref={modalRef}
-        className={`bg-white rounded-2xl w-full ${maxWidth} shadow-2xl ${overflowVisible ? 'overflow-visible' : 'overflow-hidden'} transform transition-all animate-scaleIn`}
+        className={`bg-white rounded-t-[16px] lg:rounded-[16px] w-full ${maxWidth} shadow-2xl relative ${overflowVisible ? 'overflow-visible' : 'overflow-hidden'} transform transition-all animate-slideUp lg:animate-scaleIn`}
         role="dialog"
         aria-modal="true"
       >
-        {/* Header */}
-        <div className={`${headerColorClass} p-6 text-white ${overflowVisible ? 'rounded-t-2xl' : ''}`}>
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold font-arabic flex items-center gap-2">
-              {title}
-            </h2>
-            <button
-              onClick={onClose}
-              className="p-2 hover:bg-white/20 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-white/50"
-              aria-label="Close modal"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
+        <button
+          onClick={onClose}
+          className="absolute top-3 left-3 p-2 text-neutral-400 hover:text-neutral-700 bg-neutral-100 hover:bg-neutral-200 rounded-full transition-colors focus:outline-none z-[110]"
+          aria-label="Close modal"
+        >
+          <Cancel01 aria-hidden="true" size={20} />
+        </button>
+
+        {title && (
+          <div className="px-6 pt-6 pb-2">
+            <h2 className="text-xl font-bold font-arabic text-[#17481B]">{title}</h2>
           </div>
-        </div>
+        )}
 
         {/* Body */}
-        <div className={`p-6 ${overflowVisible ? 'overflow-visible' : 'max-h-[80vh] overflow-y-auto custom-scrollbar'}`}>
+        <div className={`w-full p-4 lg:p-6 ${!title ? 'pt-12' : ''} ${overflowVisible ? 'overflow-visible' : 'max-h-[90vh] overflow-y-auto custom-scrollbar'}`}>
           {children}
         </div>
       </div>

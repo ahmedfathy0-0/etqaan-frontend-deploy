@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
-import { useAuth } from "@/contexts/AuthContext";
+import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
+import { Login01, View, ViewOff } from "@dga-icons/react/duotone-rounded";
 import GuestRoute from "@/components/GuestRoute";
-import { TextField } from "@/components/ui/TextField";
-import { Button } from "@/components/ui/Button";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function LoginPage() {
   const { login, isLoading } = useAuth();
@@ -14,8 +14,8 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
     setError("");
 
     try {
@@ -27,145 +27,110 @@ export default function LoginPage() {
 
   return (
     <GuestRoute>
-      <div className="min-h-screen w-full bg-success-800 flex items-center justify-center p-4">
-        <div className="relative z-10 w-full max-w-md flex flex-col items-center">
-          {/* Logo */}
-          <div className="text-center mb-8 flex flex-col items-center">
-            <div className="w-[240px] h-[240px] mb-4 flex items-center justify-center">
-              <img 
-                src="/images/logo.png" 
-                alt="دار الرحمن" 
-                className="w-full h-full object-contain drop-shadow-2xl"
-              />
-            </div>
-            <h1 className="text-4xl font-bold text-white font-cairo mb-2">
-              دار الرحمن
-            </h1>
-            <p className="text-white/80 font-cairo text-lg">
-              تسجيل الدخول إلى حسابك
-            </p>
-          </div>
+      <main className="min-h-screen bg-success-50 px-4 py-12 font-cairo md:flex md:items-center md:justify-center md:bg-white md:px-6 md:py-9">
+        <section className="mx-auto flex w-full max-w-[600px] flex-col items-center md:max-w-[1232px] md:gap-9">
+          <Image
+            src="/images/logo.png"
+            alt="شعار دار الرحمن"
+            width={112}
+            height={112}
+            className="h-28 w-28 object-contain"
+            priority
+          />
 
-          {/* Login Card */}
-          <div className="bg-white rounded-t-[16px] md:rounded-[16px] p-8 shadow-2xl w-full max-w-[520px]">
-            <form onSubmit={handleSubmit} className="flex flex-col items-center w-full gap-6">
+          <div className="mt-10 flex w-full max-w-[600px] flex-col items-center gap-12 md:mt-0 md:gap-9">
+            <h1 className="w-full text-center text-[40px] font-bold leading-[1.5] text-success-800 md:text-[60px]">
+              تسجيل الدخول
+            </h1>
+
+            <form onSubmit={handleSubmit} className="flex w-full flex-col gap-6" dir="rtl">
               {error && (
-                <div className="w-full bg-danger-50 border-2 border-danger-200 text-danger-700 px-4 py-3 rounded-xl font-cairo text-center flex items-center justify-center gap-2">
-                  <span>⚠️</span>
+                <p role="alert" className="rounded-lg border border-danger-200 bg-danger-50 px-4 py-3 text-center text-sm text-danger-700">
                   {error}
-                </div>
+                </p>
               )}
 
-              <TextField
-                label="البريد الإلكتروني"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="example@email.com"
-                required
-                dir="ltr"
-                icon={
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M4 7.00005L10.2 11.65C11.2667 12.45 12.7333 12.45 13.8 11.65L20 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                  </svg>
-                }
-              />
+              <div className="flex w-full flex-col items-end gap-3">
+                <label htmlFor="email" className="w-full text-right text-base font-medium leading-6 text-success-800 md:text-2xl md:font-bold md:leading-9">
+                  البريد الإلكتروني
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  placeholder="Example@gmail.com"
+                  autoComplete="email"
+                  required
+                  dir="ltr"
+                  className="h-12 w-full rounded-lg border border-[#A3C3D7] bg-white px-2 text-left text-sm font-medium text-neutral-800 outline-none placeholder:text-neutral-700 focus:border-success-700 focus:ring-2 focus:ring-success-200 md:border-2 md:border-success-700"
+                />
+                <p className="w-full text-right text-sm leading-[21px] text-neutral-700 md:hidden">
+                  أدخل البريد الإلكتروني المرتبط بحسابك
+                </p>
+              </div>
 
-              <TextField
-                label="كلمة المرور"
-                type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-                dir="ltr"
-                icon={
+              <div className="flex w-full flex-col items-end gap-3">
+                <label htmlFor="password" className="w-full text-right text-base font-medium leading-6 text-success-800 md:text-2xl md:font-bold md:leading-9">
+                  كلمة المرور
+                </label>
+                <div className="flex h-12 w-full items-center rounded-lg border border-[#A3C3D7] bg-white px-2 focus-within:border-success-700 focus-within:ring-2 focus-within:ring-success-200 md:border-2 md:border-success-700">
+                  <input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(event) => setPassword(event.target.value)}
+                    placeholder="••••••••"
+                    autoComplete="current-password"
+                    required
+                    dir="ltr"
+                    className="h-full min-w-0 flex-1 bg-transparent px-2 text-left text-sm font-medium text-neutral-800 outline-none placeholder:text-neutral-700"
+                  />
                   <button
                     type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="w-full h-full flex items-center justify-center hover:scale-110 transition-transform text-neutral-500 hover:text-neutral-800 focus:outline-none"
+                    onClick={() => setShowPassword((visible) => !visible)}
                     aria-label={showPassword ? "إخفاء كلمة المرور" : "إظهار كلمة المرور"}
+                    className="flex h-8 w-8 shrink-0 items-center justify-center text-neutral-700 hover:text-success-800 focus-visible:outline-2 focus-visible:outline-success-700"
                   >
                     {showPassword ? (
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M2.99902 3L20.999 21M9.8433 9.91364C9.32066 10.4536 8.99902 11.1892 8.99902 12C8.99902 13.6569 10.3422 15 11.999 15C12.8215 15 13.5667 14.669 14.1086 14.133M6.49902 6.64715C4.59972 7.90034 3.15305 9.78394 2.45703 12C3.73128 16.0571 7.52159 19 11.9992 19C13.9881 19 15.8414 18.4194 17.3988 17.4184M10.999 5.04939C11.328 5.01673 11.6617 5 11.9992 5C16.4769 5 20.2672 7.94291 21.5414 12C20.9705 13.8161 19.8218 15.3995 18.3304 16.5165" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
+                      <ViewOff aria-hidden="true" size={22} />
                     ) : (
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M21.544 11.045C21.848 11.4713 22 11.6845 22 12C22 12.3155 21.848 12.5287 21.544 12.955C20.1779 14.8706 16.6892 19 12 19C7.31078 19 3.8221 14.8706 2.45604 12.955C2.15201 12.5287 2 12.3155 2 12C2 11.6845 2.15201 11.4713 2.45604 11.045C3.8221 9.12944 7.31078 5 12 5C16.6892 5 20.1779 9.12944 21.544 11.045Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path d="M15 12C15 13.6569 13.6569 15 12 15C10.3431 15 9 13.6569 9 12C9 10.3431 10.3431 9 12 9C13.6569 9 15 10.3431 15 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
+                      <View aria-hidden="true" size={22} />
                     )}
                   </button>
-                }
-              />
+                </div>
+              </div>
 
-              <div className="w-full mt-4">
-                <Button
+              <div className="mt-6 flex w-full flex-col gap-4 md:mt-0">
+                <button
                   type="submit"
-                  variant="primary"
-                  size="md"
                   disabled={isLoading}
-                  icon={
-                    !isLoading && (
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M15 3H7C5.89543 3 5 3.89543 5 5V19C5 20.1046 5.89543 21 7 21H17C18.1046 21 19 20.1046 19 19V9L15 3Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path d="M15 3V9H19M9 21V15H15V21M9 8H11" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                    )
-                  }
+                  className="flex h-14 w-full items-center justify-center gap-4 rounded-2xl bg-success-800 px-4 text-lg font-bold text-success-50 transition-colors hover:bg-success-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-success-800 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {isLoading ? (
-                    <div className="flex items-center gap-2">
-                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                      <span>جاري تسجيل الدخول...</span>
-                    </div>
+                    <>
+                      <span className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" aria-hidden="true" />
+                      جاري تسجيل الدخول...
+                    </>
                   ) : (
-                    "تسجيل الدخول"
+                    <>
+                      <Login01 aria-hidden="true" size={24} />
+                      تسجيل الدخول
+                    </>
                   )}
-                </Button>
+                </button>
+
+                <Link
+                  href="/batches"
+                  className="flex h-14 w-full items-center justify-center rounded-2xl border-2 border-warning-600 px-4 text-lg font-bold text-success-900 transition-colors hover:bg-warning-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-warning-600"
+                >
+                  تصفح بدون حساب
+                </Link>
               </div>
             </form>
-
-            {/* Divider */}
-            <div className="flex items-center gap-4 my-6 w-full">
-              <div className="flex-1 h-px bg-neutral-200"></div>
-              <span className="text-neutral-700 font-cairo text-sm">أو</span>
-              <div className="flex-1 h-px bg-neutral-200"></div>
-            </div>
-
-            {/* Guest Access */}
-            <Button
-              variant="outline-primary"
-              size="md"
-              onClick={() => window.location.href = '/batches'}
-              icon={
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M21.544 11.045C21.848 11.4713 22 11.6845 22 12C22 12.3155 21.848 12.5287 21.544 12.955C20.1779 14.8706 16.6892 19 12 19C7.31078 19 3.8221 14.8706 2.45604 12.955C2.15201 12.5287 2 12.3155 2 12C2 11.6845 2.15201 11.4713 2.45604 11.045C3.8221 9.12944 7.31078 5 12 5C16.6892 5 20.1779 9.12944 21.544 11.045Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M15 12C15 13.6569 13.6569 15 12 15C10.3431 15 9 13.6569 9 12C9 10.3431 10.3431 9 12 9C13.6569 9 15 10.3431 15 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              }
-            >
-              تصفح بدون حساب
-            </Button>
           </div>
-
-          {/* Back to home */}
-          <div className="text-center mt-6">
-            <Link
-              href="/"
-              className="text-white/80 hover:text-white font-cairo transition-colors flex items-center justify-center gap-2"
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M3 9L12 2L21 9V20C21 20.5523 20.5523 21 20 21H4C3.44772 21 3 20.5523 3 20V9Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M9 21V12H15V21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              العودة للرئيسية
-            </Link>
-          </div>
-        </div>
-      </div>
+        </section>
+      </main>
     </GuestRoute>
   );
 }

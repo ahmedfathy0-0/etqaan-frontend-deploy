@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getBatches, getBatchById, enrollStudentsInBatch, createBatch, deleteBatch, updateBatch } from '@/api/batches';
+import { getBatches, getPublicBatches, getBatchById, enrollStudentsInBatch, createBatch, deleteBatch, updateBatch } from '@/api/batches';
 import type { Batch } from '@/api/batches';
 
 // Additional types for specific endpoints can be defined here or in the API module
@@ -16,6 +16,13 @@ export function useBatches() {
   return useQuery({
     queryKey: ['batches'],
     queryFn: getBatches,
+  });
+}
+
+export function usePublicBatches() {
+  return useQuery({
+    queryKey: ['batches', 'public'],
+    queryFn: getPublicBatches,
   });
 }
 

@@ -30,7 +30,7 @@ module.exports = {
         arabic: ["var(--font-noto-arabic)", "Tahoma", "Arial", "sans-serif"],
         sans: ["var(--font-inter)", "system-ui", "sans-serif"],
         mono: ["var(--font-geist-mono)", "monospace"],
-        cairo: ["Cairo", "sans-serif"],
+        cairo: ["var(--font-cairo)", "Tahoma", "Arial", "sans-serif"],
       },
       fontSize: {
         xs: ["0.75rem", { lineHeight: "1.5", letterSpacing: "0.025em" }],

@@ -15,6 +15,11 @@ export const getBatches = async () => {
   return response.data;
 };
 
+export const getPublicBatches = async () => {
+  const response = await api.get<Batch[]>('/batches/public');
+  return response.data;
+};
+
 export const getBatchById = async (batchId: string | number) => {
   const response = await api.get(`/batches/${batchId}`);
   return response.data;

@@ -128,14 +128,14 @@ export default function StudentHistoryModal({
             <div className="text-lg md:text-xl font-bold text-white font-arabic">
               {student.name}
             </div>
-            <div className="flex items-center gap-2 text-sm text-purple-100 font-arabic">
+            <div className="flex items-center gap-2 text-sm text-success-50 font-arabic">
               <span>⭐</span>
               {student.points} نقطة
             </div>
           </div>
         </div>
       }
-      headerColorClass="bg-gradient-to-r from-purple-600 to-blue-600"
+      headerColorClass="bg-success-800"
       maxWidth="max-w-2xl"
     >
       {/* Tabs */}
@@ -144,8 +144,8 @@ export default function StudentHistoryModal({
           onClick={() => setActiveTab("sessions")}
           className={`flex-1 py-4 font-arabic font-semibold transition-colors flex items-center justify-center gap-2 ${
             activeTab === "sessions"
-              ? "text-purple-600 border-b-3 border-purple-600 bg-purple-50"
-              : "text-gray-500 hover:text-gray-700"
+              ? "text-success-700 border-b-[3px] border-success-700 bg-success-50"
+              : "text-neutral-500 hover:text-neutral-700"
           }`}
         >
           <span>📅</span>
@@ -155,8 +155,8 @@ export default function StudentHistoryModal({
           onClick={() => setActiveTab("exams")}
           className={`flex-1 py-4 font-arabic font-semibold transition-colors flex items-center justify-center gap-2 ${
             activeTab === "exams"
-              ? "text-purple-600 border-b-3 border-purple-600 bg-purple-50"
-              : "text-gray-500 hover:text-gray-700"
+              ? "text-success-700 border-b-[3px] border-success-700 bg-success-50"
+              : "text-neutral-500 hover:text-neutral-700"
           }`}
         >
           <span>📝</span>
@@ -168,8 +168,8 @@ export default function StudentHistoryModal({
       <div className="p-6 max-h-[50vh] overflow-y-auto">
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-12">
-            <div className="w-12 h-12 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin mb-4"></div>
-            <p className="text-gray-500 font-arabic">جاري التحميل...</p>
+            <div className="w-12 h-12 border-[5px] border-success-200 border-t-success-700 rounded-full animate-spin mb-4"></div>
+            <p className="text-success-900 font-bold font-cairo">جاري التحميل...</p>
           </div>
         ) : activeTab === "sessions" ? (
           <div className="space-y-4">

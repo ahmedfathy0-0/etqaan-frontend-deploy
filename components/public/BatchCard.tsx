@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { UserGroup, ArrowLeft01, BookOpen01 } from "@dga-icons/react/duotone-rounded";
 
 interface BatchCardProps {
   id: number;
@@ -8,31 +9,9 @@ interface BatchCardProps {
   description?: string;
   studentCount: number;
   sheikhName?: string;
-  color: string;
-  mascot: string;
+  color?: string;
+  mascot?: string;
 }
-
-const colorGradients: Record<string, string> = {
-  purple: "from-purple-500 to-purple-700",
-  blue: "from-blue-500 to-blue-700",
-  emerald: "from-emerald-500 to-emerald-700",
-  orange: "from-orange-500 to-orange-700",
-  pink: "from-pink-500 to-pink-700",
-  cyan: "from-cyan-500 to-cyan-700",
-};
-
-const mascots: Record<string, string> = {
-  lion: "🦁",
-  bear: "🐻",
-  owl: "🦉",
-  rabbit: "🐰",
-  cat: "🐱",
-  dog: "🐶",
-  panda: "🐼",
-  tiger: "🐯",
-  koala: "🐨",
-  fox: "🦊",
-};
 
 export default function BatchCard({
   id,
@@ -40,72 +19,59 @@ export default function BatchCard({
   description,
   studentCount,
   sheikhName,
-  color,
-  mascot,
 }: BatchCardProps) {
-  const gradient = colorGradients[color] || colorGradients.purple;
-  const mascotEmoji = mascots[mascot] || mascots.lion;
 
   return (
     <Link href={`/batches/${id}`}>
-      <div className="group relative bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 hover:rotate-1 cursor-pointer border-4 border-transparent hover:border-white">
-        {/* Gradient Header */}
-        <div
-          className={`bg-gradient-to-br ${gradient} p-6 relative overflow-hidden`}
-        >
+      <div className="group relative bg-white rounded-[24px] overflow-hidden shadow-[0_2px_10px_5px_rgba(0,10,1,0.15)] hover:shadow-[0_4px_20px_10px_rgba(0,10,1,0.2)] transition-all duration-300 cursor-pointer border-[1.5px] border-success-200 hover:border-success-700 font-cairo">
+        {/* Header */}
+        <div className="bg-success-800 p-6 relative overflow-hidden flex flex-col justify-between min-h-[140px]">
           {/* Decorative circles */}
-          <div className="absolute -top-10 -right-10 w-32 h-32 bg-white/10 rounded-full"></div>
-          <div className="absolute -bottom-8 -left-8 w-24 h-24 bg-white/10 rounded-full"></div>
+          <div className="absolute -top-10 -right-10 w-32 h-32 bg-white/5 rounded-full"></div>
+          <div className="absolute -bottom-8 -left-8 w-24 h-24 bg-white/5 rounded-full"></div>
 
-          {/* Mascot */}
-          <div className="absolute top-4 left-4 text-5xl transform group-hover:scale-125 group-hover:rotate-12 transition-all duration-500">
-            {mascotEmoji}
+          {/* Icon */}
+          <div className="absolute top-4 left-4 text-warning-500 transform group-hover:scale-110 transition-transform duration-500">
+            <BookOpen01 aria-hidden="true" size={48} />
           </div>
 
           {/* Name */}
-          <h3 className="text-2xl font-bold text-white font-arabic text-right relative z-10 mt-8">
+          <h3 className="text-[28px] font-bold text-white text-right relative z-10 mt-8 truncate pr-2 border-r-4 border-warning-600">
             {name}
           </h3>
-
-          {/* Student count badge */}
-          <div className="absolute bottom-4 left-4 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full">
-            <span className="text-white font-arabic font-semibold flex items-center gap-2">
-              <span className="text-lg">👨‍🎓</span>
-              {studentCount} طالب
-            </span>
-          </div>
         </div>
 
         {/* Body */}
-        <div className="p-5 bg-gradient-to-b from-white to-gray-50">
+        <div className="p-5 bg-white">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2 bg-success-50 px-3 py-1.5 rounded-full text-success-800">
+              <UserGroup aria-hidden="true" size={20} />
+              <span className="font-bold text-sm">{studentCount} طالب</span>
+            </div>
+            
+            {sheikhName && (
+              <div className="flex items-center gap-2 bg-warning-50 px-3 py-1.5 rounded-full text-warning-800">
+                <span className="font-bold text-sm">الشيخ {sheikhName}</span>
+              </div>
+            )}
+          </div>
+
           {description && (
-            <p className="text-gray-600 font-arabic text-sm mb-3 line-clamp-2">
+            <p className="text-neutral-700 text-sm mb-4 line-clamp-2 leading-relaxed">
               {description}
             </p>
           )}
 
-          {sheikhName && (
-            <div className="flex items-center gap-2 text-gray-500 font-arabic text-sm">
-              <span>👨‍🏫</span>
-              <span>الشيخ {sheikhName}</span>
-            </div>
-          )}
-
           {/* Action hint */}
-          <div className="mt-4 flex items-center justify-between">
-            <span className="text-gray-400 text-sm font-arabic">
-              اضغط للاستكشاف
+          <div className="mt-2 flex items-center justify-between border-t border-success-100 pt-4">
+            <span className="text-success-800 font-bold text-base">
+              عرض التفاصيل
             </span>
-            <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center group-hover:bg-gray-200 transition-colors">
-              <span className="text-xl group-hover:translate-x-1 transition-transform">
-                ←
-              </span>
+            <div className="w-10 h-10 bg-success-100 text-success-800 rounded-full flex items-center justify-center group-hover:bg-success-800 group-hover:text-white transition-colors">
+              <ArrowLeft01 aria-hidden="true" size={24} className="group-hover:-translate-x-1 transition-transform" />
             </div>
           </div>
         </div>
-
-        {/* Shine effect on hover */}
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 pointer-events-none"></div>
       </div>
     </Link>
   );

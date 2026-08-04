@@ -4,6 +4,8 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 
+import Image from "next/image";
+
 export default function Home() {
   const { user, isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
@@ -35,11 +37,11 @@ export default function Home() {
   }, [isAuthenticated, isLoading, user, router]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-blue-50">
-      <div className="text-center">
-        <div className="text-6xl mb-4 animate-bounce">🕌</div>
-        <div className="w-12 h-12 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin mx-auto mb-4"></div>
-        <p className="text-gray-600 font-arabic text-lg animate-pulse">
+    <div className="min-h-screen flex items-center justify-center bg-success-50 font-cairo">
+      <div className="text-center flex flex-col items-center">
+        <Image src="/images/logo.png" alt="شعار دار الرحمن" width={96} height={96} className="w-24 h-24 mb-6 object-contain" priority />
+        <div className="w-12 h-12 border-4 border-success-200 border-t-success-700 rounded-full animate-spin mx-auto mb-4"></div>
+        <p className="text-neutral-700 font-bold text-lg animate-pulse">
           جاري التوجيه...
         </p>
       </div>

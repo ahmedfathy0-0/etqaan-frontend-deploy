@@ -13,13 +13,10 @@ export default async function InstructorDashboard({
 }) {
   const { id } = await params;
   return (
-    <div className="bg-gradient-to-br from-emerald-50 via-blue-50 to-indigo-50 min-h-screen relative">
-      <BackgroundPattern />
+    <div className="bg-success-50 min-h-screen font-cairo" dir="rtl">
+      <Header />
 
-      <div className="relative z-10">
-        <Header />
-
-        <main className="p-6 max-w-7xl mx-auto">
+      <main className="p-6 max-w-7xl mx-auto py-12">
           {/* Welcome Section */}
           <InstructorOverview instructorId={id} />
 
@@ -40,7 +37,6 @@ export default async function InstructorDashboard({
             </div>
           </div>
         </main>
-      </div>
     </div>
   );
 }

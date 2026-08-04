@@ -1,17 +1,19 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-
 import { useBatches } from "@/queries/useBatches";
 import { useCreateExam } from "@/queries/useExams";
 import toast from "react-hot-toast";
+import AdminHeader from "@/components/admin/AdminHeader";
+import { AdminSidebar, TabId } from "@/components/admin/AdminSidebar";
+import { PencilEdit01, FloppyDisk } from "@dga-icons/react/duotone-rounded";
 
 export default function NewExamPage() {
-  const { token } = useAuth();
+  const { token, logout } = useAuth();
   const router = useRouter();
   const { data: batches = [], isLoading } = useBatches();
   const { mutateAsync: createExamMutate } = useCreateExam();
@@ -24,6 +26,8 @@ export default function NewExamPage() {
   });
 
   const [isSaving, setIsSaving] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const activeTab: TabId = "exams";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,137 +53,156 @@ export default function NewExamPage() {
 
   return (
     <ProtectedRoute allowedRoles={["sheikh", "admin", "super_admin"]}>
-      <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50">
-        {/* Header */}
-        <header className="bg-gradient-to-r from-emerald-600 to-teal-700 text-white p-6 shadow-lg">
-          <div className="max-w-7xl mx-auto flex items-center gap-4">
-            <Link
-              href="/sheikh"
-              className="w-10 h-10 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-colors"
-            >
-              <span className="text-xl">→</span>
-            </Link>
-            <div>
-              <h1 className="text-2xl font-bold font-arabic flex items-center gap-3">
-                <span className="text-3xl">📝</span>
-                إنشاء امتحان جديد
-              </h1>
+      <div className="min-h-screen bg-success-50 font-cairo flex flex-col">
+        <AdminHeader 
+          onLogout={logout} 
+          onToggleMenu={() => setMobileMenuOpen((open) => !open)}
+          activeTab={activeTab}
+        />
+
+        {mobileMenuOpen && (
+          <div className="fixed inset-0 top-[149px] z-40 bg-black/30 lg:hidden" onClick={() => setMobileMenuOpen(false)}>
+            <div className="h-full w-[280px] bg-white" onClick={(event) => event.stopPropagation()}>
+              <AdminSidebar
+                activeTab={activeTab}
+                setActiveTab={(tab) => {
+                  setMobileMenuOpen(false);
+                  if (tab !== activeTab) router.push("/sheikh");
+                }}
+                mobile
+              />
             </div>
           </div>
-        </header>
+        )}
 
-        <main className="max-w-2xl mx-auto px-6 py-8">
-          <div className="bg-white rounded-2xl p-8 shadow-lg">
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Batch Selection */}
-              <div>
-                <label className="block font-arabic font-semibold text-gray-700 mb-2">
-                  الحلقة <span className="text-red-500">*</span>
-                </label>
-                <select
-                  value={formData.batch_id}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      batch_id: e.target.value,
-                    }))
-                  }
-                  required
-                  className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 font-arabic focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition-all"
-                >
-                  <option value="">-- اختر الحلقة --</option>
-                  {batches.map((batch) => (
-                    <option key={batch.id} value={batch.id}>
-                      {batch.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
+        <div className="flex flex-1 flex-col bg-success-50 lg:flex-row lg:gap-4 lg:bg-white lg:px-[10px] lg:py-2">
+          {/* Desktop Sidebar */}
+          <div className="hidden w-[250px] shrink-0 bg-white lg:block">
+            <div className="sticky top-[122px] h-[calc(100vh-130px)] min-h-[702px] overflow-y-auto overflow-x-hidden">
+              <AdminSidebar 
+                activeTab={activeTab} 
+                setActiveTab={(tab) => {
+                  if (tab !== activeTab) router.push("/sheikh");
+                }} 
+              />
+            </div>
+          </div>
 
-              {/* Exam Title */}
-              <div>
-                <label className="block font-arabic font-semibold text-gray-700 mb-2">
-                  عنوان الامتحان <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={formData.title}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, title: e.target.value }))
-                  }
-                  placeholder="مثال: امتحان سورة البقرة"
-                  required
-                  className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 font-arabic focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition-all"
-                />
-              </div>
-
-              {/* Max Score & Date */}
-              <div className="grid grid-cols-2 gap-6">
-                <div>
-                  <label className="block font-arabic font-semibold text-gray-700 mb-2">
-                    الدرجة الكاملة
-                  </label>
-                  <input
-                    type="number"
-                    min="1"
-                    max="100"
-                    value={formData.max_score}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        max_score: e.target.value,
-                      }))
-                    }
-                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 font-arabic focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition-all"
-                  />
-                </div>
-                <div>
-                  <label className="block font-arabic font-semibold text-gray-700 mb-2">
-                    تاريخ الامتحان
-                  </label>
-                  <input
-                    type="date"
-                    value={formData.exam_date}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        exam_date: e.target.value,
-                      }))
-                    }
-                    className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 font-arabic focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition-all"
-                  />
-                </div>
-              </div>
-
-              {/* Submit */}
-              <div className="pt-4 flex gap-4">
-                <button
-                  type="submit"
-                  disabled={isSaving}
-                  className="flex-1 py-4 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-arabic font-bold rounded-xl hover:from-emerald-700 hover:to-teal-700 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-                >
-                  {isSaving ? (
-                    <>
-                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                      جاري الحفظ...
-                    </>
-                  ) : (
-                    <>
-                      <span>✅</span>
-                      إنشاء الامتحان
-                    </>
-                  )}
-                </button>
+          {/* Main Content Area */}
+          <main className="w-full min-w-0 flex-1 pb-[96px] lg:w-auto lg:pb-0">
+            <div className="min-h-[500px] w-full animate-fade-in overflow-x-hidden p-4 lg:px-6 lg:py-8" dir="rtl">
+              <div className="flex items-center gap-4 mb-8">
                 <Link
                   href="/sheikh"
-                  className="px-6 py-4 bg-gray-100 text-gray-700 font-arabic font-semibold rounded-xl hover:bg-gray-200 transition-colors"
+                  className="w-10 h-10 bg-white border border-[#A3C3D7] hover:bg-[#F5F7F5] rounded-full flex items-center justify-center transition-colors shadow-sm"
                 >
-                  إلغاء
+                  <span className="text-[#17481B] font-bold text-xl">→</span>
                 </Link>
+                <div className="flex items-center gap-2">
+                  <PencilEdit01 aria-hidden="true" size={32} color="#17481B" />
+                  <h1 className="text-2xl font-bold font-cairo text-[#17481B]">
+                    إنشاء امتحان جديد
+                  </h1>
+                </div>
               </div>
-            </form>
-          </div>
-        </main>
+
+              <div className="bg-white border border-[#A3C3D7] rounded-2xl p-6 lg:p-8 shadow-sm max-w-2xl">
+                <form onSubmit={handleSubmit} className="space-y-6 flex flex-col gap-4">
+                  {/* Batch Selection */}
+                  <div className="flex flex-col items-start gap-[12px] w-full">
+                    <label className="text-right text-[#17481B] font-medium text-[16px] leading-[150%] w-full">
+                      الحلقة <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      value={formData.batch_id}
+                      onChange={(e) => setFormData((prev) => ({ ...prev, batch_id: e.target.value }))}
+                      required
+                      className="box-border flex flex-row items-center p-[8px] gap-[8px] w-full h-[48px] border border-[#A3C3D7] rounded-[8px] focus:outline-none focus:border-[#17481B] text-[#79817A] bg-white text-[14px] text-right leading-[150%] font-medium"
+                    >
+                      <option value="">-- اختر الحلقة --</option>
+                      {batches.map((batch: any) => (
+                        <option key={batch.id} value={batch.id}>
+                          {batch.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Exam Title */}
+                  <div className="flex flex-col items-start gap-[12px] w-full">
+                    <label className="text-right text-[#17481B] font-medium text-[16px] leading-[150%] w-full">
+                      عنوان الامتحان <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.title}
+                      onChange={(e) => setFormData((prev) => ({ ...prev, title: e.target.value }))}
+                      placeholder="مثال: امتحان سورة البقرة"
+                      required
+                      className="box-border flex flex-row items-center p-[8px] gap-[8px] w-full h-[48px] border border-[#A3C3D7] rounded-[8px] focus:outline-none focus:border-[#17481B] text-[#79817A] bg-white placeholder:text-[#79817A] text-[14px] text-right leading-[150%] font-medium"
+                    />
+                  </div>
+
+                  {/* Max Score & Date */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+                    <div className="flex flex-col items-start gap-[12px] w-full">
+                      <label className="text-right text-[#17481B] font-medium text-[16px] leading-[150%] w-full">
+                        الدرجة الكاملة
+                      </label>
+                      <input
+                        type="number"
+                        min="1"
+                        max="100"
+                        value={formData.max_score}
+                        onChange={(e) => setFormData((prev) => ({ ...prev, max_score: e.target.value }))}
+                        className="box-border flex flex-row items-center p-[8px] gap-[8px] w-full h-[48px] border border-[#A3C3D7] rounded-[8px] focus:outline-none focus:border-[#17481B] text-[#79817A] bg-white placeholder:text-[#79817A] text-[14px] text-right leading-[150%] font-medium"
+                      />
+                    </div>
+                    <div className="flex flex-col items-start gap-[12px] w-full">
+                      <label className="text-right text-[#17481B] font-medium text-[16px] leading-[150%] w-full">
+                        تاريخ الامتحان
+                      </label>
+                      <input
+                        type="date"
+                        value={formData.exam_date}
+                        onChange={(e) => setFormData((prev) => ({ ...prev, exam_date: e.target.value }))}
+                        className="box-border flex flex-row items-center p-[8px] gap-[8px] w-full h-[48px] border border-[#A3C3D7] rounded-[8px] focus:outline-none focus:border-[#17481B] text-[#79817A] bg-white text-[14px] text-right leading-[150%] font-medium"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Submit */}
+                  <div className="pt-6 flex gap-4 w-full">
+                    <button
+                      type="submit"
+                      disabled={isSaving}
+                      className="flex-1 flex flex-row justify-center items-center py-[8px] px-[16px] gap-[16px] h-[56px] bg-[#17481B] rounded-[16px] transition-colors disabled:opacity-50"
+                    >
+                      {isSaving ? (
+                        <span className="font-bold text-[18px] text-[#FBFFFC] leading-[150%] font-cairo">
+                          جاري الحفظ...
+                        </span>
+                      ) : (
+                        <>
+                          <FloppyDisk aria-hidden="true" size={24} color="#E2F7E4" />
+                          <span className="font-bold text-[18px] text-[#FBFFFC] leading-[150%] font-cairo">
+                            إنشاء الامتحان
+                          </span>
+                        </>
+                      )}
+                    </button>
+                    <Link
+                      href="/sheikh"
+                      className="flex justify-center items-center px-6 h-[56px] bg-[#E3E6E3] text-[#404641] font-cairo font-bold text-[18px] rounded-[16px] hover:bg-[#c9ccc9] transition-colors"
+                    >
+                      إلغاء
+                    </Link>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </main>
+        </div>
       </div>
     </ProtectedRoute>
   );

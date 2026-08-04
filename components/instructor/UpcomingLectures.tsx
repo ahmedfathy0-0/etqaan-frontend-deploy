@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { Calendar01, Time02, UserGroup, BookOpen01, Home01, Book02 } from "@dga-icons/react/duotone-rounded";
 
 export default function UpcomingLectures() {
   const [selectedFilter, setSelectedFilter] = useState("اليوم");
@@ -151,13 +152,13 @@ export default function UpcomingLectures() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "scheduled":
-        return "bg-blue-50 text-blue-800 border-blue-200";
+        return "bg-primary-50 text-primary-800 border-primary-200";
       case "in-progress":
-        return "bg-green-50 text-green-800 border-green-200";
+        return "bg-success-50 text-success-800 border-success-200";
       case "completed":
-        return "bg-gray-50 text-gray-600 border-gray-200";
+        return "bg-neutral-50 text-neutral-600 border-neutral-200";
       default:
-        return "bg-blue-50 text-blue-800 border-blue-200";
+        return "bg-primary-50 text-primary-800 border-primary-200";
     }
   };
 
@@ -175,17 +176,17 @@ export default function UpcomingLectures() {
   };
 
   return (
-    <div className="bg-white rounded-2xl p-6 card-shadow-lg border border-gray-100">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="instructor-title font-arabic flex items-center">
-          <span className="text-3xl ml-3">📅</span>
+    <div className="bg-white rounded-[24px] p-6 shadow-[0_2px_10px_5px_rgba(0,10,1,0.15)] border-[1.5px] border-success-200 font-cairo">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
+        <h2 className="text-[28px] font-bold text-success-900 flex items-center gap-3">
+          <Calendar01 aria-hidden="true" size={32} className="text-warning-600" />
           المحاضرات القادمة
         </h2>
 
         <select
           value={selectedFilter}
           onChange={(e) => setSelectedFilter(e.target.value)}
-          className="bg-white border-2 border-gray-200 rounded-xl px-4 py-2 font-arabic text-primary focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all"
+          className="w-full sm:w-auto h-12 bg-white border-[1.5px] border-success-200 rounded-xl px-4 text-neutral-800 focus:ring-1 focus:ring-success-700 focus:border-success-700 transition-all font-bold cursor-pointer"
         >
           <option value="اليوم">
             اليوم ({filteredLectures.filter((l) => l.isToday).length})
@@ -216,11 +217,12 @@ export default function UpcomingLectures() {
       </div>
 
       {filteredLectures.length === 0 ? (
-        <div className="text-center py-12">
-          <div className="text-6xl mb-4">📚</div>
-          <p className="instructor-subtitle text-muted font-arabic">
-            لا توجد محاضرات{" "}
-            {selectedFilter === "اليوم" ? "اليوم" : "في هذا التصنيف"}
+        <div className="text-center py-12 bg-success-50 rounded-2xl border-[1.5px] border-dashed border-success-200">
+          <div className="text-success-300 mb-4 flex justify-center">
+            <Book02 aria-hidden="true" size={64} />
+          </div>
+          <p className="text-xl font-bold text-success-900">
+            لا توجد محاضرات {selectedFilter === "اليوم" ? "اليوم" : "في هذا التصنيف"}
           </p>
         </div>
       ) : (
@@ -228,23 +230,23 @@ export default function UpcomingLectures() {
           {filteredLectures.map((lecture) => (
             <div
               key={`${lecture.id}-${lecture.dateString}`}
-              className={`border-2 rounded-xl p-5 transition-all duration-300 hover:shadow-lg ${
+              className={`border-[1.5px] rounded-2xl p-5 transition-all duration-300 hover:shadow-lg ${
                 lecture.isToday
-                  ? "border-emerald-300 bg-emerald-50"
-                  : "border-gray-200 bg-white hover:border-emerald-200"
+                  ? "border-success-300 bg-success-50"
+                  : "border-success-200 bg-white hover:border-success-500"
               }`}
             >
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
                 <div>
-                  <h3 className="instructor-subtitle font-arabic mb-1">
+                  <h3 className="text-xl font-bold text-success-900 mb-1">
                     {lecture.title}
                   </h3>
-                  <p className="instructor-caption font-arabic text-muted">
+                  <p className="text-neutral-500 font-medium">
                     {lecture.dayName} - {lecture.dateString}
                   </p>
                 </div>
                 <span
-                  className={`px-4 py-2 rounded-lg border font-arabic font-semibold ${getStatusColor(
+                  className={`px-4 py-2 rounded-xl border font-bold text-sm w-fit ${getStatusColor(
                     lecture.status,
                   )}`}
                 >
@@ -252,37 +254,37 @@ export default function UpcomingLectures() {
                 </span>
               </div>
 
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-5">
-                <div className="flex items-center instructor-body font-arabic">
-                  <span className="text-xl ml-3">⏰</span>
-                  <span className="text-primary">{lecture.time}</span>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div className="flex items-center gap-2 font-bold text-neutral-800">
+                  <Time02 aria-hidden="true" size={20} className="text-success-700" />
+                  <span>{lecture.time}</span>
                 </div>
-                <div className="flex items-center instructor-body font-arabic">
-                  <span className="text-xl ml-3">👥</span>
-                  <span className="text-primary">{lecture.students} طالب</span>
+                <div className="flex items-center gap-2 font-bold text-neutral-800">
+                  <UserGroup aria-hidden="true" size={20} className="text-success-700" />
+                  <span>{lecture.students} طالب</span>
                 </div>
-                <div className="flex items-center instructor-body font-arabic">
-                  <span className="text-xl ml-3">📊</span>
-                  <span className="text-primary">{lecture.level}</span>
+                <div className="flex items-center gap-2 font-bold text-neutral-800">
+                  <BookOpen01 aria-hidden="true" size={20} className="text-success-700" />
+                  <span>{lecture.level}</span>
                 </div>
-                <div className="flex items-center instructor-body font-arabic">
-                  <span className="text-xl ml-3">🏫</span>
-                  <span className="text-primary">{lecture.room}</span>
+                <div className="flex items-center gap-2 font-bold text-neutral-800">
+                  <Home01 aria-hidden="true" size={20} className="text-success-700" />
+                  <span>{lecture.room}</span>
                 </div>
               </div>
 
-              <div className="flex justify-end gap-3">
+              <div className="flex flex-wrap justify-end gap-3">
                 {lecture.status === "scheduled" && (
-                  <button className="btn-primary px-5 py-2 rounded-xl font-arabic transition-all hover:scale-105">
+                  <button className="h-10 px-5 bg-primary-600 text-white rounded-xl font-bold hover:bg-primary-700 transition-colors">
                     بدء المحاضرة
                   </button>
                 )}
                 {lecture.status === "in-progress" && (
-                  <button className="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-xl font-arabic font-semibold transition-all">
+                  <button className="h-10 px-5 bg-danger-600 hover:bg-danger-700 text-white rounded-xl font-bold transition-colors">
                     إنهاء المحاضرة
                   </button>
                 )}
-                <button className="btn-secondary px-5 py-2 rounded-xl font-arabic transition-all">
+                <button className="h-10 px-5 bg-neutral-200 text-neutral-800 rounded-xl font-bold hover:bg-neutral-300 transition-colors">
                   عرض التفاصيل
                 </button>
               </div>

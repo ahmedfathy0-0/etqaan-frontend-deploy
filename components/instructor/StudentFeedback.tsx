@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { Message01, Star } from "@dga-icons/react/duotone-rounded";
 
 export default function StudentFeedback() {
   const [selectedFilter, setSelectedFilter] = useState("الكل");
@@ -41,29 +42,27 @@ export default function StudentFeedback() {
 
   const renderStars = (rating: number) => {
     return Array.from({ length: 5 }, (_, index) => (
-      <span
+      <Star
         key={index}
-        className={`text-lg ${
-          index < rating ? "text-yellow-500" : "text-gray-300"
-        }`}
-      >
-        ⭐
-      </span>
+        size={20}
+        className={index < rating ? "text-warning-500" : "text-neutral-300"}
+        aria-hidden="true"
+      />
     ));
   };
 
   return (
-    <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 card-shadow-lg border border-white/20">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-gray-900 font-arabic flex items-center">
-          <span className="text-3xl mr-3">💬</span>
+    <div className="bg-white rounded-[24px] p-6 shadow-[0_2px_10px_5px_rgba(0,10,1,0.15)] border-[1.5px] border-success-200 font-cairo">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
+        <h2 className="text-[28px] font-bold text-success-900 flex items-center gap-3">
+          <Message01 aria-hidden="true" size={32} className="text-warning-600" />
           تقييمات الطلاب
         </h2>
 
         <select
           value={selectedFilter}
           onChange={(e) => setSelectedFilter(e.target.value)}
-          className="bg-white border border-gray-300 rounded-lg px-4 py-2 font-arabic text-gray-700 focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+          className="w-full sm:w-auto h-12 bg-white border-[1.5px] border-success-200 rounded-xl px-4 text-neutral-800 focus:ring-1 focus:ring-success-700 focus:border-success-700 transition-all font-bold cursor-pointer"
         >
           <option value="الكل">جميع التقييمات</option>
           <option value="5">5 نجوم</option>
@@ -76,45 +75,45 @@ export default function StudentFeedback() {
         {feedback.map((item) => (
           <div
             key={item.id}
-            className="border border-gray-200 rounded-xl p-5 hover:shadow-md transition-all duration-300 hover:border-emerald-300"
+            className="border-[1.5px] border-neutral-200 rounded-2xl p-5 hover:shadow-md transition-all duration-300 hover:border-success-400 bg-neutral-50/50"
           >
-            <div className="flex items-start space-x-reverse space-x-4">
-              <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
+            <div className="flex items-start gap-4">
+              <div className="w-14 h-14 rounded-full overflow-hidden shrink-0 border-2 border-white shadow-sm">
                 <Image
                   src={item.studentImage}
                   alt={item.studentName}
-                  width={48}
-                  height={48}
+                  width={56}
+                  height={56}
                   className="w-full h-full object-cover"
                 />
               </div>
 
-              <div className="flex-1">
-                <div className="flex items-center justify-between mb-2">
+              <div className="flex-1 min-w-0">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
                   <div>
-                    <h4 className="font-semibold text-gray-900 font-arabic">
+                    <h4 className="font-bold text-success-900 text-lg">
                       {item.studentName}
                     </h4>
-                    <p className="text-sm text-gray-600 font-arabic">
+                    <p className="text-sm font-bold text-neutral-500">
                       {item.subject}
                     </p>
                   </div>
-                  <div className="text-left">
-                    <div className="flex items-center mb-1">
+                  <div className="flex flex-col sm:items-end">
+                    <div className="flex items-center gap-1 mb-1">
                       {renderStars(item.rating)}
                     </div>
-                    <p className="text-xs text-gray-500 font-arabic">
+                    <p className="text-xs font-bold text-neutral-400">
                       {item.date}
                     </p>
                   </div>
                 </div>
 
-                <p className="text-gray-700 leading-relaxed font-arabic">
+                <p className="text-neutral-700 leading-relaxed font-medium mt-3">
                   {item.comment}
                 </p>
 
-                <div className="flex justify-end mt-3">
-                  <button className="text-emerald-600 hover:text-emerald-700 text-sm font-arabic">
+                <div className="flex justify-end mt-4">
+                  <button className="text-primary-600 hover:text-primary-700 font-bold transition-colors">
                     رد على التقييم
                   </button>
                 </div>
@@ -124,8 +123,8 @@ export default function StudentFeedback() {
         ))}
       </div>
 
-      <div className="text-center mt-6">
-        <button className="bg-emerald-100 hover:bg-emerald-200 text-emerald-700 px-6 py-2 rounded-lg transition-colors font-arabic">
+      <div className="text-center mt-8">
+        <button className="h-12 px-8 bg-success-50 text-success-800 rounded-xl font-bold hover:bg-success-100 transition-colors border border-success-200">
           عرض المزيد من التقييمات
         </button>
       </div>

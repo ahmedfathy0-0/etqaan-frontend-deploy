@@ -3,14 +3,15 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAuth, useRequireAuth } from "@/contexts/AuthContext";
-import Header from "@/components/Header";
+import AdminHeader from "@/components/admin/AdminHeader";
+import { AdminSidebar, TabId } from "@/components/admin/AdminSidebar";
 import BackButton from "@/components/ui/BackButton";
 import { toast } from "react-hot-toast";
 import PageLoader from "@/components/ui/PageLoader";
 import { useBatchDetails } from "@/queries/useBatches";
 import { useExamDetails, useSaveExamGrades } from "@/queries/useExams";
-
 import ProtectedRoute from "@/components/ProtectedRoute";
+import { Tv01, FloppyDisk, Calendar01, Menu01, BookOpen01 } from "@dga-icons/react/duotone-rounded";
 
 interface Student {
   id: number;
@@ -47,7 +48,7 @@ export default function ExamGradesPage() {
   const batchId = params.batchId as string;
   const examId = params.examId as string;
   // Use useAuth to get user AND token
-  const { user, token, isLoading: authLoading } = useAuth();
+  const { user, token, logout, isLoading: authLoading } = useAuth();
 
   // Protect route
   // We can't use useRequireAuth easily here because we need "token" for fetch
@@ -63,6 +64,24 @@ export default function ExamGradesPage() {
 
   const [scores, setScores] = useState<Record<number, string>>({}); // batch_student_id -> score
   const [isSaving, setIsSaving] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const sidebarRoutes: Record<TabId, string> = {
+    overview: "/admin",
+    users: "/admin",
+    students: "/admin",
+    batches: "/admin",
+    quotes: "/admin",
+    notices: "/admin",
+    exams: "/sheikh",
+    sessions: "/sheikh",
+    leaderboard: "/student/dashboard",
+  };
+
+  const handleSidebar = (tab: TabId) => {
+    setMobileMenuOpen(false);
+    router.push(sidebarRoutes[tab]);
+  };
   
   const isLoading = isBatchLoading || isExamLoading;
 
@@ -131,93 +150,122 @@ export default function ExamGradesPage() {
 
   return (
     <ProtectedRoute allowedRoles={["admin", "super_admin", "sheikh"]}>
-      <div className="min-h-screen bg-gray-50 font-arabic">
-        <Header />
+      <div className="min-h-screen bg-white font-cairo text-success-900" dir="rtl">
+        <AdminHeader
+          onLogout={logout}
+          activeTab="exams"
+          onToggleMenu={() => setMobileMenuOpen(true)}
+        />
 
-        <main className="max-w-5xl mx-auto px-4 py-8">
-          <div className="mb-6">
-            <BackButton href={`/batches/${batchId}`} label="العودة للحلقة" />
-          </div>
-
-          <div className="bg-white rounded-2xl shadow-lg p-6 mb-8 border-t-4 border-orange-500">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-              <div>
-                <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-                  <span>📝</span>
-                  رصد درجات: {exam.title}
-                </h1>
-                <p className="text-gray-500 mt-1">
-                  تاريخ الامتحان:{" "}
-                  {new Date(exam.exam_date).toLocaleDateString("ar-EG")} | الدرجة
-                  العظمى: {exam.max_score}
-                </p>
-              </div>
-              <button
-                onClick={handleSave}
-                disabled={isSaving}
-                className="px-6 py-3 bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-xl font-bold hover:shadow-lg transition-all disabled:opacity-50 flex items-center gap-2"
-              >
-                {isSaving ? (
-                  <>
-                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                    جاري الحفظ...
-                  </>
-                ) : (
-                  <>
-                    <span>💾</span>
-                    حفظ الدرجات
-                  </>
-                )}
-              </button>
+        {mobileMenuOpen && (
+          <div className="fixed inset-0 z-40 bg-black/30 lg:hidden" onClick={() => setMobileMenuOpen(false)}>
+            <div className="h-full w-[280px] bg-white" onClick={(e) => e.stopPropagation()}>
+              <AdminSidebar activeTab="exams" setActiveTab={handleSidebar} mobile />
             </div>
+          </div>
+        )}
 
-            <div className="overflow-hidden rounded-xl border border-gray-200">
-              <table className="w-full text-right">
-                <thead className="bg-gray-50 text-gray-700">
-                  <tr>
-                    <th className="p-4 font-bold border-b">#</th>
-                    <th className="p-4 font-bold border-b">اسم الطالب</th>
-                    <th className="p-4 font-bold border-b w-48">
-                      الدرجة (من {exam.max_score})
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {batch.batch_students.map((bs, index) => (
-                    <tr
-                      key={bs.id}
-                      className="hover:bg-gray-50 transition-colors"
-                    >
-                      <td className="p-4 text-gray-500">{index + 1}</td>
-                      <td className="p-4 font-medium text-gray-800">
-                        {bs.student.full_name}
-                      </td>
-                      <td className="p-4">
-                        <input
-                          type="number"
-                          min="0"
-                          max={exam.max_score}
-                          value={scores[bs.id] || ""}
-                          onChange={(e) =>
-                            handleScoreChange(bs.id, e.target.value)
-                          }
-                          placeholder="0"
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all font-bold text-center text-gray-900"
-                        />
-                      </td>
+        <div className="flex min-h-[calc(100vh-114px)] gap-4 px-[10px] py-2">
+          <aside className="hidden w-[250px] shrink-0 lg:block">
+            <div className="sticky top-[122px] h-[calc(100vh-130px)] min-h-[702px] overflow-y-auto">
+              <AdminSidebar activeTab="exams" setActiveTab={handleSidebar} />
+            </div>
+          </aside>
+
+          <main className="min-w-0 flex-1 overflow-x-hidden px-4 py-6 lg:px-4">
+            <div className="mx-auto flex w-full max-w-[962px] flex-col gap-9">
+              <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div className="w-full sm:w-auto flex justify-start">
+                  <BackButton href={`/batches/${batchId}/exams`} label="العودة للامتحانات" />
+                </div>
+              </div>
+
+              <div className="bg-success-800 rounded-[24px] shadow-sm p-6 border-[1.5px] border-success-200">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                  <div>
+                    <h1 className="text-[28px] font-bold text-white flex items-center gap-3 mb-2">
+                      <Tv01 aria-hidden="true" size={36} className="text-warning-500" />
+                      رصد درجات: {exam.title}
+                    </h1>
+                    <div className="flex items-center gap-6 text-success-100">
+                      <p className="flex items-center gap-2">
+                        <Calendar01 aria-hidden="true" size={20} />
+                        تاريخ الامتحان: {new Date(exam.exam_date).toLocaleDateString("ar-EG")}
+                      </p>
+                      <p className="flex items-center gap-2">
+                        <BookOpen01 aria-hidden="true" size={20} />
+                        الدرجة العظمى: {exam.max_score}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={handleSave}
+                    disabled={isSaving}
+                    className="w-full md:w-auto h-14 flex items-center justify-center gap-2 bg-primary-600 text-white rounded-2xl font-bold hover:bg-primary-700 transition-colors disabled:opacity-50 px-8"
+                  >
+                    {isSaving ? (
+                      <>
+                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                        جاري الحفظ...
+                      </>
+                    ) : (
+                      <>
+                        <FloppyDisk aria-hidden="true" size={24} />
+                        حفظ الدرجات
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-[24px] shadow-sm border-[1.5px] border-success-200 overflow-hidden">
+                <table className="w-full text-right text-success-900">
+                  <thead className="bg-success-50 text-success-800">
+                    <tr>
+                      <th className="p-5 font-bold border-b border-success-200">#</th>
+                      <th className="p-5 font-bold border-b border-success-200">اسم الطالب</th>
+                      <th className="p-5 font-bold border-b border-success-200 w-48 text-center">
+                        الدرجة (من {exam.max_score})
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody className="divide-y divide-success-100">
+                    {batch.batch_students.map((bs, index) => (
+                      <tr
+                        key={bs.id}
+                        className="hover:bg-success-50/50 transition-colors"
+                      >
+                        <td className="p-5 text-neutral-500 font-medium">{index + 1}</td>
+                        <td className="p-5 font-bold text-success-900">
+                          {bs.student.full_name}
+                        </td>
+                        <td className="p-5">
+                          <input
+                            type="number"
+                            min="0"
+                            max={exam.max_score}
+                            value={scores[bs.id] || ""}
+                            onChange={(e) =>
+                              handleScoreChange(bs.id, e.target.value)
+                            }
+                            placeholder="0"
+                            className="w-full h-12 px-4 border-[1.5px] border-success-200 rounded-xl focus:outline-none focus:border-success-700 focus:ring-1 focus:ring-success-700 transition-all font-bold text-center text-neutral-800 bg-white"
+                          />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
 
-            {batch.batch_students.length === 0 && (
-              <div className="p-8 text-center text-gray-500">
-                لا يوجد طلاب في هذه الحلقة
+                {batch.batch_students.length === 0 && (
+                  <div className="p-12 text-center text-neutral-500 font-medium">
+                    لا يوجد طلاب في هذه الحلقة
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-        </main>
+            </div>
+          </main>
+        </div>
       </div>
     </ProtectedRoute>
   );

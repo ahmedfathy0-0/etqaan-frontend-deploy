@@ -4,6 +4,8 @@ export interface AvailableStudent {
   id: number;
   full_name: string;
   guardian_name?: string;
+  guardian_phone?: string;
+  gender?: "male" | "female";
 }
 
 export interface NewStudentData {

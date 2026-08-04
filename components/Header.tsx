@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useMemo } from "react";
+import { Home01, DashboardCircle, BookOpen01, InformationCircle, Search01, Login01, Logout01 } from "@dga-icons/react/duotone-rounded";
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function Header() {
@@ -15,59 +16,53 @@ export default function Header() {
     if (pathname.startsWith("/admin")) {
       return {
         type: "admin",
-        title: "دار الرحمن - لوحة المدير",
-        gradient: "bg-gradient-to-r from-purple-700 to-indigo-800",
+        title: "لوحة المدير",
         navItems: [
-          { href: "/", label: "الرئيسية", icon: "🏠" },
-          { href: "/admin", label: "لوحة التحكم", icon: "🛡️" },
+          { href: "/", label: "الرئيسية", icon: <Home01 aria-hidden="true" size={24} /> },
+          { href: "/admin", label: "لوحة التحكم", icon: <DashboardCircle aria-hidden="true" size={24} /> },
         ],
       };
     } else if (pathname.startsWith("/sheikh")) {
       return {
         type: "sheikh",
-        title: "دار الرحمن - لوحة الشيخ",
-        gradient: "bg-gradient-to-r from-emerald-600 to-teal-700",
+        title: "لوحة الشيخ",
         navItems: [
-          { href: "/", label: "الرئيسية", icon: "🏠" },
-          { href: "/sheikh", label: "لوحة التحكم", icon: "📊" },
+          { href: "/", label: "الرئيسية", icon: <Home01 aria-hidden="true" size={24} /> },
+          { href: "/sheikh", label: "لوحة التحكم", icon: <DashboardCircle aria-hidden="true" size={24} /> },
         ],
       };
     } else if (pathname.startsWith("/student/dashboard")) {
       return {
         type: "student-dashboard",
-        title: "دار الرحمن - لوحة الطالب",
-        gradient: "bg-gradient-to-r from-blue-600 to-indigo-700",
+        title: "لوحة الطالب",
         navItems: [
-          { href: "/", label: "الرئيسية", icon: "🏠" },
-          { href: "/student/dashboard", label: "لوحة التحكم", icon: "📊" },
+          { href: "/", label: "الرئيسية", icon: <Home01 aria-hidden="true" size={24} /> },
+          { href: "/student/dashboard", label: "لوحة التحكم", icon: <DashboardCircle aria-hidden="true" size={24} /> },
         ],
       };
     } else if (pathname.startsWith("/batches")) {
       return {
         type: "batches",
-        title: "دار الرحمن ",
-        gradient: "bg-gradient-to-r from-purple-600 to-blue-600",
+        title: "",
         navItems: [
-          { href: "/", label: "الرئيسية", icon: "🏠" },
-          { href: "/batches", label: "الحلقات", icon: "📚" },
+          { href: "/", label: "الرئيسية", icon: <Home01 aria-hidden="true" size={24} /> },
+          { href: "/batches", label: "الحلقات", icon: <BookOpen01 aria-hidden="true" size={24} /> },
         ],
       };
     } else if (pathname.startsWith("/login")) {
       return {
         type: "login",
-        title: "دار الرحمن ",
-        gradient: "bg-gradient-to-r from-purple-600 to-blue-600",
-        navItems: [{ href: "/", label: "الرئيسية", icon: "🏠" }],
+        title: "",
+        navItems: [{ href: "/", label: "الرئيسية", icon: <Home01 aria-hidden="true" size={24} /> }],
       };
     } else {
       return {
         type: "general",
-        title: "دار الرحمن ",
-        gradient: "bg-gradient-to-r from-purple-600 to-purple-700",
+        title: "",
         navItems: [
-          { href: "/", label: "الرئيسية", icon: "🏠" },
-          { href: "/batches", label: "الحلقات", icon: "📚" },
-          { href: "/about", label: "من نحن", icon: "ℹ️" },
+          { href: "/", label: "الرئيسية", icon: <Home01 aria-hidden="true" size={24} /> },
+          { href: "/batches", label: "الحلقات", icon: <BookOpen01 aria-hidden="true" size={24} /> },
+          { href: "/about", label: "من نحن", icon: <InformationCircle aria-hidden="true" size={24} /> },
         ],
       };
     }
@@ -96,18 +91,16 @@ export default function Header() {
   };
 
   return (
-    <header
-      className={`${routeInfo.gradient} backdrop-blur-sm text-white p-4 card-shadow-lg border-b border-white/20`}
-    >
+    <header className="bg-success-800 text-white p-4 shadow-md font-cairo">
       <div className="max-w-7xl mx-auto">
         {/* Top Row - Logo and User Info */}
         <div className="flex justify-between items-center mb-4">
           <Link
             href="/"
-            className="text-2xl font-bold hover:text-white/80 transition-all duration-300 font-arabic flex items-center"
+            className="text-2xl font-bold hover:text-white/80 transition-all duration-300 flex items-center"
           >
-            <span className="text-3xl ml-3">🕌</span>
-            {routeInfo.title}
+            <Image src="/images/logo.png" alt="شعار دار الرحمن" width={40} height={40} className="ml-3 object-contain invert brightness-0" />
+            {routeInfo.title ? `دار الرحمن - ${routeInfo.title}` : "دار الرحمن"}
           </Link>
 
           {/* Auth Section */}
@@ -117,10 +110,10 @@ export default function Header() {
             ) : isAuthenticated && user ? (
               <div className="flex items-center gap-4">
                 <div className="text-right hidden sm:block">
-                  <div className="font-semibold font-arabic">
+                  <div className="font-semibold font-cairo">
                     مرحباً، {user.name}
                   </div>
-                  <div className="text-sm text-white/70 font-arabic">
+                  <div className="text-sm text-success-100 font-cairo">
                     {user.role === "super_admin" && "مدير عام"}
                     {user.role === "admin" && "مدير"}
                     {user.role === "sheikh" && "شيخ"}
@@ -131,16 +124,16 @@ export default function Header() {
                   !pathname.startsWith(getDashboardLink()!) && (
                     <Link
                       href={getDashboardLink()!}
-                      className="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-xl font-arabic transition-colors"
+                      className="px-4 py-2 bg-success-700 hover:bg-success-600 rounded-xl font-cairo transition-colors font-bold"
                     >
                       لوحة التحكم
                     </Link>
                   )}
                 <button
                   onClick={logout}
-                  className="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-xl font-arabic transition-colors flex items-center gap-2"
+                  className="px-4 py-2 bg-danger-600 hover:bg-danger-700 rounded-xl font-cairo transition-colors flex items-center gap-2 font-bold"
                 >
-                  <span>🚪</span>
+                  <Logout01 aria-hidden="true" size={20} />
                   <span className="hidden sm:inline">خروج</span>
                 </button>
               </div>
@@ -148,16 +141,16 @@ export default function Header() {
               <div className="flex items-center gap-3">
                 <Link
                   href="/batches"
-                  className="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-xl font-arabic transition-colors flex items-center gap-2"
+                  className="px-4 py-2 bg-success-700 hover:bg-success-600 rounded-xl font-cairo transition-colors flex items-center gap-2 font-bold"
                 >
-                  <span>🔍</span>
+                  <Search01 aria-hidden="true" size={20} />
                   <span className="hidden sm:inline">ابحث عن حلقتك</span>
                 </Link>
                 <Link
                   href="/login"
-                  className="px-4 py-2 bg-white text-purple-700 hover:bg-white/90 rounded-xl font-arabic font-semibold transition-colors flex items-center gap-2"
+                  className="px-4 py-2 bg-warning-600 text-warning-50 hover:bg-warning-700 rounded-xl font-cairo font-bold transition-colors flex items-center gap-2"
                 >
-                  <span>🔐</span>
+                  <Login01 aria-hidden="true" size={20} />
                   تسجيل الدخول
                 </Link>
               </div>
@@ -166,22 +159,22 @@ export default function Header() {
         </div>
 
         {/* Navigation Row */}
-        <nav className="border-t border-white/20 pt-4">
+        <nav className="border-t border-success-700 pt-4 mt-2">
           <div className="flex items-center justify-center">
-            <div className="flex items-center gap-2 bg-white/10 rounded-full p-2">
+            <div className="flex items-center gap-2 bg-success-900/50 rounded-full p-2">
               {routeInfo.navItems.map((item, index) => (
                 <Link
                   key={index}
                   href={item.href}
                   className={`
-                    flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 font-arabic font-medium
+                    flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 font-cairo font-bold
                     ${isActiveLink(item.href)
-                      ? "bg-white/20 text-white shadow-md"
-                      : "hover:bg-white/10 text-white/90 hover:text-white"
+                      ? "bg-warning-600 text-warning-50 shadow-md"
+                      : "hover:bg-success-700 text-success-100 hover:text-white"
                     }
                   `}
                 >
-                  <span className="text-lg">{item.icon}</span>
+                  <span className="flex items-center justify-center">{item.icon}</span>
                   <span>{item.label}</span>
                 </Link>
               ))}

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Noto_Sans_Arabic, Geist_Mono } from "next/font/google";
+import { Cairo, Inter, Noto_Sans_Arabic, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { Toaster } from "react-hot-toast";
@@ -14,6 +14,12 @@ const notoSansArabic = Noto_Sans_Arabic({
   variable: "--font-noto-arabic",
   subsets: ["arabic"],
   weight: ["300", "400", "500", "600", "700"],
+});
+
+const cairo = Cairo({
+  variable: "--font-cairo",
+  subsets: ["arabic", "latin"],
+  weight: ["400", "500", "700"],
 });
 
 const geistMono = Geist_Mono({
@@ -39,7 +45,7 @@ export default function RootLayout({
     <html lang="ar" dir="rtl" suppressHydrationWarning>
       <body
         suppressHydrationWarning
-        className={`${inter.variable} ${notoSansArabic.variable} ${geistMono.variable} font-arabic antialiased`}
+        className={`${inter.variable} ${notoSansArabic.variable} ${cairo.variable} ${geistMono.variable} font-arabic antialiased`}
       >
         <ReactQueryProvider>
           <AuthProvider>
