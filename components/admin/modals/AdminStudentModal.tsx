@@ -86,9 +86,9 @@ export default function AdminStudentModal({
       maxWidth="max-w-[430px]"
       overflowVisible={true}
     >
-      <form onSubmit={handleSaveStudent} className="flex flex-col items-center gap-[32px] w-full font-cairo">
+      <form onSubmit={handleSaveStudent} className="flex flex-col gap-6 w-full font-cairo">
         {/* Frame 1 */}
-        <div className="flex flex-col items-end gap-[16px] w-full max-w-[398px]">
+        <div className="flex flex-col gap-4 w-full">
           {formError && (
             <div className="w-full bg-red-50 border border-red-200 text-red-700 p-3 rounded-xl font-arabic text-sm text-right">
               {formError}
@@ -97,77 +97,91 @@ export default function AdminStudentModal({
 
           <div className="flex flex-col items-end gap-[12px] w-full">
             <label className="text-right text-[#17481B] font-medium text-[24px] leading-[150%] w-full">اسم الطالب</label>
+          <div className="flex flex-col gap-2 w-full">
+            <label className="text-right text-success-800 font-bold text-lg w-full">اسم الطالب المربع</label>
             <input
               type="text"
               value={newStudent.full_name}
               onChange={(e) =>
                 setNewStudent({ ...newStudent, full_name: e.target.value })
               }
-              className="box-border flex flex-row items-center p-[8px] gap-[8px] w-full h-[48px] border border-[#A3C3D7] rounded-[8px] focus:outline-none focus:border-[#17481B] text-[#79817A] bg-white placeholder:text-[#79817A] text-[16px] text-right leading-[150%] font-medium"
+              className="w-full h-12 px-4 border-2 border-success-200 rounded-xl focus:outline-none focus:border-success-700 focus:ring-1 focus:ring-success-700 text-neutral-800 bg-white placeholder:text-neutral-500 text-base font-medium text-right transition-all"
               placeholder="مثال: أحمد محمد"
               required
             />
           </div>
 
-          <div className="flex flex-col items-end gap-[12px] w-full">
-            <label className="text-right text-[#17481B] font-medium text-[24px] leading-[150%] w-full">اسم ولي الأمر</label>
+          <div className="flex flex-col gap-2 w-full">
+            <label className="text-right text-success-800 font-bold text-lg w-full">اسم ولي الأمر</label>
             <input
               type="text"
               value={newStudent.guardian_name}
               onChange={(e) =>
                 setNewStudent({ ...newStudent, guardian_name: e.target.value })
               }
-              className="box-border flex flex-row items-center p-[8px] gap-[8px] w-full h-[48px] border border-[#A3C3D7] rounded-[8px] focus:outline-none focus:border-[#17481B] text-[#79817A] bg-white placeholder:text-[#79817A] text-[16px] text-right leading-[150%] font-medium"
+              className="w-full h-12 px-4 border-2 border-success-200 rounded-xl focus:outline-none focus:border-success-700 focus:ring-1 focus:ring-success-700 text-neutral-800 bg-white placeholder:text-neutral-500 text-base font-medium text-right transition-all"
               placeholder="مثال: محمد علي"
             />
           </div>
 
-          <div className="flex flex-col items-end gap-[12px] w-full">
-            <label className="text-right text-[#17481B] font-medium text-[24px] leading-[150%] w-full">رقم هاتف ولي الأمر</label>
+          <div className="flex flex-col gap-2 w-full">
+            <label className="text-right text-success-800 font-bold text-lg w-full">رقم هاتف ولي الأمر</label>
             <input
               type="text"
               value={newStudent.guardian_phone}
               onChange={(e) =>
                 setNewStudent({ ...newStudent, guardian_phone: e.target.value })
               }
-              className="box-border flex flex-row items-center p-[8px] gap-[8px] w-full h-[48px] border border-[#A3C3D7] rounded-[8px] focus:outline-none focus:border-[#17481B] text-[#79817A] bg-white placeholder:text-[#79817A] text-[16px] text-right leading-[150%] font-medium"
+              className="w-full h-12 px-4 border-2 border-success-200 rounded-xl focus:outline-none focus:border-success-700 focus:ring-1 focus:ring-success-700 text-neutral-800 bg-white placeholder:text-neutral-500 text-base font-medium text-right transition-all"
               placeholder="0500000000"
               dir="ltr"
             />
           </div>
 
-          <div className="flex flex-col items-end gap-[12px] w-full">
-            <label className="text-right text-[#17481B] font-medium text-[24px] leading-[150%] w-full">الجنس</label>
+          <div className="flex flex-col gap-2 w-full">
+            <label className="text-right text-success-800 font-bold text-lg w-full">الجنس</label>
             <div className="w-full relative">
               <select
                 value={newStudent.gender}
                 onChange={(e) =>
                   setNewStudent({ ...newStudent, gender: e.target.value as "male" | "female" })
                 }
-                className="box-border flex flex-row items-center p-[8px] gap-[8px] w-full h-[48px] border border-[#A3C3D7] rounded-[8px] focus:outline-none focus:border-[#17481B] text-[#79817A] bg-white text-[16px] text-right leading-[150%] font-medium appearance-none"
+                className="w-full h-12 px-4 pl-10 border-2 border-success-200 rounded-xl focus:outline-none focus:border-success-700 focus:ring-1 focus:ring-success-700 text-neutral-800 bg-white text-base font-medium text-right appearance-none transition-all"
                 dir="rtl"
               >
                 <option value="male">ذكر</option>
                 <option value="female">أنثى</option>
               </select>
-              <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                <ArrowDown01 aria-hidden="true" size={24} color="#79817A" />
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                <ArrowDown01 aria-hidden="true" size={20} className="text-neutral-500" />
               </div>
             </div>
           </div>
         </div>
 
-        {/* Button */}
-        <button
-          type="submit"
-          className="flex flex-row justify-center items-center py-[8px] px-[4px] gap-[16px] w-full max-w-[398px] h-[56px] bg-[#17481B] rounded-[16px] transition-colors disabled:opacity-50"
-          disabled={formLoading}
-        >
-          <FloppyDisk aria-hidden="true" size={24} color="#E2F7E4" />
-          <span className="font-bold text-[18px] text-[#FBFFFC] leading-[150%]">
-             {formLoading ? "جاري الحفظ..." : "حفظ الطالب"}
-          </span>
-        </button>
+        {/* Buttons */}
+        <div className="flex flex-row gap-3 w-full mt-2">
+          <button
+            type="submit"
+            className="flex-1 flex flex-row justify-center items-center gap-2 h-14 bg-success-800 hover:bg-success-900 rounded-2xl transition-colors disabled:opacity-50"
+            disabled={formLoading}
+          >
+            <FloppyDisk aria-hidden="true" size={24} className="text-white" />
+            <span className="font-bold text-lg text-white">
+               {formLoading ? "جاري الحفظ..." : "حفظ الطالب"}
+            </span>
+          </button>
+          
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex-1 flex flex-row justify-center items-center h-14 bg-neutral-100 hover:bg-neutral-200 border-2 border-neutral-200 rounded-2xl transition-colors"
+          >
+            <span className="font-bold text-lg text-neutral-700">
+              إلغاء
+            </span>
+          </button>
+        </div>
       </form>
     </Modal>
   );

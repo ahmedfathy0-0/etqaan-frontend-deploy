@@ -41,16 +41,16 @@ export default function AddStudentModal({
       maxWidth="max-w-[430px]"
       overflowVisible={true}
     >
-      <div className="flex flex-col items-center gap-[32px] w-full font-cairo">
-        <div className="flex flex-col items-end gap-[16px] w-full max-w-[398px]">
+      <div className="flex flex-col gap-6 w-full font-cairo">
+        <div className="flex flex-col gap-4 w-full">
           {formError && (
             <div className="w-full bg-red-50 border border-red-200 text-red-700 p-3 rounded-xl font-arabic text-sm text-right">
               {formError}
             </div>
           )}
 
-          <div className="flex flex-col items-end gap-[12px] w-full">
-            <label className="text-right text-[#17481B] font-medium text-[24px] leading-[150%] w-full">
+          <div className="flex flex-col gap-2 w-full">
+            <label className="text-right text-success-800 font-bold text-lg w-full">
               اختر الطلاب ({selectedStudentIds.length})
             </label>
             <div className="w-full relative">
@@ -59,27 +59,28 @@ export default function AddStudentModal({
                 value={selectedStudentIds}
                 onChange={(val) => setSelectedStudentIds(val as number[])}
                 placeholder="ابحث عن اسم الطالب..."
-                className="mb-1"
+                className="mb-1 [&>div]:!h-12 [&>div]:!border-2 [&>div]:!border-success-200 [&>div]:!rounded-xl focus:[&>div]:!border-success-700 transition-all"
               />
             </div>
           </div>
         </div>
 
-        <div className="flex flex-col gap-4 w-full max-w-[398px]">
+        <div className="flex flex-row gap-3 w-full mt-2">
           <button
             onClick={onEnroll}
             disabled={selectedStudentIds.length === 0 || formLoading}
-            className="flex flex-row justify-center items-center py-[8px] px-[4px] gap-[16px] w-full h-[56px] bg-[#17481B] rounded-[16px] transition-colors disabled:opacity-50"
+            className="flex-1 flex flex-row justify-center items-center gap-2 h-14 bg-success-800 hover:bg-success-900 rounded-2xl transition-colors disabled:opacity-50"
           >
-            <span className="font-bold text-[18px] text-[#FBFFFC] leading-[150%]">
+            <span className="font-bold text-lg text-white">
               {formLoading ? "جاري الإضافة..." : `إضافة ${selectedStudentIds.length} طالب`}
             </span>
           </button>
+          
           <button
             onClick={onClose}
-            className="flex flex-row justify-center items-center py-[8px] px-[4px] gap-[16px] w-full h-[56px] bg-gray-100 rounded-[16px] transition-colors"
+            className="flex-1 flex flex-row justify-center items-center h-14 bg-neutral-100 hover:bg-neutral-200 border-2 border-neutral-200 rounded-2xl transition-colors"
           >
-            <span className="font-bold text-[18px] text-gray-700 leading-[150%]">
+            <span className="font-bold text-lg text-neutral-700">
               إلغاء
             </span>
           </button>
