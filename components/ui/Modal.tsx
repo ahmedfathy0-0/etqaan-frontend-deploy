@@ -64,7 +64,7 @@ export default function Modal({
       >
         <button
           onClick={onClose}
-          className="absolute top-3 left-3 p-2 text-neutral-400 hover:text-neutral-700 bg-neutral-100 hover:bg-neutral-200 rounded-full transition-colors focus:outline-none z-[110]"
+          className="absolute top-3 left-3 p-2 text-neutral-900 hover:text-neutral-700 bg-neutral-300 hover:bg-neutral-300 rounded-full transition-colors focus:outline-none z-[110]"
           aria-label="Close modal"
         >
           <Cancel01 aria-hidden="true" size={20} />
