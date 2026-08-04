@@ -95,8 +95,6 @@ export default function AdminStudentModal({
             </div>
           )}
 
-          <div className="flex flex-col items-end gap-[12px] w-full">
-            <label className="text-right text-[#17481B] font-medium text-[24px] leading-[150%] w-full">اسم الطالب</label>
           <div className="flex flex-col gap-2 w-full">
             <label className="text-right text-success-800 font-bold text-lg w-full">اسم الطالب المربع</label>
             <input
