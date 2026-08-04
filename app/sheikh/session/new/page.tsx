@@ -192,7 +192,7 @@ export default function NewSessionPage() {
 
       if (!studentId) {
         toast.success("تم حفظ الحضور بنجاح");
-        router.push(`/batches/${selectedBatchId}`);
+        router.push(`/batches/detail?id=${selectedBatchId}`);
       } else {
         toast.success("تم حفظ الطالب");
       }
@@ -257,7 +257,7 @@ export default function NewSessionPage() {
           <div className="max-w-5xl mx-auto px-4 py-8" dir="rtl">
             <div className="mb-6 flex">
               <BackButton
-                href={selectedBatchId ? `/batches/${selectedBatchId}` : "/batches"}
+                href={selectedBatchId ? `/batches/detail?id=${selectedBatchId}` : "/batches"}
                 label="العودة للحلقة"
               />
             </div>

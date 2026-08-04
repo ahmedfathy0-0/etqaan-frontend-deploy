@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useSearchParams, useRouter } from "next/navigation";
 import { useAuth, useRequireAuth } from "@/contexts/AuthContext";
 import AdminHeader from "@/components/admin/AdminHeader";
 import { AdminSidebar, TabId } from "@/components/admin/AdminSidebar";
@@ -43,10 +43,10 @@ interface Batch {
 }
 
 export default function ExamGradesPage() {
-  const params = useParams();
+  const searchParams = useSearchParams();
+  const batchId = searchParams.get("batchId") || "";
+  const examId = searchParams.get("examId") || "";
   const router = useRouter();
-  const batchId = params.batchId as string;
-  const examId = params.examId as string;
   // Use useAuth to get user AND token
   const { user, token, logout, isLoading: authLoading } = useAuth();
 
@@ -134,7 +134,7 @@ export default function ExamGradesPage() {
       await saveGradesMutate({ examId, grades: validResults, batchId });
 
       toast.success("تم حفظ الدرجات وتحديث النقاط بنجاح! 🎉");
-      router.push(`/batches/${batchId}`);
+      router.push(`/batches/detail?id=${batchId}`);
     } catch (err: any) {
       toast.error(err.response?.data?.message || "فشل حفظ الدرجات");
     } finally {
@@ -176,7 +176,7 @@ export default function ExamGradesPage() {
             <div className="mx-auto flex w-full max-w-[962px] flex-col gap-9">
               <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
                 <div className="w-full sm:w-auto flex justify-start">
-                  <BackButton href={`/batches/${batchId}/exams`} label="العودة للامتحانات" />
+                  <BackButton href={`/batches/exams?batchId=${batchId}`} label="العودة للامتحانات" />
                 </div>
               </div>
 

@@ -5,20 +5,14 @@ import UpcomingLectures from "@/components/instructor/UpcomingLectures";
 import StudentFeedback from "@/components/instructor/StudentFeedback";
 import StudentsManagement from "@/components/instructor/StudentsManagement";
 import QuickStats from "@/components/instructor/QuickStats";
-
-export default async function InstructorDashboard({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = await params;
+export default async function InstructorDashboard() {
   return (
     <div className="bg-success-50 min-h-screen font-cairo" dir="rtl">
       <Header />
 
       <main className="p-6 max-w-7xl mx-auto py-12">
           {/* Welcome Section */}
-          <InstructorOverview instructorId={id} />
+          <InstructorOverview />
 
           {/* Quick Stats */}
           <QuickStats />

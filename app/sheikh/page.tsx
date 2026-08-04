@@ -116,7 +116,7 @@ export default function SheikhDashboard() {
                         .map((batch: any) => (
                         <Link
                           key={batch.id}
-                          href={`/batches/${batch.id}`}
+                          href={`/batches/detail?id=${batch.id}`}
                           className="bg-white border border-[#A3C3D7] rounded-[16px] p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col gap-4"
                         >
                           <div className="flex justify-between items-start w-full">

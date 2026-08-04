@@ -3,12 +3,7 @@ import WelcomeCard from "@/components/WelcomeCard";
 import InfoCards from "@/components/InfoCards";
 import { Calendar01, Target01, TickDouble01, Time02 } from "@dga-icons/react/duotone-rounded";
 
-export default async function StudentDashboard({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = await params;
+export default async function StudentDashboard() {
   return (
     <div className="bg-success-50 min-h-screen font-cairo" dir="rtl">
       <Header />

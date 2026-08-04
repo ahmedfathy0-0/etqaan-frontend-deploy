@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
   Add01,
@@ -64,7 +64,8 @@ const medalStyles = [
 ];
 
 export default function BatchDetailsPage() {
-  const { batchId } = useParams<{ batchId: string }>();
+  const searchParams = useSearchParams();
+  const batchId = searchParams.get("id") || "";
   const router = useRouter();
   const { user, logout } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
@@ -176,7 +177,7 @@ export default function BatchDetailsPage() {
             <button onClick={() => setShowAddStudentModal(true)} className="flex h-14 min-w-[190px] items-center justify-center gap-4 rounded-2xl bg-primary-600 px-5 font-bold text-white hover:bg-primary-700">
               <Add01 aria-hidden="true" size={24} /> إضافة طالب
             </button>
-            <Link href={`/batches/${batchId}/exams`} className="flex h-14 min-w-[190px] items-center justify-center gap-4 rounded-2xl bg-success-800 px-5 font-bold text-white hover:bg-success-900">
+            <Link href={`/batches/exams?batchId=${batchId}`} className="flex h-14 min-w-[190px] items-center justify-center gap-4 rounded-2xl bg-success-800 px-5 font-bold text-white hover:bg-success-900">
               <Tv01 aria-hidden="true" size={24} /> إدارة الاختبارات
             </Link>
           </>
@@ -283,7 +284,7 @@ export default function BatchDetailsPage() {
                 <section className="rounded-2xl bg-white p-4 shadow-[0_2px_10px_5px_rgba(34,23,1,0.25)]" aria-labelledby="exams-title">
                   <div className="mb-4 flex items-center justify-between gap-3">
                     <h2 id="exams-title" className="text-2xl font-bold">الاختبارات السابقة</h2>
-                    <Link href={`/batches/${batchId}/exams`} className="flex items-center gap-1 font-medium text-secondary-700">
+                    <Link href={`/batches/exams?batchId=${batchId}`} className="flex items-center gap-1 font-medium text-secondary-700">
                       {new Date().getFullYear()} <ArrowDown01 aria-hidden="true" size={24} />
                     </Link>
                   </div>
@@ -292,7 +293,7 @@ export default function BatchDetailsPage() {
                       <p className="py-6 text-center text-neutral-700">جاري تحميل الاختبارات...</p>
                     ) : exams.length ? (
                       exams.slice(0, 3).map((exam) => (
-                        <Link key={exam.id} href={`/batches/${batchId}/exams/${exam.id}/grades`} className="flex min-h-[40px] items-center gap-2 hover:text-success-700">
+                        <Link key={exam.id} href={`/batches/exams/grades?batchId=${batchId}&examId=${exam.id}`} className="flex min-h-[40px] items-center gap-2 hover:text-success-700">
                           <span className="min-w-0 flex-1 truncate">{exam.title}</span>
                           <span className="shrink-0 rounded-full bg-primary-200 px-4 py-2 text-sm text-primary-800">الدرجة من {exam.max_score}</span>
                           <ArrowLeft01 aria-hidden="true" size={24} />
@@ -303,7 +304,7 @@ export default function BatchDetailsPage() {
                     )}
                   </div>
                   {canManage && (
-                    <Link href={`/batches/${batchId}/exams`} className="mt-6 flex h-10 w-full items-center justify-center rounded-2xl border-2 border-success-700 font-bold hover:bg-success-100">
+                    <Link href={`/batches/exams?batchId=${batchId}`} className="mt-6 flex h-10 w-full items-center justify-center rounded-2xl border-2 border-success-700 font-bold hover:bg-success-100">
                       عرض وإدارة الاختبارات
                     </Link>
                   )}
@@ -318,7 +319,7 @@ export default function BatchDetailsPage() {
         <div className="fixed inset-x-0 bottom-0 z-20 grid grid-cols-3 gap-2 border-t border-neutral-300 bg-white p-3 lg:hidden">
           <button onClick={() => setShowAddStudentModal(true)} className="flex h-11 items-center justify-center gap-2 rounded-xl bg-primary-600 text-sm font-bold text-white"><Add01 size={20} /> إضافة طالب</button>
           <button onClick={() => setShowAddSessionModal(true)} className="flex h-11 items-center justify-center gap-2 rounded-xl bg-warning-600 text-sm font-bold text-white"><TaskAdd01 size={20} /> الحضور</button>
-          <Link href={`/batches/${batchId}/exams`} className="flex h-11 items-center justify-center gap-2 rounded-xl bg-success-800 text-sm font-bold text-white"><Tv01 size={20} /> الاختبارات</Link>
+          <Link href={`/batches/exams?batchId=${batchId}`} className="flex h-11 items-center justify-center gap-2 rounded-xl bg-success-800 text-sm font-bold text-white"><Tv01 size={20} /> الاختبارات</Link>
         </div>
       )}
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import AdminHeader from "@/components/admin/AdminHeader";
 import { AdminSidebar, TabId } from "@/components/admin/AdminSidebar";
@@ -29,9 +29,9 @@ interface Batch {
 }
 
 export default function ExamDashboardPage() {
-  const params = useParams();
+  const searchParams = useSearchParams();
+  const batchId = searchParams.get("batchId") || "";
   const router = useRouter();
-  const batchId = params.batchId as string;
   const { user, token, logout, isLoading: authLoading } = useAuth();
 
   const { data: batchDetails, isLoading: isBatchLoading } = useBatchDetails(batchId);
@@ -123,7 +123,7 @@ export default function ExamDashboardPage() {
             <div className="mx-auto flex w-full max-w-[962px] flex-col gap-9">
               <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
                 <div className="w-full sm:w-auto flex justify-start">
-                  <BackButton href={`/batches/${batchId}`} label="العودة للحلقة" />
+                  <BackButton href={`/batches/detail?id=${batchId}`} label="العودة للحلقة" />
                 </div>
                 <button
                   onClick={() => setShowCreateModal(true)}
@@ -168,7 +168,7 @@ export default function ExamDashboardPage() {
                     </div>
 
                     <Link
-                      href={`/batches/${batchId}/exams/${exam.id}/grades`}
+                      href={`/batches/exams/grades?batchId=${batchId}&examId=${exam.id}`}
                       className="w-full h-12 flex items-center justify-center gap-2 bg-success-50 text-success-800 rounded-xl font-bold hover:bg-success-800 hover:text-white transition-all border-[1.5px] border-transparent"
                     >
                       <Award01 aria-hidden="true" size={24} /> رصد الدرجات

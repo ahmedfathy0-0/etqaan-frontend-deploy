@@ -26,7 +26,7 @@ export default function BatchAdminActions({
           إضافة طالب
         </button>
         <Link
-          href={`/batches/${batchId}/exams`}
+          href={`/batches/exams?batchId=${batchId}`}
           className="flex items-center justify-center gap-2 p-4 bg-orange-50 hover:bg-orange-100 text-orange-700 rounded-xl font-arabic transition-colors"
         >
           <span className="text-2xl">📝</span>

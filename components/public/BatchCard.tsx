@@ -22,7 +22,7 @@ export default function BatchCard({
 }: BatchCardProps) {
 
   return (
-    <Link href={`/batches/${id}`}>
+    <Link href={`/batches/detail?id=${id}`}>
       <div className="group relative bg-white rounded-[24px] overflow-hidden shadow-[0_2px_10px_5px_rgba(0,10,1,0.15)] hover:shadow-[0_4px_20px_10px_rgba(0,10,1,0.2)] transition-all duration-300 cursor-pointer border-[1.5px] border-success-200 hover:border-success-700 font-cairo">
         {/* Header */}
         <div className="bg-success-800 p-6 relative overflow-hidden flex flex-col justify-between min-h-[140px]">

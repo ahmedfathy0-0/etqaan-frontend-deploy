@@ -1,13 +1,7 @@
 import Image from "next/image";
 import { Star, Award01, UserGroup, BookOpen01 } from "@dga-icons/react/duotone-rounded";
 
-interface InstructorOverviewProps {
-  instructorId: string;
-}
-
-export default function InstructorOverview({
-  instructorId,
-}: InstructorOverviewProps) {
+export default function InstructorOverview() {
   const instructorImagePath = "/images/profile/teacher.png";
 
   return (

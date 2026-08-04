@@ -108,7 +108,7 @@ export default function AdminBatchesTab({
             </p>
 
             <Link
-              href={`/batches/${batch.id}`}
+              href={`/batches/detail?id=${batch.id}`}
               className="mt-auto flex h-10 w-full items-center justify-center rounded-2xl border-2 border-success-700 text-lg font-bold text-success-900 transition-colors hover:bg-success-100"
             >
               عرض التفاصيل
