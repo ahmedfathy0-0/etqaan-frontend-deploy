@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import AppLogo from "@/components/ui/AppLogo";
 import { useState, useEffect } from "react";
 import { Login01, View, ViewOff } from "@dga-icons/react/duotone-rounded";
 import GuestRoute from "@/components/GuestRoute";
@@ -49,14 +50,7 @@ export default function LoginPage() {
     <GuestRoute>
       <main className="min-h-screen bg-success-50 px-4 py-12 font-cairo md:flex md:items-center md:justify-center md:bg-white md:px-6 md:py-9">
         <section className="mx-auto flex w-full max-w-[600px] flex-col items-center md:max-w-[1232px] md:gap-9">
-          <Image
-            src="/images/logo.png"
-            alt="شعار دار الرحمن"
-            width={112}
-            height={112}
-            className="h-28 w-28 object-contain"
-            priority
-          />
+          <AppLogo className="h-40 w-40 object-contain text-success-800" />
 
           <div className="mt-10 flex w-full max-w-[600px] flex-col items-center gap-12 md:mt-0 md:gap-9">
             <h1 className="w-full text-center text-[40px] font-bold leading-[1.5] text-success-800 md:text-[60px]">

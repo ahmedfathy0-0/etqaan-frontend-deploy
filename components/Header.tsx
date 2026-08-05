@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useMemo } from "react";
+import AppLogo from "@/components/ui/AppLogo";
 import { Home01, DashboardCircle, BookOpen01, InformationCircle, Search01, Login01, Logout01 } from "@dga-icons/react/duotone-rounded";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -91,7 +92,7 @@ export default function Header() {
   };
 
   return (
-    <header className="bg-success-800 text-white p-4 shadow-md font-cairo">
+    <header className="bg-success-800 text-white p-4 shadow-md font-cairo" dir="rtl">
       <div className="max-w-7xl mx-auto">
         {/* Top Row - Logo and User Info */}
         <div className="flex justify-between items-center mb-4">
@@ -99,7 +100,7 @@ export default function Header() {
             href="/"
             className="text-2xl font-bold hover:text-white/80 transition-all duration-300 flex items-center"
           >
-            <Image src="/images/logo.png" alt="شعار دار الرحمن" width={40} height={40} className="ml-3 object-contain invert brightness-0" />
+            <AppLogo className="ml-3 w-20 h-20 object-contain text-white" />
             {routeInfo.title ? `دار الرحمن - ${routeInfo.title}` : "دار الرحمن"}
           </Link>
 

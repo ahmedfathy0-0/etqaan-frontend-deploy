@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { ArrowRight01 } from "@dga-icons/react/duotone-rounded";
 
 interface BackButtonProps {
   label?: string;
@@ -24,7 +25,7 @@ export default function BackButton({
     return (
       <Link href={href} className={baseClasses}>
         <span className="transform transition-transform group-hover:-translate-x-1">
-          ➡️
+          <ArrowRight01 aria-hidden="true" size={20} />
         </span>
         <span>{label}</span>
       </Link>
@@ -42,7 +43,7 @@ export default function BackButton({
   return (
     <button onClick={handleClick} className={baseClasses}>
       <span className="transform transition-transform group-hover:-translate-x-1">
-        ➡️
+        <ArrowRight01 aria-hidden="true" size={20} />
       </span>
       <span>{label}</span>
     </button>

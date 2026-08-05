@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
-  Add01,
   ArrowDown01,
   ArrowLeft01,
   Award01,
@@ -15,6 +14,7 @@ import {
   Search01,
   TaskAdd01,
   Tv01,
+  UserAdd01,
 } from "@dga-icons/react/duotone-rounded";
 import { toast } from "react-hot-toast";
 import { useAuth } from "@/contexts/AuthContext";
@@ -175,7 +175,7 @@ export default function BatchDetailsPage() {
               <TaskAdd01 aria-hidden="true" size={24} /> تسجيل الحضور
             </button>
             <button onClick={() => setShowAddStudentModal(true)} className="flex h-14 min-w-[190px] items-center justify-center gap-4 rounded-2xl bg-primary-600 px-5 font-bold text-white hover:bg-primary-700">
-              <Add01 aria-hidden="true" size={24} /> إضافة طالب
+              <UserAdd01 aria-hidden="true" size={24} /> إضافة طالب
             </button>
             <Link href={`/batches/exams?batchId=${batchId}`} className="flex h-14 min-w-[190px] items-center justify-center gap-4 rounded-2xl bg-success-800 px-5 font-bold text-white hover:bg-success-900">
               <Tv01 aria-hidden="true" size={24} /> إدارة الاختبارات
@@ -317,7 +317,7 @@ export default function BatchDetailsPage() {
 
       {canManage && (
         <div className="fixed inset-x-0 bottom-0 z-20 grid grid-cols-3 gap-2 border-t border-neutral-300 bg-white p-3 lg:hidden">
-          <button onClick={() => setShowAddStudentModal(true)} className="flex h-11 items-center justify-center gap-2 rounded-xl bg-primary-600 text-sm font-bold text-white"><Add01 size={20} /> إضافة طالب</button>
+          <button onClick={() => setShowAddStudentModal(true)} className="flex h-11 items-center justify-center gap-2 rounded-xl bg-primary-600 text-sm font-bold text-white"><UserAdd01 size={20} /> إضافة طالب</button>
           <button onClick={() => setShowAddSessionModal(true)} className="flex h-11 items-center justify-center gap-2 rounded-xl bg-warning-600 text-sm font-bold text-white"><TaskAdd01 size={20} /> الحضور</button>
           <Link href={`/batches/exams?batchId=${batchId}`} className="flex h-11 items-center justify-center gap-2 rounded-xl bg-success-800 text-sm font-bold text-white"><Tv01 size={20} /> الاختبارات</Link>
         </div>
