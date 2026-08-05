@@ -98,9 +98,9 @@ export default function Header() {
         <div className="flex justify-between items-center mb-4">
           <Link
             href="/"
-            className="text-2xl font-bold hover:text-white/80 transition-all duration-300 flex items-center"
+            className="text-lg md:text-2xl font-bold hover:text-white/80 transition-all duration-300 flex items-center"
           >
-            <AppLogo className="ml-3 w-20 h-20 object-contain text-white" />
+            <AppLogo className="ml-2 md:ml-3 w-12 h-12 md:w-16 md:h-16 lg:w-20 lg:h-20 object-contain text-white shrink-0" />
             {routeInfo.title ? `دار الرحمن - ${routeInfo.title}` : "دار الرحمن"}
           </Link>
 

@@ -66,7 +66,7 @@ export default function AdminHeader({ onLogout, onAddUser, onAddBatch, onToggleM
 
       <header className="relative z-30 flex h-[149px] flex-col bg-success-800 p-4 text-white lg:hidden" dir="rtl">
         <div className="flex w-full items-start justify-between">
-          <AppLogo className="h-28 w-28 text-white object-contain mr-2" />
+          <AppLogo className="h-16 w-16 text-white object-contain mr-2 shrink-0" />
           <div className="flex items-center gap-2 pt-1">
             <button onClick={onLogout} aria-label="تسجيل الخروج" className="flex h-[32px] w-[32px] items-center justify-center rounded-full border border-success-50 bg-neutral-700 text-success-50">
               <Login01 aria-hidden="true" size={16} />

@@ -11,6 +11,8 @@ import SearchableSelect from "@/components/ui/SearchableSelect";
 import BackButton from "@/components/ui/BackButton";
 import { useBatches, useBatchDetails } from "@/queries/useBatches";
 import { useCreateSession } from "@/queries/useSessions";
+import { api } from "@/lib/api";
+import { TaskAdd01, Calendar01, Book01, BookOpen01, Award01, FloppyDisk, Note01 } from "@dga-icons/react/duotone-rounded";
 
 interface Batch {
   id: number;
@@ -66,6 +68,128 @@ export default function NewSessionPage() {
   const students = batchDetails?.students || [];
   
   const { mutateAsync: createSessionMutate } = useCreateSession();
+
+  const parseRange = (rangeString: string | null) => {
+    if (!rangeString) return { startSurahId: "", startAyah: "", endSurahId: "", endAyah: "" };
+    const parts = rangeString.split("-").map(p => p.trim());
+    let startStr = parts[0] || "";
+    let endStr = parts.length > 1 ? parts[1] : "";
+
+    let startSurah = null;
+    let startAyah = "";
+    for (const s of SURAHS) {
+      if (startStr.startsWith(s.name)) {
+        startSurah = s;
+        startAyah = startStr.substring(s.name.length).trim();
+        break;
+      }
+    }
+
+    let endSurah = startSurah;
+    let endAyah = "";
+    if (endStr) {
+      let foundEndSurah = null;
+      for (const s of SURAHS) {
+        if (endStr.startsWith(s.name)) {
+          foundEndSurah = s;
+          endAyah = endStr.substring(s.name.length).trim();
+          break;
+        }
+      }
+      if (foundEndSurah) {
+        endSurah = foundEndSurah;
+      } else {
+        endAyah = endStr;
+      }
+    }
+
+    return {
+      startSurahId: startSurah ? startSurah.id : "",
+      startAyah: startAyah,
+      endSurahId: endSurah ? endSurah.id : "",
+      endAyah: endAyah
+    };
+  };
+
+  const mapGradeToNumber = (grade: string | null) => {
+    switch (grade) {
+      case "excellent": return 100;
+      case "very_good": return 90;
+      case "good": return 80;
+      case "acceptable": return 70;
+      case "weak": return 50;
+      case "redo": return 0;
+      default: return "";
+    }
+  };
+
+  // Fetch existing records when batch or date changes
+  useEffect(() => {
+    if (!selectedBatchId || !sessionDate || !token) return;
+
+    const fetchExistingRecords = async () => {
+      try {
+        const res = await api.get(`/sessions/records`, {
+          params: { batchId: selectedBatchId, date: sessionDate }
+        });
+        
+        if (res.data && Array.isArray(res.data)) {
+          setRecords((prev) => {
+            // First, reset all students to default empty state
+            const reset: Record<number, AttendanceRecord> = {};
+            students.forEach((s: any) => {
+              reset[s.id] = {
+                studentId: s.id,
+                status: "present",
+                jadeedStartSurahId: "",
+                jadeedStartAyah: "",
+                jadeedEndSurahId: "",
+                jadeedEndAyah: "",
+                jadeedGrade: "",
+                murajaStartSurahId: "",
+                murajaStartAyah: "",
+                murajaEndSurahId: "",
+                murajaEndAyah: "",
+                murajaGrade: "",
+                behaviorNote: "",
+                bonus: "",
+              };
+            });
+
+            // Then merge fetched records
+            res.data.forEach((r: any) => {
+              if (!r.studentId) return;
+              
+              const jadeedParsed = parseRange(r.jadeed_range);
+              const murajaParsed = parseRange(r.muraja_range);
+              
+              reset[r.studentId] = {
+                studentId: r.studentId,
+                status: r.attendance_status || "",
+                jadeedStartAyah: jadeedParsed.startAyah,
+                jadeedStartSurahId: jadeedParsed.startSurahId,
+                jadeedEndSurahId: jadeedParsed.endSurahId,
+                jadeedEndAyah: jadeedParsed.endAyah,
+                jadeedGrade: mapGradeToNumber(r.jadeed_grade),
+                murajaStartAyah: murajaParsed.startAyah,
+                murajaStartSurahId: murajaParsed.startSurahId,
+                murajaEndSurahId: murajaParsed.endSurahId,
+                murajaEndAyah: murajaParsed.endAyah,
+                murajaGrade: mapGradeToNumber(r.muraja_grade),
+                behaviorNote: r.behavior_note || "",
+                bonus: r.bonus_points ? r.bonus_points : "",
+              };
+            });
+            return reset;
+          });
+        }
+      } catch (err) {
+        console.error("Failed to load existing session data", err);
+      }
+    };
+
+    fetchExistingRecords();
+  }, [selectedBatchId, sessionDate, token]);
 
   // Initialize records when students load
   useEffect(() => {
@@ -197,7 +321,9 @@ export default function NewSessionPage() {
         toast.success("تم حفظ الطالب");
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || "فشل حفظ الحضور");
+      const errMsg = err.response?.data?.message || "فشل حفظ الحضور";
+      setError(errMsg);
+      toast.error(errMsg);
     } finally {
       if (studentId) {
         setSavingStudent((prev) => ({ ...prev, [studentId]: false }));
@@ -254,51 +380,45 @@ export default function NewSessionPage() {
 
         {/* Main Content Area */}
         <main className="w-full min-w-0 flex-1 pb-[96px] lg:w-auto lg:pb-0">
-          <div className="max-w-5xl mx-auto px-4 py-8" dir="rtl">
+          <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 py-8" dir="rtl">
             <div className="mb-6 flex">
               <BackButton
                 href={selectedBatchId ? `/batches/detail?id=${selectedBatchId}` : "/batches"}
                 label="العودة للحلقة"
               />
             </div>
-        <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
-          <h1 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-            <span>📋</span>
+        <div className="bg-white rounded-2xl shadow-sm border border-neutral-200 p-6 mb-8">
+          <h1 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+            <TaskAdd01 className="text-primary-600" size={32} />
             تسجيل الحضور والمتابعة
           </h1>
 
           {/* Session Info */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <div>
-              <label className="block text-gray-700 mb-2 font-semibold">
-                اختر الحلقة
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <label className="flex items-center gap-2 text-gray-700 font-semibold">
+                <Note01 size={20} className="text-gray-400" />
+                الحلقة
               </label>
-              <select
-                value={selectedBatchId || ""}
-                onChange={(e) => setSelectedBatchId(Number(e.target.value))}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 font-arabic"
-              >
-                <option value="">-- اختر الحلقة --</option>
-                {batches.map((batch) => (
-                  <option key={batch.id} value={batch.id}>
-                    {batch.name} ({batch._count?.batch_students || 0} طالب)
-                  </option>
-                ))}
-              </select>
+              <div className="w-full px-4 py-3 bg-neutral-100 border border-gray-200 rounded-xl text-neutral-900 font-bold transition-all font-arabic flex items-center">
+                {batches.find(b => b.id === selectedBatchId)?.name || "جاري التحميل..."}
+              </div>
             </div>
 
-            <div>
-              <label className="block text-gray-700 mb-2 font-semibold">
+            <div className="space-y-2">
+              <label className="flex items-center gap-2 text-gray-700 font-semibold">
+                <Calendar01 size={20} className="text-primary-600" />
                 تاريخ الجلسة
               </label>
               <input
                 type="date"
                 value={sessionDate}
                 onChange={(e) => setSessionDate(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500"
+                className="w-full px-4 py-3 bg-white border border-neutral-300 rounded-xl text-neutral-900 font-bold focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all font-arabic"
               />
             </div>
           </div>
+        </div>
 
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl mb-6">
@@ -323,33 +443,34 @@ export default function NewSessionPage() {
                   return (
                     <div
                       key={student.id}
-                      className="border border-gray-200 rounded-xl p-4 md:p-6 bg-white hover:shadow-md transition-shadow"
+                      className="bg-white rounded-2xl shadow-sm border border-neutral-200 p-4 md:p-6 hover:shadow-md hover:border-primary-300 transition-all"
                     >
-                      <div className="flex flex-col md:flex-row md:items-start gap-4 md:gap-8">
+                      <div className="flex flex-col md:flex-row md:items-start gap-6">
                         {/* Student Name & Status */}
-                        <div className="md:w-1/4">
-                          <div className="flex items-center justify-between mb-3">
-                            <h3 className="font-bold text-lg text-gray-800">
-                              {student.full_name}
+                        <div className="md:w-1/3 space-y-4">
+                          <div className="flex items-center justify-between">
+                            <h3 className="font-bold text-xl text-neutral-900 flex items-center gap-3">
+                              <span className="w-8 h-8 rounded-full bg-primary-50 text-primary-600 flex items-center justify-center font-bold text-sm shrink-0">
+                                {student.id}
+                              </span>
+                              {student.name || student.full_name}
                             </h3>
                             <button
                               onClick={() => handleSubmit(student.id)}
                               disabled={savingStudent[student.id]}
-                              className="text-white bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded-lg text-sm font-bold shadow-sm disabled:opacity-50"
+                              className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-600/20 px-6 py-2 rounded-xl text-sm font-bold transition-all disabled:opacity-50 disabled:hover:transform-none flex items-center justify-center gap-2 transform hover:-translate-y-0.5"
                             >
-                              {savingStudent[student.id] ? "..." : "حفظ"}
+                              <FloppyDisk size={18} />
+                              {savingStudent[student.id] ? "جاري الحفظ..." : "حفظ"}
                             </button>
                           </div>
-                          <div className="flex flex-wrap gap-2">
+                          
+                          <div className="grid grid-cols-2 gap-2">
                             {[
-                              {
-                                id: "present",
-                                label: "حاضر",
-                                color: "emerald",
-                              },
-                              { id: "absent", label: "غائب", color: "red" },
-                              { id: "late", label: "متأخر", color: "yellow" },
-                              { id: "excused", label: "معذور", color: "gray" },
+                              { id: "present", label: "حاضر", activeClass: "bg-emerald-500 text-white border-emerald-600 shadow-md" },
+                              { id: "late", label: "متأخر", activeClass: "bg-amber-500 text-white border-amber-600 shadow-md" },
+                              { id: "absent", label: "غائب", activeClass: "bg-red-500 text-white border-red-600 shadow-md" },
+                              { id: "excused", label: "معذور", activeClass: "bg-neutral-500 text-white border-neutral-600 shadow-md" },
                             ].map((status) => (
                               <button
                                 key={status.id}
@@ -360,10 +481,10 @@ export default function NewSessionPage() {
                                     status.id,
                                   )
                                 }
-                                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                                className={`px-3 py-2 rounded-xl text-sm font-bold transition-all border ${
                                   record.status === status.id
-                                    ? `bg-${status.color}-100 text-${status.color}-700 border border-${status.color}-200 ring-1 ring-${status.color}-300`
-                                    : "bg-gray-50 text-gray-500 hover:bg-gray-100"
+                                    ? status.activeClass
+                                    : "bg-neutral-50 text-neutral-600 hover:bg-neutral-100 border-neutral-200"
                                 }`}
                               >
                                 {status.label}
@@ -377,16 +498,15 @@ export default function NewSessionPage() {
                           record.status === "late") && (
                           <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 border-t md:border-t-0 md:border-r border-gray-100 pt-4 md:pt-0 md:pr-4">
                             {/* Jadeed (New Lesson) */}
-                            <div className="space-y-3">
-                              <label className="text-sm font-semibold text-gray-600 block">
+                            <div className="space-y-4 bg-emerald-50/50 p-4 rounded-xl border border-emerald-100/50">
+                              <label className="flex items-center gap-2 text-sm font-bold text-emerald-800">
+                                <Book01 size={18} />
                                 الجديد
                               </label>
 
                               {/* From */}
                               <div className="flex gap-2 items-center">
-                                <span className="text-xs text-gray-400 w-6">
-                                  من
-                                </span>
+                                <span className="text-xs font-bold text-emerald-600/70 w-6">من</span>
                                 <div className="flex-1">
                                   <SearchableSelect
                                     options={SURAHS.map((s) => ({
@@ -395,11 +515,7 @@ export default function NewSessionPage() {
                                     }))}
                                     value={record.jadeedStartSurahId}
                                     onChange={(val) =>
-                                      handleRecordChange(
-                                        student.id,
-                                        "jadeedStartSurahId",
-                                        val,
-                                      )
+                                      handleRecordChange(student.id, "jadeedStartSurahId", val)
                                     }
                                     placeholder="سورة..."
                                   />
@@ -409,21 +525,15 @@ export default function NewSessionPage() {
                                   placeholder="لآية"
                                   value={record.jadeedStartAyah}
                                   onChange={(e) =>
-                                    handleRecordChange(
-                                      student.id,
-                                      "jadeedStartAyah",
-                                      e.target.value,
-                                    )
+                                    handleRecordChange(student.id, "jadeedStartAyah", e.target.value)
                                   }
-                                  className="w-20 px-2 py-2 border border-gray-200 rounded-lg text-sm text-gray-900 bg-white placeholder-gray-400"
+                                  className="w-16 sm:w-20 px-2 py-2.5 border border-emerald-200 rounded-lg text-sm font-bold text-neutral-900 bg-white placeholder-emerald-300 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all"
                                 />
                               </div>
 
                               {/* To */}
                               <div className="flex gap-2 items-center">
-                                <span className="text-xs text-gray-400 w-6">
-                                  إلى
-                                </span>
+                                <span className="text-xs font-bold text-emerald-600/70 w-6">إلى</span>
                                 <div className="flex-1">
                                   <SearchableSelect
                                     options={SURAHS.map((s) => ({
@@ -432,11 +542,7 @@ export default function NewSessionPage() {
                                     }))}
                                     value={record.jadeedEndSurahId}
                                     onChange={(val) =>
-                                      handleRecordChange(
-                                        student.id,
-                                        "jadeedEndSurahId",
-                                        val,
-                                      )
+                                      handleRecordChange(student.id, "jadeedEndSurahId", val)
                                     }
                                     placeholder="سورة..."
                                   />
@@ -446,28 +552,20 @@ export default function NewSessionPage() {
                                   placeholder="لآية"
                                   value={record.jadeedEndAyah}
                                   onChange={(e) =>
-                                    handleRecordChange(
-                                      student.id,
-                                      "jadeedEndAyah",
-                                      e.target.value,
-                                    )
+                                    handleRecordChange(student.id, "jadeedEndAyah", e.target.value)
                                   }
-                                  className="w-20 px-2 py-2 border border-gray-200 rounded-lg text-sm text-gray-900 bg-white placeholder-gray-400"
+                                  className="w-16 sm:w-20 px-2 py-2.5 border border-emerald-200 rounded-lg text-sm font-bold text-neutral-900 bg-white placeholder-emerald-300 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all"
                                 />
                               </div>
 
                               <select
                                 value={record.jadeedGrade}
                                 onChange={(e) =>
-                                  handleRecordChange(
-                                    student.id,
-                                    "jadeedGrade",
-                                    e.target.value,
-                                  )
+                                  handleRecordChange(student.id, "jadeedGrade", e.target.value)
                                 }
-                                className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-1 focus:ring-emerald-500 text-sm bg-gray-50 text-gray-900"
+                                className="w-full px-3 py-2.5 border border-emerald-200 rounded-lg focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 text-sm font-bold bg-white text-neutral-900 transition-all"
                               >
-                                <option value="">الدرجة...</option>
+                                <option value="">تقييم الجديد...</option>
                                 {gradeOptions.map((opt) => (
                                   <option key={opt.value} value={opt.value}>
                                     {opt.label}
@@ -477,16 +575,16 @@ export default function NewSessionPage() {
                             </div>
 
                             {/* Muraja (Revision) */}
-                            <div className="space-y-3">
-                              <label className="text-sm font-semibold text-gray-600 block">
+                            {/* Muraja (Revision) */}
+                            <div className="space-y-4 bg-sky-50/50 p-4 rounded-xl border border-sky-100/50">
+                              <label className="flex items-center gap-2 text-sm font-bold text-sky-800">
+                                <BookOpen01 size={18} />
                                 المراجعة
                               </label>
 
                               {/* From */}
                               <div className="flex gap-2 items-center">
-                                <span className="text-xs text-gray-400 w-6">
-                                  من
-                                </span>
+                                <span className="text-xs font-bold text-sky-600/70 w-6">من</span>
                                 <div className="flex-1">
                                   <SearchableSelect
                                     options={SURAHS.map((s) => ({
@@ -495,11 +593,7 @@ export default function NewSessionPage() {
                                     }))}
                                     value={record.murajaStartSurahId}
                                     onChange={(val) =>
-                                      handleRecordChange(
-                                        student.id,
-                                        "murajaStartSurahId",
-                                        val,
-                                      )
+                                      handleRecordChange(student.id, "murajaStartSurahId", val)
                                     }
                                     placeholder="سورة..."
                                   />
@@ -509,21 +603,15 @@ export default function NewSessionPage() {
                                   placeholder="لآية"
                                   value={record.murajaStartAyah}
                                   onChange={(e) =>
-                                    handleRecordChange(
-                                      student.id,
-                                      "murajaStartAyah",
-                                      e.target.value,
-                                    )
+                                    handleRecordChange(student.id, "murajaStartAyah", e.target.value)
                                   }
-                                  className="w-20 px-2 py-2 border border-gray-200 rounded-lg text-sm text-gray-900 bg-white placeholder-gray-400"
+                                  className="w-16 sm:w-20 px-2 py-2.5 border border-sky-200 rounded-lg text-sm font-bold text-neutral-900 bg-white placeholder-sky-300 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all"
                                 />
                               </div>
 
                               {/* To */}
                               <div className="flex gap-2 items-center">
-                                <span className="text-xs text-gray-400 w-6">
-                                  إلى
-                                </span>
+                                <span className="text-xs font-bold text-sky-600/70 w-6">إلى</span>
                                 <div className="flex-1">
                                   <SearchableSelect
                                     options={SURAHS.map((s) => ({
@@ -532,11 +620,7 @@ export default function NewSessionPage() {
                                     }))}
                                     value={record.murajaEndSurahId}
                                     onChange={(val) =>
-                                      handleRecordChange(
-                                        student.id,
-                                        "murajaEndSurahId",
-                                        val,
-                                      )
+                                      handleRecordChange(student.id, "murajaEndSurahId", val)
                                     }
                                     placeholder="سورة..."
                                   />
@@ -546,28 +630,20 @@ export default function NewSessionPage() {
                                   placeholder="لآية"
                                   value={record.murajaEndAyah}
                                   onChange={(e) =>
-                                    handleRecordChange(
-                                      student.id,
-                                      "murajaEndAyah",
-                                      e.target.value,
-                                    )
+                                    handleRecordChange(student.id, "murajaEndAyah", e.target.value)
                                   }
-                                  className="w-20 px-2 py-2 border border-gray-200 rounded-lg text-sm text-gray-900 bg-white placeholder-gray-400"
+                                  className="w-16 sm:w-20 px-2 py-2.5 border border-sky-200 rounded-lg text-sm font-bold text-neutral-900 bg-white placeholder-sky-300 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all"
                                 />
                               </div>
 
                               <select
                                 value={record.murajaGrade}
                                 onChange={(e) =>
-                                  handleRecordChange(
-                                    student.id,
-                                    "murajaGrade",
-                                    e.target.value,
-                                  )
+                                  handleRecordChange(student.id, "murajaGrade", e.target.value)
                                 }
-                                className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-1 focus:ring-emerald-500 text-sm bg-gray-50 text-gray-900"
+                                className="w-full px-3 py-2.5 border border-sky-200 rounded-lg focus:ring-1 focus:ring-sky-500 focus:border-sky-500 text-sm font-bold bg-white text-neutral-900 transition-all"
                               >
-                                <option value="">الدرجة...</option>
+                                <option value="">تقييم المراجعة...</option>
                                 {gradeOptions.map((opt) => (
                                   <option key={opt.value} value={opt.value}>
                                     {opt.label}
@@ -577,36 +653,31 @@ export default function NewSessionPage() {
                             </div>
 
                             {/* Behavior Note & Bonus */}
-                            <div className="md:col-span-2 mt-2 grid grid-cols-1 md:grid-cols-4 gap-2">
+                            <div className="md:col-span-2 mt-4 grid grid-cols-1 md:grid-cols-4 gap-4 bg-neutral-50 p-4 rounded-xl border border-neutral-100">
                               <div className="md:col-span-3">
                                 <input
                                   type="text"
                                   placeholder="ملاحظات (سلوك / حفظ)..."
                                   value={record.behaviorNote}
                                   onChange={(e) =>
-                                    handleRecordChange(
-                                      student.id,
-                                      "behaviorNote",
-                                      e.target.value,
-                                    )
+                                    handleRecordChange(student.id, "behaviorNote", e.target.value)
                                   }
-                                  className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-1 focus:ring-emerald-500 text-sm text-gray-900 bg-white placeholder-gray-400"
+                                  className="w-full px-4 py-2.5 border border-neutral-300 rounded-lg focus:ring-1 focus:ring-primary-500 focus:border-primary-500 text-sm font-bold text-neutral-900 bg-white placeholder-neutral-400 transition-all"
                                 />
                               </div>
                               <div className="md:col-span-1">
-                                <input
-                                  type="number"
-                                  placeholder="نقاط إضافية"
-                                  value={record.bonus}
-                                  onChange={(e) =>
-                                    handleRecordChange(
-                                      student.id,
-                                      "bonus",
-                                      e.target.value,
-                                    )
-                                  }
-                                  className="w-full px-3 py-2 border border-emerald-200 rounded-lg text-sm bg-emerald-50 text-emerald-800 placeholder-emerald-400 focus:ring-emerald-500 border-2"
-                                />
+                                <div className="relative">
+                                  <input
+                                    type="number"
+                                    placeholder="نقاط+"
+                                    value={record.bonus}
+                                    onChange={(e) =>
+                                      handleRecordChange(student.id, "bonus", e.target.value)
+                                    }
+                                    className="w-full pl-3 pr-8 py-2.5 border border-amber-300 rounded-lg text-sm font-bold bg-amber-50 text-amber-900 placeholder-amber-400 focus:ring-1 focus:ring-amber-500 focus:border-amber-500 transition-all"
+                                  />
+                                  <Award01 className="absolute right-2.5 top-1/2 -translate-y-1/2 text-amber-500" size={16} />
+                                </div>
                               </div>
                             </div>
                           </div>
@@ -616,26 +687,6 @@ export default function NewSessionPage() {
                   );
                 })}
               </div>
-
-              {/* Submit Button */}
-              <div className="sticky bottom-4 bg-white p-4 rounded-xl shadow-lg border border-gray-100 flex items-center justify-between">
-                <div className="text-gray-600 text-sm">
-                  يتم الحفظ لـ{" "}
-                  {
-                    Object.values(records).filter(
-                      (r) => r.status === "present" || r.status === "late",
-                    ).length
-                  }{" "}
-                  طالب حاضر
-                </div>
-                <button
-                  onClick={() => handleSubmit()}
-                  disabled={submitting}
-                  className="px-8 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-xl font-bold hover:shadow-lg transform hover:-translate-y-0.5 transition-all disabled:opacity-50"
-                >
-                  {submitting ? "جاري الحفظ..." : "حفظ الكل"}
-                </button>
-              </div>
             </div>
           )}
 
@@ -644,7 +695,7 @@ export default function NewSessionPage() {
               لا يوجد طلاب في هذه الحلقة
             </div>
           )}
-        </div>
+
           </div>
         </main>
       </div>

@@ -28,7 +28,7 @@ export function usePublicBatches() {
 
 export function useBatchDetails(batchId: string | number) {
   return useQuery({
-    queryKey: ['batch', batchId],
+    queryKey: ['batch', String(batchId)],
     queryFn: async () => {
       const data = await getBatchById(batchId);
       
@@ -55,7 +55,7 @@ export function useEnrollStudents() {
     mutationFn: ({ batchId, studentIds }: { batchId: string | number, studentIds: number[] }) => 
       enrollStudentsInBatch(batchId, studentIds),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['batch', variables.batchId] });
+      queryClient.invalidateQueries({ queryKey: ['batch', String(variables.batchId)] });
     },
   });
 }
@@ -79,7 +79,7 @@ export function useUpdateBatch() {
     mutationFn: ({ batchId, data }: { batchId: number; data: any }) => updateBatch(batchId, data),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['batches'] });
-      queryClient.invalidateQueries({ queryKey: ['batch', variables.batchId] });
+      queryClient.invalidateQueries({ queryKey: ['batch', String(variables.batchId)] });
     },
   });
 }
