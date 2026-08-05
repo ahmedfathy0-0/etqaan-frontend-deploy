@@ -2,6 +2,9 @@ const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
 const { autoUpdater } = require("electron-updater");
 
+const serve = require("electron-serve");
+const loadURL = serve({ directory: "out" });
+
 let store;
 
 function createWindow() {
@@ -18,15 +21,12 @@ function createWindow() {
     },
   });
 
-  const indexPath = path.join(app.getAppPath(), "out", "index.html");
-  win.loadFile(indexPath);
+  loadURL(win);
   win.maximize();
 }
 
 app.whenReady().then(async () => {
-  const StoreModule = await import("electron-store");
-  const Store = StoreModule.default;
-  store = new Store();
+  // Store removed to fix startup crash
 
   ipcMain.handle("app:getVersion", () => {
     return app.getVersion();
