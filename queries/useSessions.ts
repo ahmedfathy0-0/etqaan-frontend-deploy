@@ -8,7 +8,7 @@ export function useCreateSession() {
   return useMutation({
     mutationFn: (data: CreateSessionPayload) => createSession(data),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['batch', variables.batchId] });
+      queryClient.invalidateQueries({ queryKey: ['batch', String(variables.batchId)] });
       queryClient.invalidateQueries({ queryKey: ['sessions'] });
     },
   });

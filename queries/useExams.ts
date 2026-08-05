@@ -4,7 +4,7 @@ import type { Exam } from '@/api/exams';
 
 export function useBatchExams(batchId: string | number) {
   return useQuery({
-    queryKey: ['exams', 'batch', batchId],
+    queryKey: ['exams', 'batch', String(batchId)],
     queryFn: () => getBatchExams(batchId),
     enabled: !!batchId,
   });
@@ -12,7 +12,7 @@ export function useBatchExams(batchId: string | number) {
 
 export function useExamDetails(examId: string | number) {
   return useQuery({
-    queryKey: ['exam', examId],
+    queryKey: ['exam', String(examId)],
     queryFn: () => getExamDetails(examId),
     enabled: !!examId,
   });
@@ -37,7 +37,7 @@ export function useSaveExamGrades() {
   return useMutation({
     mutationFn: ({ examId, grades }: { examId: string | number, grades: any[], batchId?: string | number }) => saveExamGrades(examId, grades),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['exam', variables.examId] });
+      queryClient.invalidateQueries({ queryKey: ['exam', String(variables.examId)] });
       if (variables.batchId) {
         queryClient.invalidateQueries({ queryKey: ['batch', String(variables.batchId)] });
       }
