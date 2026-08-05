@@ -7,6 +7,7 @@ export interface User {
   role: string;
   created_at: string;
   plain_password?: string;
+  password?: string;
 }
 
 export const getUsers = async () => {

@@ -139,20 +139,15 @@ export default function AdminStudentsTab({
   return (
     <div className="flex flex-col items-center p-0 lg:py-[24px] lg:px-[16px] gap-[24px] w-full max-w-full mx-auto" dir="rtl">
       
-      {/* Mobile Title / Tags Section */}
-      <div className="lg:hidden w-full flex flex-col items-end px-4 pb-8 pt-6 bg-[#17481B] mb-6 gap-6">
-        <div className="flex w-full items-center justify-between">
-          <span className="text-[#FFFFFF] font-cairo font-bold text-[18px]">الطلاب</span>
+      {/* Mobile Tags Section */}
+      <div className="lg:hidden w-full flex flex-row items-center justify-start px-4 mb-2 gap-2">
+        <div className="flex flex-row items-center py-1.5 px-3 gap-2 bg-[#E2F7E4] rounded-full">
+          <UserGroup aria-hidden="true" size={20} color="#17481B" />
+          <span className="font-cairo font-bold text-sm text-[#17481B]">{studentsWithAccount.length} لديهم حساب</span>
         </div>
-        <div className="flex flex-row items-center gap-2">
-          <div className="flex flex-row justify-center items-center py-[8px] px-[16px] gap-[10px] bg-[#E2F7E4] rounded-[48px] mb-4">
-            <UserGroup aria-hidden="true" size={24} color="#17481B" />
-            <span className="font-cairo font-normal text-[14px] leading-[150%] text-[#17481B] text-right">{studentsWithAccount.length} لديهم حساب</span>
-          </div>
-          <div className="flex flex-row justify-center items-center py-[8px] px-[16px] gap-[10px] bg-red-100 rounded-[48px] mb-4">
-            <UserGroup aria-hidden="true" size={24} color="#930404" />
-            <span className="font-cairo font-normal text-[14px] leading-[150%] text-[#930404] text-right">{studentsWithoutAccount.length} ليس لديهم حساب</span>
-          </div>
+        <div className="flex flex-row items-center py-1.5 px-3 gap-2 bg-red-100 rounded-full">
+          <UserGroup aria-hidden="true" size={20} color="#930404" />
+          <span className="font-cairo font-bold text-sm text-[#930404]">{studentsWithoutAccount.length} ليس لديهم حساب</span>
         </div>
       </div>
 
