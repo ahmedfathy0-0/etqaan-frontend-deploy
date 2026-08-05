@@ -103,6 +103,9 @@ export default function AdminDashboard() {
       guardian_name: student.guardian_name || "",
       guardian_phone: student.guardian_phone || "",
       gender: student.gender || "male",
+      user_id: student.user_id,
+      email: student.user?.email || "",
+      password: student.user?.plain_password || "",
     });
     setShowStudentModal(true);
   };

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Modal from "@/components/ui/Modal";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCreateStudent, useUpdateStudent } from "@/queries/useStudents";
+import { useUpdateUser } from "@/queries/useUsers";
 import { ArrowDown01, FloppyDisk } from "@dga-icons/react/duotone-rounded";
 
 interface AdminStudentModalProps {
@@ -13,6 +14,9 @@ interface AdminStudentModalProps {
     guardian_name: string;
     guardian_phone: string;
     gender: "male" | "female";
+    user_id?: number | null;
+    email?: string;
+    password?: string;
   };
 }
 
@@ -25,6 +29,7 @@ export default function AdminStudentModal({
   const { token } = useAuth();
   const { mutateAsync: createStudentMutate } = useCreateStudent();
   const { mutateAsync: updateStudentMutate } = useUpdateStudent();
+  const { mutateAsync: updateUserMutate } = useUpdateUser();
 
   const [formError, setFormError] = useState("");
   const [formLoading, setFormLoading] = useState(false);
@@ -33,6 +38,8 @@ export default function AdminStudentModal({
     guardian_name: "",
     guardian_phone: "",
     gender: "male" as "male" | "female",
+    email: "",
+    password: "",
   });
 
   useEffect(() => {
@@ -43,6 +50,8 @@ export default function AdminStudentModal({
           guardian_name: initialData.guardian_name || "",
           guardian_phone: initialData.guardian_phone || "",
           gender: initialData.gender || "male",
+          email: initialData.email || "",
+          password: initialData.password || "",
         });
       } else {
         setNewStudent({
@@ -50,6 +59,8 @@ export default function AdminStudentModal({
           guardian_name: "",
           guardian_phone: "",
           gender: "male",
+          email: "",
+          password: "",
         });
       }
       setFormError("");
@@ -65,9 +76,33 @@ export default function AdminStudentModal({
 
     try {
       if (editStudentId) {
-        await updateStudentMutate({ id: editStudentId, data: newStudent });
+        await updateStudentMutate({ 
+          id: editStudentId, 
+          data: {
+            full_name: newStudent.full_name,
+            guardian_name: newStudent.guardian_name,
+            guardian_phone: newStudent.guardian_phone,
+            gender: newStudent.gender,
+          } 
+        });
+
+        if (initialData?.user_id) {
+          await updateUserMutate({
+            id: initialData.user_id,
+            data: {
+              name: newStudent.full_name,
+              email: newStudent.email,
+              ...(newStudent.password ? { password: newStudent.password } : {}),
+            }
+          });
+        }
       } else {
-        await createStudentMutate(newStudent);
+        await createStudentMutate({
+          full_name: newStudent.full_name,
+          guardian_name: newStudent.guardian_name,
+          guardian_phone: newStudent.guardian_phone,
+          gender: newStudent.gender,
+        });
       }
       onClose();
     } catch (err: any) {
@@ -88,7 +123,7 @@ export default function AdminStudentModal({
     >
       <form onSubmit={handleSaveStudent} className="flex flex-col gap-6 w-full font-cairo">
         {/* Frame 1 */}
-        <div className="flex flex-col gap-4 w-full">
+        <div className="flex flex-col gap-4 w-full max-h-[60vh] overflow-y-auto px-1">
           {formError && (
             <div className="w-full bg-red-50 border border-red-200 text-red-700 p-3 rounded-xl font-arabic text-sm text-right">
               {formError}
@@ -96,7 +131,7 @@ export default function AdminStudentModal({
           )}
 
           <div className="flex flex-col gap-2 w-full">
-            <label className="text-right text-success-800 font-bold text-lg w-full">اسم الطالب المربع</label>
+            <label className="text-right text-success-800 font-bold text-lg w-full">اسم الطالب</label>
             <input
               type="text"
               value={newStudent.full_name}
@@ -155,6 +190,40 @@ export default function AdminStudentModal({
               </div>
             </div>
           </div>
+
+          {/* User Fields (Only show if student has an account) */}
+          {initialData?.user_id && (
+            <>
+              <div className="flex flex-col gap-2 w-full mt-2 pt-4 border-t border-success-100">
+                <label className="text-right text-success-800 font-bold text-lg w-full">البريد الإلكتروني للحساب</label>
+                <input
+                  type="email"
+                  value={newStudent.email}
+                  onChange={(e) =>
+                    setNewStudent({ ...newStudent, email: e.target.value })
+                  }
+                  className="w-full h-12 px-4 border-2 border-success-200 rounded-xl focus:outline-none focus:border-success-700 focus:ring-1 focus:ring-success-700 text-neutral-800 bg-white placeholder:text-neutral-500 text-base font-medium text-right transition-all"
+                  dir="ltr"
+                  required
+                />
+              </div>
+
+              <div className="flex flex-col gap-2 w-full">
+                <label className="text-right text-success-800 font-bold text-lg w-full">كلمة المرور للحساب</label>
+                <input
+                  type="text"
+                  value={newStudent.password}
+                  onChange={(e) =>
+                    setNewStudent({ ...newStudent, password: e.target.value })
+                  }
+                  className="w-full h-12 px-4 border-2 border-success-200 rounded-xl focus:outline-none focus:border-success-700 focus:ring-1 focus:ring-success-700 text-neutral-800 bg-white placeholder:text-neutral-500 text-base font-medium text-right transition-all"
+                  placeholder="أدخل كلمة مرور جديدة للتغيير"
+                  dir="ltr"
+                />
+              </div>
+            </>
+          )}
+
         </div>
 
         {/* Buttons */}

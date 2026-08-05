@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { SearchBar } from "@/components/ui/SearchBar";
-import { Delete01, Edit01, Filter, UserAdd01, UserGroup } from "@dga-icons/react/duotone-rounded";
+import { Delete01, Edit01, Filter, UserAdd01, UserGroup, Search01 } from "@dga-icons/react/duotone-rounded";
 
 interface User {
   id: number;
@@ -28,12 +28,20 @@ export default function AdminUsersTab({
   onEditUser,
 }: AdminUsersTabProps) {
   const [searchTerm, setSearchTerm] = useState("");
+  const [sortBy, setSortBy] = useState("name_asc");
 
-  const filteredUsers = users.filter(
-    (u) =>
-      u.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      u.email.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
+  const filteredUsers = users
+    .filter(
+      (u) =>
+        u.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        u.email.toLowerCase().includes(searchTerm.toLowerCase()),
+    )
+    .sort((a, b) => {
+      if (sortBy === "name_desc") return b.name.localeCompare(a.name, "ar");
+      if (sortBy === "role_asc") return a.role.localeCompare(b.role, "ar");
+      if (sortBy === "role_desc") return b.role.localeCompare(a.role, "ar");
+      return a.name.localeCompare(b.name, "ar");
+    });
 
   return (
     <div className="flex flex-col items-center p-0 lg:py-[24px] lg:px-[16px] gap-[24px] w-full max-w-full mx-auto" dir="rtl">
@@ -55,25 +63,33 @@ export default function AdminUsersTab({
         </div>
       </div>
 
-      {/* Search Bar Container */}
-      <div className="flex flex-row items-center px-[16px] gap-[16px] w-full lg:w-[850px] h-[48px]">
-        {/* filter icon */}
-        <button className="w-[48px] h-[48px] flex-shrink-0 cursor-pointer flex items-center justify-center bg-gray-50 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors">
-          <svg className="hidden" width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path opacity="0.4" d="M11.8099 16.6748C8.49201 14.1942 6.12752 11.4655 4.83645 9.93155C4.43679 9.4567 4.30584 9.10919 4.2271 8.49707C3.95749 6.40107 3.82268 5.35307 4.43727 4.67654C5.05186 4 6.13872 4 8.31243 4H23.6876C25.8613 4 26.9481 4 27.5627 4.67654C28.1773 5.35307 28.0425 6.40107 27.7729 8.49707C27.6942 9.10921 27.5632 9.45672 27.1635 9.93156C25.8707 11.4675 23.5014 14.2009 20.1768 16.6847C19.876 16.9094 19.6777 17.2756 19.6409 17.6819C19.3116 21.3226 19.0079 23.3168 18.8188 24.3256C18.5137 25.9543 16.2042 26.9341 14.968 27.8085C14.2321 28.3288 13.3391 27.7093 13.2437 26.9037C13.0619 25.3682 12.7195 22.2485 12.3457 17.6819C12.3121 17.2719 12.1131 16.9014 11.8099 16.6748Z" fill="#404641"/>
-            <path fill-rule="evenodd" clip-rule="evenodd" d="M8.24284 2.99707C8.26595 2.99707 8.28914 2.99707 8.31241 2.99707L23.7571 2.99707C24.7845 2.99703 25.6567 2.99699 26.3449 3.09081C27.0733 3.19012 27.7697 3.41429 28.3029 4.0012C28.8407 4.59325 28.988 5.30675 28.9993 6.0361C29.0098 6.71725 28.9009 7.56337 28.774 8.54988L28.7647 8.62173C28.7198 8.97084 28.6525 9.30849 28.512 9.64655C28.3694 9.98978 28.1731 10.2821 27.9285 10.5726C26.6223 12.1245 24.1939 14.9289 20.7752 17.4829C20.7199 17.5242 20.6502 17.6222 20.6369 17.7691C20.3047 21.4396 20.0125 23.3817 19.8017 24.5068C19.5737 25.7235 18.6457 26.5656 17.8455 27.1454C17.4268 27.4488 16.9823 27.722 16.5864 27.9629C16.5547 27.9823 16.5233 28.0013 16.4924 28.0202C16.1225 28.245 15.8081 28.4362 15.5453 28.622C14.8247 29.1316 13.9932 29.0959 13.3577 28.7256C12.758 28.3763 12.3359 27.7391 12.2506 27.0184C12.0633 25.4365 11.7238 22.3396 11.349 17.7605C11.337 17.6136 11.314 17.571 11.3121 17.5675C11.3108 17.565 11.3074 17.5588 11.2962 17.5465C11.2837 17.5327 11.2587 17.5083 11.2111 17.4728C7.79936 14.922 5.37576 12.1224 4.07134 10.5726C3.82774 10.2831 3.62561 9.99775 3.4815 9.6507C3.34041 9.31096 3.28026 8.97159 3.23525 8.62173C3.23216 8.5977 3.22908 8.57374 3.22601 8.54987C3.09905 7.56336 2.99016 6.71724 3.00071 6.0361C3.012 5.30675 3.15923 4.59325 3.69707 4.0012C4.23025 3.41429 4.9267 3.19012 5.65507 3.09081C6.34321 2.99699 7.21542 2.99703 8.24284 2.99707ZM5.92525 5.07247C5.41312 5.1423 5.25885 5.2564 5.17743 5.34602C5.10068 5.4305 5.00802 5.57927 5.00047 6.06706C4.99243 6.58657 5.08016 7.28789 5.21891 8.36657C5.25747 8.66631 5.29124 8.79379 5.32857 8.88369C5.36287 8.96628 5.42364 9.07336 5.60151 9.2847C6.87923 10.8028 9.18462 13.4605 12.4087 15.871C12.6677 16.0646 12.9054 16.3044 13.0773 16.6272C13.2467 16.9453 13.3161 17.2762 13.3423 17.5974C13.7151 22.1515 14.0522 25.2243 14.2367 26.7832C14.2424 26.8308 14.2597 26.8777 14.2863 26.9185C14.3136 26.9603 14.3438 26.9855 14.3644 26.9975C14.3671 26.999 14.3694 27.0003 14.3714 27.0012C14.3761 26.9987 14.3825 26.9948 14.3906 26.989C14.7135 26.7608 15.0881 26.5331 15.4418 26.3182C15.477 26.2968 15.512 26.2756 15.5467 26.2544C15.9451 26.012 16.3261 25.7764 16.672 25.5258C17.4011 24.9975 17.7587 24.5505 17.8359 24.1385C18.0312 23.0961 18.3163 21.2212 18.645 17.5888C18.7052 16.9233 19.032 16.2888 19.5782 15.8807C22.8089 13.4671 25.119 10.8047 26.3984 9.28466C26.5536 9.10033 26.6226 8.98148 26.6651 8.87921C26.7097 8.77177 26.7472 8.6296 26.781 8.36657C26.9198 7.28789 27.0075 6.58657 26.9995 6.06706C26.9919 5.57927 26.8993 5.4305 26.8225 5.34602C26.7411 5.2564 26.5868 5.1423 26.0747 5.07247C25.5378 4.99927 24.8036 4.99707 23.6875 4.99707H8.31241C7.19635 4.99707 6.46214 4.99927 5.92525 5.07247ZM14.3609 27.0059C14.3609 27.0058 14.3616 27.0056 14.3628 27.0053L14.3609 27.0059Z" fill="#404641"/>
-          </svg>
-          <Filter aria-hidden="true" size={32} color="#404641" />
-        </button>
-
-        {/* search input */}
-        <div className="w-full lg:w-[770px]">
-          <SearchBar 
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+      <div className="mb-6 flex h-12 w-full items-center gap-4 px-4 lg:px-0">
+        <label className="relative h-12 min-w-0 flex-1">
+          <span className="sr-only">البحث عن مستخدم</span>
+          <input
+            type="search"
             placeholder="أبحث عن مستخدم"
+            value={searchTerm}
+            onChange={(event) => setSearchTerm(event.target.value)}
+            className="h-12 w-full rounded-2xl border-[1.5px] border-neutral-800 bg-white py-3 pr-11 pl-3 text-right text-base text-success-900 outline-none placeholder:text-success-900 focus:border-success-800"
           />
-        </div>
+          <Search01 aria-hidden="true" size={24} className="absolute right-3 top-1/2 -translate-y-1/2 text-success-800" />
+        </label>
+
+        <label className="relative flex h-12 w-12 shrink-0 cursor-pointer items-center justify-center text-neutral-800">
+          <span className="sr-only">ترتيب المستخدمين</span>
+          <Filter aria-hidden="true" size={32} />
+          <select
+            value={sortBy}
+            onChange={(event) => setSortBy(event.target.value)}
+            className="absolute inset-0 cursor-pointer opacity-0"
+          >
+            <option value="name_asc">الاسم (أ-ي)</option>
+            <option value="name_desc">الاسم (ي-أ)</option>
+            <option value="role_asc">الدور (أ-ي)</option>
+            <option value="role_desc">الدور (ي-أ)</option>
+          </select>
+        </label>
       </div>
 
       {/* Desktop Table View */}

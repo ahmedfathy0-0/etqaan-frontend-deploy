@@ -6,6 +6,13 @@ export interface AvailableStudent {
   guardian_name?: string;
   guardian_phone?: string;
   gender?: "male" | "female";
+  user_id?: number | null;
+  user?: {
+    id: number;
+    name: string;
+    email: string;
+    plain_password?: string;
+  } | null;
 }
 
 export interface NewStudentData {

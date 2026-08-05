@@ -40,6 +40,7 @@ export function useUpdateUser() {
     mutationFn: ({ id, data }: { id: number; data: Partial<User> }) => updateUser(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
+      queryClient.invalidateQueries({ queryKey: ['students'] });
       queryClient.invalidateQueries({ queryKey: ['adminStats'] });
     },
   });
