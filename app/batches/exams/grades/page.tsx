@@ -80,7 +80,7 @@ export default function ExamGradesPage() {
 
   const handleSidebar = (tab: TabId) => {
     setMobileMenuOpen(false);
-    router.push(sidebarRoutes[tab]);
+    router.push(`${sidebarRoutes[tab]}?tab=${tab}`);
   };
   
   const isLoading = isBatchLoading || isExamLoading;

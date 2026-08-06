@@ -32,7 +32,18 @@ interface RecentSession {
   muraja_grade?: string;
 }
 
+import { Suspense } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+
 export default function StudentDashboardPage() {
+  return (
+    <Suspense fallback={<PageLoader />}>
+      <StudentDashboardPageContent />
+    </Suspense>
+  );
+}
+
+function StudentDashboardPageContent() {
   const { user, logout } = useAuth();
   
   const [batches, setBatches] = useState<Batch[]>([]);
@@ -43,8 +54,24 @@ export default function StudentDashboardPage() {
   const [totalPoints, setTotalPoints] = useState(0);
   const [myRank, setMyRank] = useState(0);
   
-  const [activeTab, setActiveTab] = useState<TabId>("overview");
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const defaultTab = (searchParams.get("tab") as TabId) || "overview";
+
+  const [activeTab, setActiveTab] = useState<TabId>(defaultTab);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const tab = searchParams.get("tab") as TabId;
+    if (tab && tab !== activeTab) {
+      setActiveTab(tab);
+    }
+  }, [searchParams]);
+
+  const handleTabChange = (tab: TabId) => {
+    setActiveTab(tab);
+    router.replace(`/student/dashboard?tab=${tab}`);
+  };
 
   useEffect(() => {
     // Mock loading delay for demonstration
@@ -83,7 +110,7 @@ export default function StudentDashboardPage() {
               <AdminSidebar
                 activeTab={activeTab}
                 setActiveTab={(tab) => {
-                  setActiveTab(tab);
+                  handleTabChange(tab);
                   setMobileMenuOpen(false);
                 }}
                 mobile
@@ -98,7 +125,7 @@ export default function StudentDashboardPage() {
             <div className="sticky top-[122px] h-[calc(100vh-130px)] min-h-[702px] overflow-y-auto overflow-x-hidden">
               <AdminSidebar 
                 activeTab={activeTab} 
-                setActiveTab={setActiveTab} 
+                setActiveTab={handleTabChange} 
               />
             </div>
           </div>

@@ -22,7 +22,18 @@ import AdminBatchModal from "@/components/admin/modals/AdminBatchModal";
 import AdminStudentModal from "@/components/admin/modals/AdminStudentModal";
 import { Alert02, Clock01 } from "@dga-icons/react/duotone-rounded";
 
+import { Suspense } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+
 export default function AdminDashboard() {
+  return (
+    <Suspense fallback={<PageLoader />}>
+      <AdminDashboardContent />
+    </Suspense>
+  );
+}
+
+function AdminDashboardContent() {
   const { token, logout } = useAuth();
   const { data: stats = {
     totalUsers: 0,
@@ -39,9 +50,26 @@ export default function AdminDashboard() {
   
   const isLoading = loadingStats || loadingUsers || loadingBatches || loadingStudents;
   const error = ""; 
-  const [activeTab, setActiveTab] = useState<TabId>("overview");
+  
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const defaultTab = (searchParams.get("tab") as TabId) || "overview";
+  
+  const [activeTab, setActiveTab] = useState<TabId>(defaultTab);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
+
+  useEffect(() => {
+    const tab = searchParams.get("tab") as TabId;
+    if (tab && tab !== activeTab) {
+      setActiveTab(tab);
+    }
+  }, [searchParams]);
+
+  const handleTabChange = (tab: TabId) => {
+    setActiveTab(tab);
+    router.replace(`/admin?tab=${tab}`);
+  };
 
   useEffect(() => {
     if (mobileMenuOpen) {
@@ -178,7 +206,7 @@ export default function AdminDashboard() {
               <AdminSidebar
                 activeTab={activeTab}
                 setActiveTab={(tab) => {
-                  setActiveTab(tab);
+                  handleTabChange(tab);
                   setMobileMenuOpen(false);
                 }}
                 mobile
@@ -193,7 +221,7 @@ export default function AdminDashboard() {
             <div className="sticky top-[122px] h-[calc(100vh-130px)] min-h-[702px] overflow-y-auto overflow-x-hidden">
               <AdminSidebar 
                 activeTab={activeTab} 
-                setActiveTab={setActiveTab} 
+                setActiveTab={handleTabChange} 
               />
             </div>
           </div>

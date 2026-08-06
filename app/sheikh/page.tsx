@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import PageLoader from "@/components/ui/PageLoader";
@@ -11,14 +11,41 @@ import { Alert02, Clock01 } from "@dga-icons/react/duotone-rounded";
 import Link from "next/link";
 import { Students, Tv01 } from "@dga-icons/react/duotone-rounded";
 
+import { Suspense } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+
 export default function SheikhDashboard() {
+  return (
+    <Suspense fallback={<PageLoader />}>
+      <SheikhDashboardContent />
+    </Suspense>
+  );
+}
+
+function SheikhDashboardContent() {
   const { user, logout } = useAuth();
   
   const { data: batches = [], isLoading } = useBatches();
   
-  const [activeTab, setActiveTab] = useState<TabId>("overview");
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const defaultTab = (searchParams.get("tab") as TabId) || "overview";
+
+  const [activeTab, setActiveTab] = useState<TabId>(defaultTab);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+
+  useEffect(() => {
+    const tab = searchParams.get("tab") as TabId;
+    if (tab && tab !== activeTab) {
+      setActiveTab(tab);
+    }
+  }, [searchParams]);
+
+  const handleTabChange = (tab: TabId) => {
+    setActiveTab(tab);
+    router.replace(`/sheikh?tab=${tab}`);
+  };
 
   const stats = {
     totalStudents: batches.reduce((acc: number, batch: any) => acc + (batch._count?.batch_students || 0), 0),
@@ -42,7 +69,7 @@ export default function SheikhDashboard() {
               <AdminSidebar
                 activeTab={activeTab}
                 setActiveTab={(tab) => {
-                  setActiveTab(tab);
+                  handleTabChange(tab);
                   setMobileMenuOpen(false);
                 }}
                 mobile
@@ -57,7 +84,7 @@ export default function SheikhDashboard() {
             <div className="sticky top-[122px] h-[calc(100vh-130px)] min-h-[702px] overflow-y-auto overflow-x-hidden">
               <AdminSidebar 
                 activeTab={activeTab} 
-                setActiveTab={setActiveTab} 
+                setActiveTab={handleTabChange} 
               />
             </div>
           </div>

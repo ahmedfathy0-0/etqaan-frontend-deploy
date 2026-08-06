@@ -357,7 +357,7 @@ export default function NewSessionPage() {
               activeTab={activeTab}
               setActiveTab={(tab) => {
                 setMobileMenuOpen(false);
-                if (tab !== activeTab) router.push("/sheikh");
+                if (tab !== activeTab) router.push(`/sheikh?tab=${tab}`);
               }}
               mobile
             />
@@ -372,7 +372,7 @@ export default function NewSessionPage() {
             <AdminSidebar 
               activeTab={activeTab} 
               setActiveTab={(tab) => {
-                if (tab !== activeTab) router.push("/sheikh");
+                if (tab !== activeTab) router.push(`/sheikh?tab=${tab}`);
               }} 
             />
           </div>

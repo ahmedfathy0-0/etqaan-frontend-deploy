@@ -132,7 +132,7 @@ export default function BatchDetailsPage() {
 
   const handleSidebar = (tab: TabId) => {
     setMobileMenuOpen(false);
-    router.push(sidebarRoutes[tab]);
+    router.push(`${sidebarRoutes[tab]}?tab=${tab}`);
   };
 
   return (

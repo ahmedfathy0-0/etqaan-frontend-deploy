@@ -62,7 +62,7 @@ export default function ExamDashboardPage() {
 
   const handleSidebar = (tab: TabId) => {
     setMobileMenuOpen(false);
-    router.push(sidebarRoutes[tab]);
+    router.push(`${sidebarRoutes[tab]}?tab=${tab}`);
   };
   
   const { mutateAsync: createExamMutate } = useCreateExam();
