@@ -25,6 +25,7 @@ export default function AdminStudentModal({
   onClose,
   editStudentId,
   initialData,
+  hideAccountSection = false,
 }: AdminStudentModalProps) {
   const { token } = useAuth();
   const { mutateAsync: createStudentMutate } = useCreateStudent();
@@ -250,18 +251,20 @@ export default function AdminStudentModal({
             </div>
           </div>
 
-          <div className="flex flex-row items-center justify-start gap-3 w-full mt-2 pt-4 border-t border-success-100">
-            <input 
-              type="checkbox" 
-              id="hasAccountToggle"
-              checked={hasAccount}
-              onChange={(e) => setHasAccount(e.target.checked)}
-              className="w-5 h-5 accent-success-700 cursor-pointer"
-            />
-            <label htmlFor="hasAccountToggle" className="text-right text-success-800 font-bold text-base lg:text-lg cursor-pointer select-none">
-              ربط/إنشاء حساب للمنصة لهذا الطالب
-            </label>
-          </div>
+          {!hideAccountSection && (
+            <div className="flex flex-row items-center justify-start gap-3 w-full mt-2 pt-4 border-t border-success-100">
+              <input 
+                type="checkbox" 
+                id="hasAccountToggle"
+                checked={hasAccount}
+                onChange={(e) => setHasAccount(e.target.checked)}
+                className="w-5 h-5 accent-success-700 cursor-pointer"
+              />
+              <label htmlFor="hasAccountToggle" className="text-right text-success-800 font-bold text-base lg:text-lg cursor-pointer select-none">
+                ربط/إنشاء حساب للمنصة لهذا الطالب
+              </label>
+            </div>
+          )}
 
           {hasAccount && (
             <div className="flex flex-col gap-4 bg-success-50 p-4 rounded-xl border border-success-100 mt-2">

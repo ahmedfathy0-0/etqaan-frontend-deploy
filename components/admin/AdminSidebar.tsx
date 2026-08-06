@@ -43,14 +43,13 @@ const adminTabs: { id: TabId; label: string }[] = [
 
 const sheikhTabs: { id: TabId; label: string }[] = [
   { id: "overview", label: "لوحة التحكم" },
-  { id: "batches", label: "حلقاتي" },
+  { id: "batches", label: "الحلقات" },
+  { id: "students", label: "الطلاب" },
 ];
 
 const studentTabs: { id: TabId; label: string }[] = [
   { id: "overview", label: "لوحة الطالب" },
-  { id: "batches", label: "حلقاتي" },
-  { id: "sessions", label: "جلساتي" },
-  { id: "leaderboard", label: "لوحة الشرف" },
+  { id: "batches", label: "الحلقات" },
 ];
 
 export function AdminSidebar({ activeTab, setActiveTab, mobile = false }: AdminSidebarProps) {

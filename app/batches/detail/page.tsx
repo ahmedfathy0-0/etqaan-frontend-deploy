@@ -81,21 +81,42 @@ export default function BatchDetailsPage() {
   const [formLoading, setFormLoading] = useState(false);
   const [formError, setFormError] = useState("");
 
-  const canManage = ["admin", "super_admin", "sheikh"].includes(user?.role || "");
+  const isAdmin = ["admin", "super_admin"].includes(user?.role || "");
+  const isSheikh = user?.role === "sheikh";
+  const isStudent = user?.role === "student";
+  const isPublic = !user;
+
   const { data, isLoading, isError } = useBatchDetails(batchId);
   const { data: exams = [], isLoading: examsLoading } = useBatchExams(batchId);
   const { data: allStudents } = useStudents();
   const { mutateAsync: enrollStudents } = useEnrollStudents();
   const { mutateAsync: unenrollStudent } = useUnenrollStudent();
   const batch = data?.batch;
-  const students: Student[] = (data?.students || []).map((student: Omit<Student, "rank">, index: number) => ({
+
+  // Determine if the current user "owns" this batch
+  const batchSheikhIds: number[] = (batch?.batch_sheikhs || []).map((bs: any) => bs.sheikh_id ?? bs.sheikh?.id);
+  const isOwnBatch = isSheikh
+    ? batchSheikhIds.includes(user?.id || 0)
+    : isStudent
+    ? (data?.students || []).some((s: any) => s.user_id === user?.id)
+    : isAdmin;
+
+  const canManage = isAdmin || (isSheikh && isOwnBatch);
+  const canEnroll = canManage; // same rule for enrollment
+
+  const allStudentsRanked: Student[] = (data?.students || []).map((student: Omit<Student, "rank">, index: number) => ({
     ...student,
     rank: index + 1,
   }));
 
+  // Public and student-in-other-batch: only top 3
+  const students: Student[] = (isPublic || (isStudent && !isOwnBatch))
+    ? allStudentsRanked.slice(0, 3)
+    : allStudentsRanked;
+
   useEffect(() => {
     if (!showAddStudentModal || !allStudents) return;
-    const enrolled = new Set(students.map((student) => student.id));
+    const enrolled = new Set(allStudentsRanked.map((student) => student.id));
     setAvailableStudents(allStudents.filter((student: AvailableStudent) => !enrolled.has(student.id)));
   }, [showAddStudentModal, allStudents, data?.students]);
 
@@ -109,8 +130,8 @@ export default function BatchDetailsPage() {
     });
 
   const handleStudentClick = (student: Student) => {
-    if (!user) return toast.error("يجب تسجيل الدخول لعرض التفاصيل");
-    if (user.role === "student" && student.id !== user.id) {
+    if (isPublic || (isStudent && !isOwnBatch)) return; // no modal for public or in other-batch
+    if (isStudent && (student as any).user_id !== user?.id) {
       return toast.error("عفواً، لا يمكنك عرض تفاصيل طلاب آخرين");
     }
     setSelectedStudent(student);
@@ -172,12 +193,16 @@ export default function BatchDetailsPage() {
             <Link href={`/sheikh/session/new?batchId=${batchId}`} className="flex h-14 min-w-[190px] items-center justify-center gap-4 rounded-2xl bg-warning-600 px-5 font-bold text-warning-50 hover:bg-warning-700">
               <TaskAdd01 aria-hidden="true" size={24} /> تسجيل الحضور
             </Link>
-            <button onClick={() => setShowAddStudentModal(true)} className="flex h-14 min-w-[190px] items-center justify-center gap-4 rounded-2xl bg-primary-600 px-5 font-bold text-white hover:bg-primary-700">
-              <UserAdd01 aria-hidden="true" size={24} /> إضافة طالب
-            </button>
-            <Link href={`/batches/exams?batchId=${batchId}`} className="flex h-14 min-w-[190px] items-center justify-center gap-4 rounded-2xl bg-success-800 px-5 font-bold text-white hover:bg-success-900">
-              <Tv01 aria-hidden="true" size={24} /> إدارة الاختبارات
-            </Link>
+            {canEnroll && (
+              <button onClick={() => setShowAddStudentModal(true)} className="flex h-14 min-w-[190px] items-center justify-center gap-4 rounded-2xl bg-primary-600 px-5 font-bold text-white hover:bg-primary-700">
+                <UserAdd01 aria-hidden="true" size={24} /> إضافة طالب
+              </button>
+            )}
+            {isAdmin && (
+              <Link href={`/batches/exams?batchId=${batchId}`} className="flex h-14 min-w-[190px] items-center justify-center gap-4 rounded-2xl bg-success-800 px-5 font-bold text-white hover:bg-success-900">
+                <Tv01 aria-hidden="true" size={24} /> إدارة الاختبارات
+              </Link>
+            )}
           </>
         )}
       </AdminHeader>
@@ -260,13 +285,22 @@ export default function BatchDetailsPage() {
                   </div>
                   <div className="flex flex-col gap-2">
                     {filteredStudents.map((student) => (
-                      <button
+                      <div
                         key={student.id}
-                        onClick={() => handleStudentClick(student)}
-                        className="grid min-h-12 w-full grid-cols-[36px_minmax(100px,1fr)_auto_24px] items-center gap-3 rounded-lg px-1 text-right hover:bg-success-50 focus-visible:outline-2 focus-visible:outline-success-700 sm:grid-cols-[36px_minmax(120px,1fr)_auto_auto_auto_24px]"
+                        className="grid min-h-12 w-full grid-cols-[36px_minmax(100px,1fr)_auto_24px] items-center gap-3 rounded-lg px-1 text-right hover:bg-success-50 sm:grid-cols-[36px_minmax(120px,1fr)_auto_auto_auto_24px]"
                       >
-                        <Avatar name={student.name} className="h-9 w-9 rounded-full text-sm" />
-                        <span className="truncate font-medium">{student.name}</span>
+                        <button
+                          onClick={() => handleStudentClick(student)}
+                          className="col-span-1 flex items-center justify-center focus-visible:outline-2 focus-visible:outline-success-700 rounded-full"
+                        >
+                          <Avatar name={student.name} className="h-9 w-9 rounded-full text-sm" />
+                        </button>
+                        <button
+                          onClick={() => handleStudentClick(student)}
+                          className="truncate font-medium text-right focus-visible:outline-2 focus-visible:outline-success-700 rounded"
+                        >
+                          {student.name}
+                        </button>
                         <span className="rounded-full bg-success-200 px-3 py-1 text-[11px] text-success-800">{student.points} نقطة</span>
                         <span className="hidden rounded-full bg-warning-200 px-3 py-1 text-[11px] text-warning-800 sm:inline">الترتيب {student.rank}</span>
                         <span className="hidden rounded-full bg-danger-200 px-3 py-1 text-[11px] text-danger-800 sm:inline">طالب</span>
@@ -281,7 +315,7 @@ export default function BatchDetailsPage() {
                         ) : (
                           <MoreVertical aria-hidden="true" size={24} className="text-neutral-800" />
                         )}
-                      </button>
+                      </div>
                     ))}
                     {!filteredStudents.length && (
                       <div className="border border-neutral-300 py-10 text-center text-neutral-700">
