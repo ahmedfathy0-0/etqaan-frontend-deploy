@@ -268,16 +268,7 @@ export default function AdminUsersTab({
         )}
       </div>
 
-      {/* Mobile Floating Action Button - Quick Actions Area */}
-      <div className="lg:hidden fixed bottom-0 left-0 w-full h-[88px] bg-[#F5F7F5] shadow-[0px_-2px_30px_4px_rgba(0,0,0,0.15)] rounded-t-[16px] flex flex-row items-center justify-center p-[8px_16px] gap-[8px] z-30">
-        <button
-          onClick={() => setShowUserModal(true)}
-          className="flex flex-row justify-center items-center py-[8px] px-[16px] gap-[16px] w-full max-w-[448px] h-[56px] bg-[#B17C08] rounded-[16px]"
-        >
-          <UserAdd01 aria-hidden="true" size={24} color="#FEFFFF" />
-          <span className="font-cairo font-bold text-[16px] leading-[150%] text-[#FBFFFC]">إضافة مستخدم</span>
-        </button>
-      </div>
+
     </div>
   );
 }

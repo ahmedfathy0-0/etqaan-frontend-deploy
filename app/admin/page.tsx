@@ -208,7 +208,7 @@ export default function AdminDashboard() {
                 <p className="text-danger-700 font-bold font-cairo">{error}</p>
               </div>
             ) : (
-              <div className="min-h-[500px] w-full animate-fade-in overflow-x-hidden p-4 lg:px-6 lg:py-8">
+              <div className="min-h-[500px] w-full animate-fade-in overflow-x-hidden p-4 pb-32 lg:px-6 lg:py-8 lg:pb-8">
                 {activeTab === "overview" && (
                   <AdminStatsCards 
                     stats={stats} 
@@ -269,6 +269,7 @@ export default function AdminDashboard() {
         <AdminMobileActions 
           onAddBatch={() => setShowBatchModal(true)}
           onAddUser={() => setShowUserModal(true)}
+          onAddStudent={() => setShowStudentModal(true)}
           activeTab={activeTab}
         />
 
