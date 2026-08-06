@@ -2,7 +2,8 @@ const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
 const { autoUpdater } = require("electron-updater");
 
-const serve = require("electron-serve");
+const serveModule = require("electron-serve");
+const serve = serveModule.default || serveModule;
 const loadURL = serve({ directory: "out" });
 
 let store;

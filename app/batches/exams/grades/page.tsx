@@ -184,7 +184,6 @@ export default function ExamGradesPage() {
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                   <div>
                     <h1 className="text-[28px] font-bold text-white flex items-center gap-3 mb-2">
-                      <Tv01 aria-hidden="true" size={36} className="text-warning-500" />
                       رصد درجات: {exam.title}
                     </h1>
                     <div className="flex items-center gap-6 text-success-100">
@@ -201,7 +200,7 @@ export default function ExamGradesPage() {
                   <button
                     onClick={handleSave}
                     disabled={isSaving}
-                    className="w-full md:w-auto h-14 flex items-center justify-center gap-2 bg-primary-600 text-white rounded-2xl font-bold hover:bg-primary-700 transition-colors disabled:opacity-50 px-8"
+                    className="w-full md:w-auto h-14 flex items-center justify-center gap-2 bg-transparent border-2 border-white text-white rounded-full font-bold hover:bg-white hover:text-success-800 transition-colors disabled:opacity-50 px-8"
                   >
                     {isSaving ? (
                       <>
