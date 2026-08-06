@@ -9,10 +9,11 @@ import { AdminSidebar, TabId } from "@/components/admin/AdminSidebar";
 import { SURAHS } from "@/constants/surahs";
 import SearchableSelect from "@/components/ui/SearchableSelect";
 import BackButton from "@/components/ui/BackButton";
+import Modal from "@/components/ui/Modal";
 import { useBatches, useBatchDetails } from "@/queries/useBatches";
 import { useCreateSession } from "@/queries/useSessions";
 import { api } from "@/lib/api";
-import { TaskAdd01, Calendar01, Book01, BookOpen01, Award01, FloppyDisk, Note01 } from "@dga-icons/react/duotone-rounded";
+import { TaskAdd01, Calendar01, Book01, BookOpen01, Award01, FloppyDisk, Note01, Search01, Filter } from "@dga-icons/react/duotone-rounded";
 
 interface Batch {
   id: number;
@@ -61,11 +62,23 @@ export default function NewSessionPage() {
   const [error, setError] = useState("");
   const [sessionDate, setSessionDate] = useState(new Date().toISOString().split("T")[0]);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activeStudentId, setActiveStudentId] = useState<number | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortBy, setSortBy] = useState("name_asc");
   const activeTab: TabId = "sessions";
 
   const { data: batches = [] } = useBatches();
   const { data: batchDetails, isLoading: loadingStudents } = useBatchDetails(selectedBatchId || "");
   const students = batchDetails?.students || [];
+  
+  const filteredStudents = students
+    .filter((s: any) => (s.name || s.full_name || "").toLowerCase().includes(searchTerm.toLowerCase()))
+    .sort((a: any, b: any) => {
+      const nameA = a.name || a.full_name || "";
+      const nameB = b.name || b.full_name || "";
+      if (sortBy === "name_desc") return nameB.localeCompare(nameA, "ar");
+      return nameA.localeCompare(nameB, "ar");
+    });
   
   const { mutateAsync: createSessionMutate } = useCreateSession();
 
@@ -430,263 +443,324 @@ export default function NewSessionPage() {
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-bold text-gray-800">
-                  قائمة الطلاب ({students.length})
+                  قائمة الطلاب ({filteredStudents.length})
                 </h2>
               </div>
 
+              <div className="mb-6 flex h-12 w-full items-center gap-4 px-4 lg:px-0">
+                <label className="relative h-12 min-w-0 flex-1">
+                  <span className="sr-only">البحث عن طالب</span>
+                  <input
+                    type="search"
+                    placeholder="أبحث عن طالب"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="h-12 w-full rounded-2xl border-[1.5px] border-neutral-800 bg-white py-3 pr-11 pl-3 text-right text-base text-success-900 outline-none placeholder:text-success-900 focus:border-success-800"
+                  />
+                  <Search01 aria-hidden="true" size={24} className="absolute right-3 top-1/2 -translate-y-1/2 text-success-800" />
+                </label>
+                <label className="relative flex h-12 w-12 shrink-0 cursor-pointer items-center justify-center text-neutral-800">
+                  <span className="sr-only">ترتيب الطلاب</span>
+                  <Filter aria-hidden="true" size={32} />
+                  <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="absolute inset-0 cursor-pointer opacity-0">
+                    <option value="name_asc">الاسم (أ-ي)</option>
+                    <option value="name_desc">الاسم (ي-أ)</option>
+                  </select>
+                </label>
+              </div>
+
               {/* Students List */}
-              <div className="space-y-4">
-                {students.map((student: any) => {
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {filteredStudents.map((student: any) => {
                   const record = records[student.id];
                   if (!record) return null;
 
                   return (
                     <div
                       key={student.id}
-                      className="bg-white rounded-2xl shadow-sm border border-neutral-200 p-4 md:p-6 hover:shadow-md hover:border-primary-300 transition-all"
+                      onClick={() => setActiveStudentId(student.id)}
+                      className="bg-white rounded-2xl shadow-sm border border-neutral-200 p-4 hover:shadow-md hover:border-primary-300 transition-all cursor-pointer flex flex-col gap-3"
                     >
-                      <div className="flex flex-col md:flex-row md:items-start gap-6">
-                        {/* Student Name & Status */}
-                        <div className="md:w-1/3 space-y-4">
-                          <div className="flex items-center justify-between">
-                            <h3 className="font-bold text-xl text-neutral-900 flex items-center gap-3">
-                              <span className="w-8 h-8 rounded-full bg-primary-50 text-primary-600 flex items-center justify-center font-bold text-sm shrink-0">
-                                {student.id}
-                              </span>
-                              {student.name || student.full_name}
-                            </h3>
-                            <button
-                              onClick={() => handleSubmit(student.id)}
-                              disabled={savingStudent[student.id]}
-                              className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-600/20 px-6 py-2 rounded-xl text-sm font-bold transition-all disabled:opacity-50 disabled:hover:transform-none flex items-center justify-center gap-2 transform hover:-translate-y-0.5"
-                            >
-                              <FloppyDisk size={18} />
-                              {savingStudent[student.id] ? "جاري الحفظ..." : "حفظ"}
-                            </button>
-                          </div>
-                          
-                          <div className="grid grid-cols-2 gap-2">
-                            {[
-                              { id: "present", label: "حاضر", activeClass: "bg-emerald-500 text-white border-emerald-600 shadow-md" },
-                              { id: "late", label: "متأخر", activeClass: "bg-amber-500 text-white border-amber-600 shadow-md" },
-                              { id: "absent", label: "غائب", activeClass: "bg-red-500 text-white border-red-600 shadow-md" },
-                              { id: "excused", label: "معذور", activeClass: "bg-neutral-500 text-white border-neutral-600 shadow-md" },
-                            ].map((status) => (
-                              <button
-                                key={status.id}
-                                onClick={() =>
-                                  handleRecordChange(
-                                    student.id,
-                                    "status",
-                                    status.id,
-                                  )
-                                }
-                                className={`px-3 py-2 rounded-xl text-sm font-bold transition-all border ${
-                                  record.status === status.id
-                                    ? status.activeClass
-                                    : "bg-neutral-50 text-neutral-600 hover:bg-neutral-100 border-neutral-200"
-                                }`}
-                              >
-                                {status.label}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-
-                        {/* Performance Inputs (Only if present/late) */}
-                        {(record.status === "present" ||
-                          record.status === "late") && (
-                          <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 border-t md:border-t-0 md:border-r border-gray-100 pt-4 md:pt-0 md:pr-4">
-                            {/* Jadeed (New Lesson) */}
-                            <div className="space-y-4 bg-emerald-50/50 p-4 rounded-xl border border-emerald-100/50">
-                              <label className="flex items-center gap-2 text-sm font-bold text-emerald-800">
-                                <Book01 size={18} />
-                                الجديد
-                              </label>
-
-                              {/* From */}
-                              <div className="flex gap-2 items-center">
-                                <span className="text-xs font-bold text-emerald-600/70 w-6">من</span>
-                                <div className="flex-1">
-                                  <SearchableSelect
-                                    options={SURAHS.map((s) => ({
-                                      id: s.id,
-                                      label: s.name,
-                                    }))}
-                                    value={record.jadeedStartSurahId}
-                                    onChange={(val) =>
-                                      handleRecordChange(student.id, "jadeedStartSurahId", val)
-                                    }
-                                    placeholder="سورة..."
-                                  />
-                                </div>
-                                <input
-                                  type="number"
-                                  placeholder="لآية"
-                                  value={record.jadeedStartAyah}
-                                  onChange={(e) =>
-                                    handleRecordChange(student.id, "jadeedStartAyah", e.target.value)
-                                  }
-                                  className="w-16 sm:w-20 px-2 py-2.5 border border-emerald-200 rounded-lg text-sm font-bold text-neutral-900 bg-white placeholder-emerald-300 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all"
-                                />
-                              </div>
-
-                              {/* To */}
-                              <div className="flex gap-2 items-center">
-                                <span className="text-xs font-bold text-emerald-600/70 w-6">إلى</span>
-                                <div className="flex-1">
-                                  <SearchableSelect
-                                    options={SURAHS.map((s) => ({
-                                      id: s.id,
-                                      label: s.name,
-                                    }))}
-                                    value={record.jadeedEndSurahId}
-                                    onChange={(val) =>
-                                      handleRecordChange(student.id, "jadeedEndSurahId", val)
-                                    }
-                                    placeholder="سورة..."
-                                  />
-                                </div>
-                                <input
-                                  type="number"
-                                  placeholder="لآية"
-                                  value={record.jadeedEndAyah}
-                                  onChange={(e) =>
-                                    handleRecordChange(student.id, "jadeedEndAyah", e.target.value)
-                                  }
-                                  className="w-16 sm:w-20 px-2 py-2.5 border border-emerald-200 rounded-lg text-sm font-bold text-neutral-900 bg-white placeholder-emerald-300 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all"
-                                />
-                              </div>
-
-                              <select
-                                value={record.jadeedGrade}
-                                onChange={(e) =>
-                                  handleRecordChange(student.id, "jadeedGrade", e.target.value)
-                                }
-                                className="w-full px-3 py-2.5 border border-emerald-200 rounded-lg focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 text-sm font-bold bg-white text-neutral-900 transition-all"
-                              >
-                                <option value="">تقييم الجديد...</option>
-                                {gradeOptions.map((opt) => (
-                                  <option key={opt.value} value={opt.value}>
-                                    {opt.label}
-                                  </option>
-                                ))}
-                              </select>
-                            </div>
-
-                            {/* Muraja (Revision) */}
-                            {/* Muraja (Revision) */}
-                            <div className="space-y-4 bg-sky-50/50 p-4 rounded-xl border border-sky-100/50">
-                              <label className="flex items-center gap-2 text-sm font-bold text-sky-800">
-                                <BookOpen01 size={18} />
-                                المراجعة
-                              </label>
-
-                              {/* From */}
-                              <div className="flex gap-2 items-center">
-                                <span className="text-xs font-bold text-sky-600/70 w-6">من</span>
-                                <div className="flex-1">
-                                  <SearchableSelect
-                                    options={SURAHS.map((s) => ({
-                                      id: s.id,
-                                      label: s.name,
-                                    }))}
-                                    value={record.murajaStartSurahId}
-                                    onChange={(val) =>
-                                      handleRecordChange(student.id, "murajaStartSurahId", val)
-                                    }
-                                    placeholder="سورة..."
-                                  />
-                                </div>
-                                <input
-                                  type="number"
-                                  placeholder="لآية"
-                                  value={record.murajaStartAyah}
-                                  onChange={(e) =>
-                                    handleRecordChange(student.id, "murajaStartAyah", e.target.value)
-                                  }
-                                  className="w-16 sm:w-20 px-2 py-2.5 border border-sky-200 rounded-lg text-sm font-bold text-neutral-900 bg-white placeholder-sky-300 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all"
-                                />
-                              </div>
-
-                              {/* To */}
-                              <div className="flex gap-2 items-center">
-                                <span className="text-xs font-bold text-sky-600/70 w-6">إلى</span>
-                                <div className="flex-1">
-                                  <SearchableSelect
-                                    options={SURAHS.map((s) => ({
-                                      id: s.id,
-                                      label: s.name,
-                                    }))}
-                                    value={record.murajaEndSurahId}
-                                    onChange={(val) =>
-                                      handleRecordChange(student.id, "murajaEndSurahId", val)
-                                    }
-                                    placeholder="سورة..."
-                                  />
-                                </div>
-                                <input
-                                  type="number"
-                                  placeholder="لآية"
-                                  value={record.murajaEndAyah}
-                                  onChange={(e) =>
-                                    handleRecordChange(student.id, "murajaEndAyah", e.target.value)
-                                  }
-                                  className="w-16 sm:w-20 px-2 py-2.5 border border-sky-200 rounded-lg text-sm font-bold text-neutral-900 bg-white placeholder-sky-300 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all"
-                                />
-                              </div>
-
-                              <select
-                                value={record.murajaGrade}
-                                onChange={(e) =>
-                                  handleRecordChange(student.id, "murajaGrade", e.target.value)
-                                }
-                                className="w-full px-3 py-2.5 border border-sky-200 rounded-lg focus:ring-1 focus:ring-sky-500 focus:border-sky-500 text-sm font-bold bg-white text-neutral-900 transition-all"
-                              >
-                                <option value="">تقييم المراجعة...</option>
-                                {gradeOptions.map((opt) => (
-                                  <option key={opt.value} value={opt.value}>
-                                    {opt.label}
-                                  </option>
-                                ))}
-                              </select>
-                            </div>
-
-                            {/* Behavior Note & Bonus */}
-                            <div className="md:col-span-2 mt-4 grid grid-cols-1 md:grid-cols-4 gap-4 bg-neutral-50 p-4 rounded-xl border border-neutral-100">
-                              <div className="md:col-span-3">
-                                <input
-                                  type="text"
-                                  placeholder="ملاحظات (سلوك / حفظ)..."
-                                  value={record.behaviorNote}
-                                  onChange={(e) =>
-                                    handleRecordChange(student.id, "behaviorNote", e.target.value)
-                                  }
-                                  className="w-full px-4 py-2.5 border border-neutral-300 rounded-lg focus:ring-1 focus:ring-primary-500 focus:border-primary-500 text-sm font-bold text-neutral-900 bg-white placeholder-neutral-400 transition-all"
-                                />
-                              </div>
-                              <div className="md:col-span-1">
-                                <div className="relative">
-                                  <input
-                                    type="number"
-                                    placeholder="نقاط+"
-                                    value={record.bonus}
-                                    onChange={(e) =>
-                                      handleRecordChange(student.id, "bonus", e.target.value)
-                                    }
-                                    className="w-full pl-3 pr-8 py-2.5 border border-amber-300 rounded-lg text-sm font-bold bg-amber-50 text-amber-900 placeholder-amber-400 focus:ring-1 focus:ring-amber-500 focus:border-amber-500 transition-all"
-                                  />
-                                  <Award01 className="absolute right-2.5 top-1/2 -translate-y-1/2 text-amber-500" size={16} />
-                                </div>
-                              </div>
-                            </div>
-                          </div>
+                      <div className="flex items-center justify-between">
+                        <h3 className="font-bold text-lg text-neutral-900 flex items-center gap-3">
+                          {student.name || student.full_name}
+                        </h3>
+                        {record.status && record.status !== "present" && (
+                          <span className={`text-xs font-bold px-2 py-1 rounded-md ${
+                            record.status === "absent" ? "bg-red-50 text-red-600" :
+                            record.status === "late" ? "bg-amber-50 text-amber-600" :
+                            "bg-neutral-100 text-neutral-600"
+                          }`}>
+                            {record.status === "absent" ? "غائب" : record.status === "late" ? "متأخر" : "معذور"}
+                          </span>
+                        )}
+                        {record.status === "present" && (
+                          <span className="text-xs font-bold px-2 py-1 rounded-md bg-emerald-50 text-emerald-600">
+                            حاضر
+                          </span>
                         )}
                       </div>
+                      {!record.status && (
+                        <div className="text-xs text-neutral-400">لم يتم التحضير</div>
+                      )}
                     </div>
                   );
                 })}
               </div>
+
+              {/* Attendance Modal */}
+              {activeStudentId && records[activeStudentId] && (
+                <Modal
+                  isOpen={activeStudentId !== null}
+                  onClose={() => setActiveStudentId(null)}
+                  title={`تحضير الطالب: ${students.find((s: any) => s.id === activeStudentId)?.name || students.find((s: any) => s.id === activeStudentId)?.full_name || ''}`}
+                  headerColorClass="bg-success-800"
+                  maxWidth="max-w-2xl"
+                >
+                  <div className="flex flex-col gap-6 w-full max-h-[80vh] overflow-y-auto pb-4 px-2 sm:px-4" dir="rtl">
+                    {(() => {
+                      const student = students.find((s: any) => s.id === activeStudentId);
+                      const record = records[activeStudentId];
+                      if (!student || !record) return null;
+
+                      return (
+                        <div className="flex flex-col gap-6">
+                          {/* Student Status */}
+                          <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                              <h4 className="font-bold text-lg text-neutral-900">حالة الحضور</h4>
+                              <button
+                                onClick={() => handleSubmit(student.id)}
+                                disabled={savingStudent[student.id]}
+                                className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-600/20 px-6 py-2 rounded-xl text-sm font-bold transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                              >
+                                <FloppyDisk size={18} />
+                                {savingStudent[student.id] ? "جاري الحفظ..." : "حفظ"}
+                              </button>
+                            </div>
+                            
+                            <div className="grid grid-cols-2 gap-2">
+                              {[
+                                { id: "present", label: "حاضر", activeClass: "bg-emerald-500 text-white border-emerald-600 shadow-md" },
+                                { id: "late", label: "متأخر", activeClass: "bg-amber-500 text-white border-amber-600 shadow-md" },
+                                { id: "absent", label: "غائب", activeClass: "bg-red-500 text-white border-red-600 shadow-md" },
+                                { id: "excused", label: "معذور", activeClass: "bg-neutral-500 text-white border-neutral-600 shadow-md" },
+                              ].map((status) => (
+                                <button
+                                  key={status.id}
+                                  onClick={() =>
+                                    handleRecordChange(
+                                      student.id,
+                                      "status",
+                                      status.id,
+                                    )
+                                  }
+                                  className={`px-3 py-3 rounded-xl text-sm font-bold transition-all border ${
+                                    record.status === status.id
+                                      ? status.activeClass
+                                      : "bg-neutral-50 text-neutral-600 hover:bg-neutral-100 border-neutral-200"
+                                  }`}
+                                >
+                                  {status.label}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Performance Inputs (Only if present/late) */}
+                          {(record.status === "present" ||
+                            record.status === "late") && (
+                            <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-gray-100 pt-4">
+                              {/* Jadeed (New Lesson) */}
+                              <div className="space-y-4 bg-emerald-50/50 p-4 rounded-xl border border-emerald-100/50">
+                                <label className="flex items-center gap-2 text-sm font-bold text-emerald-800">
+                                  <Book01 size={18} />
+                                  الجديد
+                                </label>
+
+                                {/* From */}
+                                <div className="flex gap-2 items-center">
+                                  <span className="text-xs font-bold text-emerald-600/70 w-6">من</span>
+                                  <div className="flex-1">
+                                    <SearchableSelect
+                                      options={SURAHS.map((s) => ({
+                                        id: s.id,
+                                        label: s.name,
+                                      }))}
+                                      value={record.jadeedStartSurahId}
+                                      onChange={(val) =>
+                                        handleRecordChange(student.id, "jadeedStartSurahId", val)
+                                      }
+                                      placeholder="سورة..."
+                                    />
+                                  </div>
+                                  <input
+                                    type="number"
+                                    placeholder="لآية"
+                                    value={record.jadeedStartAyah}
+                                    onChange={(e) =>
+                                      handleRecordChange(student.id, "jadeedStartAyah", e.target.value)
+                                    }
+                                    className="w-16 sm:w-20 px-2 py-2.5 border border-emerald-200 rounded-lg text-sm font-bold text-neutral-900 bg-white placeholder-emerald-300 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all"
+                                  />
+                                </div>
+
+                                {/* To */}
+                                <div className="flex gap-2 items-center">
+                                  <span className="text-xs font-bold text-emerald-600/70 w-6">إلى</span>
+                                  <div className="flex-1">
+                                    <SearchableSelect
+                                      options={SURAHS.map((s) => ({
+                                        id: s.id,
+                                        label: s.name,
+                                      }))}
+                                      value={record.jadeedEndSurahId}
+                                      onChange={(val) =>
+                                        handleRecordChange(student.id, "jadeedEndSurahId", val)
+                                      }
+                                      placeholder="سورة..."
+                                    />
+                                  </div>
+                                  <input
+                                    type="number"
+                                    placeholder="لآية"
+                                    value={record.jadeedEndAyah}
+                                    onChange={(e) =>
+                                      handleRecordChange(student.id, "jadeedEndAyah", e.target.value)
+                                    }
+                                    className="w-16 sm:w-20 px-2 py-2.5 border border-emerald-200 rounded-lg text-sm font-bold text-neutral-900 bg-white placeholder-emerald-300 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all"
+                                  />
+                                </div>
+
+                                <select
+                                  value={record.jadeedGrade}
+                                  onChange={(e) =>
+                                    handleRecordChange(student.id, "jadeedGrade", e.target.value)
+                                  }
+                                  className="w-full px-3 py-2.5 border border-emerald-200 rounded-lg focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 text-sm font-bold bg-white text-neutral-900 transition-all"
+                                >
+                                  <option value="">تقييم الجديد...</option>
+                                  {gradeOptions.map((opt) => (
+                                    <option key={opt.value} value={opt.value}>
+                                      {opt.label}
+                                    </option>
+                                  ))}
+                                </select>
+                              </div>
+
+                              {/* Muraja (Revision) */}
+                              <div className="space-y-4 bg-sky-50/50 p-4 rounded-xl border border-sky-100/50">
+                                <label className="flex items-center gap-2 text-sm font-bold text-sky-800">
+                                  <BookOpen01 size={18} />
+                                  المراجعة
+                                </label>
+
+                                {/* From */}
+                                <div className="flex gap-2 items-center">
+                                  <span className="text-xs font-bold text-sky-600/70 w-6">من</span>
+                                  <div className="flex-1">
+                                    <SearchableSelect
+                                      options={SURAHS.map((s) => ({
+                                        id: s.id,
+                                        label: s.name,
+                                      }))}
+                                      value={record.murajaStartSurahId}
+                                      onChange={(val) =>
+                                        handleRecordChange(student.id, "murajaStartSurahId", val)
+                                      }
+                                      placeholder="سورة..."
+                                    />
+                                  </div>
+                                  <input
+                                    type="number"
+                                    placeholder="لآية"
+                                    value={record.murajaStartAyah}
+                                    onChange={(e) =>
+                                      handleRecordChange(student.id, "murajaStartAyah", e.target.value)
+                                    }
+                                    className="w-16 sm:w-20 px-2 py-2.5 border border-sky-200 rounded-lg text-sm font-bold text-neutral-900 bg-white placeholder-sky-300 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all"
+                                  />
+                                </div>
+
+                                {/* To */}
+                                <div className="flex gap-2 items-center">
+                                  <span className="text-xs font-bold text-sky-600/70 w-6">إلى</span>
+                                  <div className="flex-1">
+                                    <SearchableSelect
+                                      options={SURAHS.map((s) => ({
+                                        id: s.id,
+                                        label: s.name,
+                                      }))}
+                                      value={record.murajaEndSurahId}
+                                      onChange={(val) =>
+                                        handleRecordChange(student.id, "murajaEndSurahId", val)
+                                      }
+                                      placeholder="سورة..."
+                                    />
+                                  </div>
+                                  <input
+                                    type="number"
+                                    placeholder="لآية"
+                                    value={record.murajaEndAyah}
+                                    onChange={(e) =>
+                                      handleRecordChange(student.id, "murajaEndAyah", e.target.value)
+                                    }
+                                    className="w-16 sm:w-20 px-2 py-2.5 border border-sky-200 rounded-lg text-sm font-bold text-neutral-900 bg-white placeholder-sky-300 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all"
+                                  />
+                                </div>
+
+                                <select
+                                  value={record.murajaGrade}
+                                  onChange={(e) =>
+                                    handleRecordChange(student.id, "murajaGrade", e.target.value)
+                                  }
+                                  className="w-full px-3 py-2.5 border border-sky-200 rounded-lg focus:ring-1 focus:ring-sky-500 focus:border-sky-500 text-sm font-bold bg-white text-neutral-900 transition-all"
+                                >
+                                  <option value="">تقييم المراجعة...</option>
+                                  {gradeOptions.map((opt) => (
+                                    <option key={opt.value} value={opt.value}>
+                                      {opt.label}
+                                    </option>
+                                  ))}
+                                </select>
+                              </div>
+
+                              {/* Behavior Note & Bonus */}
+                              <div className="md:col-span-2 mt-2 grid grid-cols-1 md:grid-cols-4 gap-4 bg-neutral-50 p-4 rounded-xl border border-neutral-100">
+                                <div className="md:col-span-3">
+                                  <input
+                                    type="text"
+                                    placeholder="ملاحظات (سلوك / حفظ)..."
+                                    value={record.behaviorNote}
+                                    onChange={(e) =>
+                                      handleRecordChange(student.id, "behaviorNote", e.target.value)
+                                    }
+                                    className="w-full px-4 py-2.5 border border-neutral-300 rounded-lg focus:ring-1 focus:ring-primary-500 focus:border-primary-500 text-sm font-bold text-neutral-900 bg-white placeholder-neutral-400 transition-all"
+                                  />
+                                </div>
+                                <div className="md:col-span-1">
+                                  <div className="relative">
+                                    <input
+                                      type="number"
+                                      placeholder="نقاط+"
+                                      value={record.bonus}
+                                      onChange={(e) =>
+                                        handleRecordChange(student.id, "bonus", e.target.value)
+                                      }
+                                      className="w-full pl-3 pr-8 py-2.5 border border-amber-300 rounded-lg text-sm font-bold bg-amber-50 text-amber-900 placeholder-amber-400 focus:ring-1 focus:ring-amber-500 focus:border-amber-500 transition-all"
+                                    />
+                                    <Award01 className="absolute right-2.5 top-1/2 -translate-y-1/2 text-amber-500" size={16} />
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })()}
+                  </div>
+                </Modal>
+              )}
             </div>
           )}
 

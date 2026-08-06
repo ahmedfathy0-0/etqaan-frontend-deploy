@@ -148,21 +148,6 @@ export default function BatchDetailsPage() {
         onEnroll={handleEnrollStudent}
       />
 
-      <Modal
-        isOpen={showAddSessionModal}
-        onClose={() => setShowAddSessionModal(false)}
-        title="تسجيل الحضور"
-        headerColorClass="bg-success-800"
-      >
-        <p className="mb-6 text-center text-neutral-800">سيتم توجيهك إلى صفحة تسجيل الحضور لهذه الحلقة.</p>
-        <div className="flex gap-3">
-          <Link href={`/sheikh/session/new?batchId=${batchId}`} className="flex-1 rounded-xl bg-success-700 px-4 py-3 text-center font-bold text-white">
-            متابعة
-          </Link>
-          <button onClick={() => setShowAddSessionModal(false)} className="rounded-xl bg-neutral-200 px-6 py-3 font-bold">إلغاء</button>
-        </div>
-      </Modal>
-
       <AdminHeader
         onLogout={logout}
         onToggleMenu={() => setMobileMenuOpen(true)}
@@ -171,9 +156,9 @@ export default function BatchDetailsPage() {
       >
         {canManage && (
           <>
-            <button onClick={() => setShowAddSessionModal(true)} className="flex h-14 min-w-[190px] items-center justify-center gap-4 rounded-2xl bg-warning-600 px-5 font-bold text-warning-50 hover:bg-warning-700">
+            <Link href={`/sheikh/session/new?batchId=${batchId}`} className="flex h-14 min-w-[190px] items-center justify-center gap-4 rounded-2xl bg-warning-600 px-5 font-bold text-warning-50 hover:bg-warning-700">
               <TaskAdd01 aria-hidden="true" size={24} /> تسجيل الحضور
-            </button>
+            </Link>
             <button onClick={() => setShowAddStudentModal(true)} className="flex h-14 min-w-[190px] items-center justify-center gap-4 rounded-2xl bg-primary-600 px-5 font-bold text-white hover:bg-primary-700">
               <UserAdd01 aria-hidden="true" size={24} /> إضافة طالب
             </button>
@@ -208,29 +193,7 @@ export default function BatchDetailsPage() {
             </div>
           ) : (
             <div className="mx-auto flex w-full flex-col gap-9 xl:px-8">
-              <div className="mx-auto flex h-12 w-full items-center gap-4">
-                <label className="relative min-w-0 flex-1">
-                  <span className="sr-only">البحث عن طالب</span>
-                  <input
-                    type="search"
-                    value={searchQuery}
-                    onChange={(event) => setSearchQuery(event.target.value)}
-                    placeholder="أبحث عن"
-                    className="h-12 w-full rounded-2xl border-[1.5px] border-neutral-800 bg-white py-3 pr-11 pl-4 outline-none placeholder:text-success-900 focus:border-success-700"
-                  />
-                  <Search01 aria-hidden="true" size={24} className="absolute right-3 top-1/2 -translate-y-1/2 text-success-800" />
-                </label>
-                <label className="relative flex h-12 w-12 shrink-0 cursor-pointer items-center justify-center text-neutral-800">
-                  <span className="sr-only">ترتيب الطلاب</span>
-                  <Filter aria-hidden="true" size={32} />
-                  <select value={sortBy} onChange={(event) => setSortBy(event.target.value)} className="absolute inset-0 cursor-pointer opacity-0">
-                    <option value="points_desc">النقاط: الأعلى</option>
-                    <option value="points_asc">النقاط: الأقل</option>
-                    <option value="name_asc">الاسم: أ-ي</option>
-                    <option value="name_desc">الاسم: ي-أ</option>
-                  </select>
-                </label>
-              </div>
+
 
               <section className="overflow-hidden rounded-xl bg-white shadow-[0_2px_10px_5px_rgba(0,10,1,0.25)]" aria-labelledby="honor-title">
                 <div className="flex min-h-14 items-center justify-between gap-4 px-4">
@@ -258,6 +221,30 @@ export default function BatchDetailsPage() {
               <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_450px]">
                 <section id="students" className="min-w-0 scroll-mt-32 px-1" aria-labelledby="students-title">
                   <h2 id="students-title" className="mb-4 text-2xl font-bold">الطلاب ({filteredStudents.length})</h2>
+                  
+                  <div className="mb-6 flex h-12 w-full items-center gap-4 px-4 lg:px-0">
+                    <label className="relative h-12 min-w-0 flex-1">
+                      <span className="sr-only">البحث عن طالب</span>
+                      <input
+                        type="search"
+                        placeholder="أبحث عن طالب"
+                        value={searchQuery}
+                        onChange={(event) => setSearchQuery(event.target.value)}
+                        className="h-12 w-full rounded-2xl border-[1.5px] border-neutral-800 bg-white py-3 pr-11 pl-3 text-right text-base text-success-900 outline-none placeholder:text-success-900 focus:border-success-800"
+                      />
+                      <Search01 aria-hidden="true" size={24} className="absolute right-3 top-1/2 -translate-y-1/2 text-success-800" />
+                    </label>
+                    <label className="relative flex h-12 w-12 shrink-0 cursor-pointer items-center justify-center text-neutral-800">
+                      <span className="sr-only">ترتيب الطلاب</span>
+                      <Filter aria-hidden="true" size={32} />
+                      <select value={sortBy} onChange={(event) => setSortBy(event.target.value)} className="absolute inset-0 cursor-pointer opacity-0">
+                        <option value="points_desc">النقاط: الأعلى</option>
+                        <option value="points_asc">النقاط: الأقل</option>
+                        <option value="name_asc">الاسم (أ-ي)</option>
+                        <option value="name_desc">الاسم (ي-أ)</option>
+                      </select>
+                    </label>
+                  </div>
                   <div className="flex flex-col gap-2">
                     {filteredStudents.map((student) => (
                       <button
