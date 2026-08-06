@@ -77,7 +77,7 @@ export default function AdminBatchesTab({
           >
             <div className="flex items-center justify-between gap-3">
               <div className="flex min-w-0 items-center gap-2">
-                <h2 className="truncate text-2xl font-bold leading-9 text-success-900">{batch.name}</h2>
+                <h2 className="truncate text-xl lg:text-2xl font-bold leading-8 lg:leading-9 text-success-900">{batch.name}</h2>
                 <span
                   className={`h-3.5 w-3.5 shrink-0 rounded-full ${batch.is_active === false ? "bg-neutral-600" : "bg-success-600"}`}
                   aria-label={batch.is_active === false ? "غير نشطة" : "نشطة"}
@@ -109,7 +109,7 @@ export default function AdminBatchesTab({
 
             <Link
               href={`/batches/detail?id=${batch.id}`}
-              className="mt-auto flex h-10 w-full items-center justify-center rounded-2xl border-2 border-success-700 text-lg font-bold text-success-900 transition-colors hover:bg-success-100"
+              className="mt-auto flex h-10 w-full items-center justify-center rounded-2xl border-2 border-success-700 text-base lg:text-lg font-bold text-success-900 transition-colors hover:bg-success-100"
             >
               عرض التفاصيل
             </Link>

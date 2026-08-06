@@ -183,7 +183,7 @@ export default function ExamGradesPage() {
               <div className="bg-success-800 rounded-[24px] shadow-sm p-6 border-[1.5px] border-success-200">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                   <div>
-                    <h1 className="text-[28px] font-bold text-white flex items-center gap-3 mb-2">
+                    <h1 className="text-xl lg:text-[28px] font-bold text-white flex items-center gap-3 mb-2">
                       رصد درجات: {exam.title}
                     </h1>
                     <div className="flex items-center gap-6 text-success-100">

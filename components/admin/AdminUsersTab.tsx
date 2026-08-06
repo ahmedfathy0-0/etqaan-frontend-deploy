@@ -88,19 +88,19 @@ export default function AdminUsersTab({
         <div className="min-w-[700px] w-full flex flex-col">
           {/* Header Row */}
           <div className="flex flex-row justify-center items-center py-[16px] px-0 gap-[16px] w-full bg-[#308337] min-h-[68px]">
-            <div className="flex-1 text-center font-cairo font-bold text-[24px] leading-[150%] text-[#FBFFFC]">
+            <div className="flex-1 text-center font-cairo font-bold text-lg lg:text-[24px] leading-[150%] text-[#FBFFFC]">
               الأسم
             </div>
-            <div className="w-[295px] text-center font-cairo font-bold text-[24px] leading-[150%] text-[#FBFFFC]">
+            <div className="w-[295px] text-center font-cairo font-bold text-lg lg:text-[24px] leading-[150%] text-[#FBFFFC]">
               البريد الإلكتروني
             </div>
-            <div className="w-[150px] text-center font-cairo font-bold text-[24px] leading-[150%] text-[#FBFFFC]">
+            <div className="w-[150px] text-center font-cairo font-bold text-lg lg:text-[24px] leading-[150%] text-[#FBFFFC]">
               كلمة المرور
             </div>
-            <div className="flex-1 text-center font-cairo font-bold text-[24px] leading-[150%] text-[#FBFFFC]">
+            <div className="flex-1 text-center font-cairo font-bold text-lg lg:text-[24px] leading-[150%] text-[#FBFFFC]">
               الدور
             </div>
-            <div className="flex-1 text-center font-cairo font-bold text-[24px] leading-[150%] text-[#FBFFFC]">
+            <div className="flex-1 text-center font-cairo font-bold text-lg lg:text-[24px] leading-[150%] text-[#FBFFFC]">
               الإجراءات
             </div>
           </div>
@@ -112,17 +112,17 @@ export default function AdminUsersTab({
               className={`flex flex-row justify-center items-center py-[16px] px-0 gap-[16px] w-full ${index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#E3E6E3]"}`}
             >
               {/* Name */}
-              <div className="flex-1 text-center font-cairo font-bold text-[18px] leading-[150%] text-[#000000] break-words">
+              <div className="flex-1 text-center font-cairo font-bold text-base lg:text-[18px] leading-[150%] text-[#000000] break-words">
                 {user.name}
               </div>
 
               {/* Email */}
-              <div className="w-[295px] text-center font-cairo font-bold text-[18px] leading-[150%] text-[#000000] break-words">
+              <div className="w-[295px] text-center font-cairo font-bold text-base lg:text-[18px] leading-[150%] text-[#000000] break-words">
                 {user.email}
               </div>
 
               {/* Password */}
-              <div className="w-[150px] text-center font-cairo font-bold text-[18px] leading-[150%] text-[#000000]">
+              <div className="w-[150px] text-center font-cairo font-bold text-base lg:text-[18px] leading-[150%] text-[#000000]">
                 ********
               </div>
 
@@ -197,7 +197,7 @@ export default function AdminUsersTab({
         {filteredUsers.map((user) => (
           <div key={user.id} className="flex flex-col bg-white border border-[#A3C3D7] rounded-[16px] p-4 gap-4 shadow-sm">
             <div className="flex justify-between items-center w-full">
-              <span className="font-cairo font-bold text-[18px] text-[#000000]">
+              <span className="font-cairo font-bold text-base text-[#000000]">
                 {user.name}
               </span>
               <div className={`flex flex-row justify-center items-center py-[4px] px-[12px] gap-[10px] rounded-[48px] ${

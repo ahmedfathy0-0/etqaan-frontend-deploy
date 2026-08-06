@@ -401,7 +401,7 @@ export default function NewSessionPage() {
               />
             </div>
         <div className="bg-white rounded-2xl shadow-sm border border-neutral-200 p-6 mb-8">
-          <h1 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+          <h1 className="text-xl lg:text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
             <TaskAdd01 className="text-primary-600" size={32} />
             تسجيل الحضور والمتابعة
           </h1>
@@ -528,7 +528,7 @@ export default function NewSessionPage() {
                           {/* Student Status */}
                           <div className="space-y-4">
                             <div className="flex items-center justify-between">
-                              <h4 className="font-bold text-lg text-neutral-900">حالة الحضور</h4>
+                              <h4 className="font-bold text-base lg:text-lg text-neutral-900">حالة الحضور</h4>
                               <button
                                 onClick={() => handleSubmit(student.id)}
                                 disabled={savingStudent[student.id]}

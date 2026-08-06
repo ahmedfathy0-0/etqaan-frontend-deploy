@@ -190,7 +190,7 @@ export default function AdminStudentModal({
           )}
 
           <div className="flex flex-col gap-2 w-full">
-            <label className="text-right text-success-800 font-bold text-lg w-full">اسم الطالب</label>
+            <label className="text-right text-success-800 font-bold text-base lg:text-lg w-full">اسم الطالب</label>
             <input
               type="text"
               value={newStudent.full_name}
@@ -204,7 +204,7 @@ export default function AdminStudentModal({
           </div>
 
           <div className="flex flex-col gap-2 w-full">
-            <label className="text-right text-success-800 font-bold text-lg w-full">اسم ولي الأمر (اختياري)</label>
+            <label className="text-right text-success-800 font-bold text-base lg:text-lg w-full">اسم ولي الأمر (اختياري)</label>
             <input
               type="text"
               value={newStudent.guardian_name}
@@ -217,7 +217,7 @@ export default function AdminStudentModal({
           </div>
 
           <div className="flex flex-col gap-2 w-full">
-            <label className="text-right text-success-800 font-bold text-lg w-full">رقم هاتف ولي الأمر (اختياري)</label>
+            <label className="text-right text-success-800 font-bold text-base lg:text-lg w-full">رقم هاتف ولي الأمر (اختياري)</label>
             <input
               type="text"
               value={newStudent.guardian_phone}
@@ -231,7 +231,7 @@ export default function AdminStudentModal({
           </div>
 
           <div className="flex flex-col gap-2 w-full">
-            <label className="text-right text-success-800 font-bold text-lg w-full">الجنس</label>
+            <label className="text-right text-success-800 font-bold text-base lg:text-lg w-full">الجنس</label>
             <div className="w-full relative">
               <select
                 value={newStudent.gender}
@@ -258,7 +258,7 @@ export default function AdminStudentModal({
               onChange={(e) => setHasAccount(e.target.checked)}
               className="w-5 h-5 accent-success-700 cursor-pointer"
             />
-            <label htmlFor="hasAccountToggle" className="text-right text-success-800 font-bold text-lg cursor-pointer select-none">
+            <label htmlFor="hasAccountToggle" className="text-right text-success-800 font-bold text-base lg:text-lg cursor-pointer select-none">
               ربط/إنشاء حساب للمنصة لهذا الطالب
             </label>
           </div>
@@ -304,7 +304,7 @@ export default function AdminStudentModal({
             disabled={formLoading}
           >
             <FloppyDisk aria-hidden="true" size={24} className="text-white" />
-            <span className="font-bold text-lg text-white">
+            <span className="font-bold text-base lg:text-lg text-white">
                {formLoading ? "جاري الحفظ..." : "حفظ الطالب"}
             </span>
           </button>
@@ -314,7 +314,7 @@ export default function AdminStudentModal({
             onClick={onClose}
             className="flex-1 flex flex-row justify-center items-center h-14 bg-neutral-100 hover:bg-neutral-200 border-2 border-neutral-200 rounded-2xl transition-colors"
           >
-            <span className="font-bold text-lg text-neutral-700">
+            <span className="font-bold text-base lg:text-lg text-neutral-700">
               إلغاء
             </span>
           </button>

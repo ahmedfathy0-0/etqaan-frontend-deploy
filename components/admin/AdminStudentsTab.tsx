@@ -39,26 +39,26 @@ export default function AdminStudentsTab({
 
   const renderTable = (title: string, list: AvailableStudent[]) => (
     <div className="w-full flex flex-col gap-4 mb-8">
-      <h3 className="text-2xl font-bold font-cairo text-success-900 text-right px-4 lg:px-0">{title} ({list.length})</h3>
+      <h3 className="text-xl lg:text-2xl font-bold font-cairo text-success-900 text-right px-4 lg:px-0">{title} ({list.length})</h3>
       
       {/* Desktop Table View */}
       <div className="hidden lg:flex flex-col items-end p-0 w-full overflow-x-auto border border-gray-200 rounded-[16px] overflow-hidden shadow-sm">
         <div className="min-w-[700px] w-full flex flex-col">
           {/* Header Row */}
           <div className="flex flex-row justify-center items-center py-[16px] px-0 gap-[16px] w-full bg-[#308337] min-h-[68px]">
-            <div className="flex-1 text-center font-cairo font-bold text-[24px] leading-[150%] text-[#FBFFFC]">الأسم</div>
-            <div className="flex-1 text-center font-cairo font-bold text-[24px] leading-[150%] text-[#FBFFFC]">ولي الأمر</div>
-            <div className="flex-1 text-center font-cairo font-bold text-[24px] leading-[150%] text-[#FBFFFC]">رقم التواصل</div>
-            <div className="w-[120px] text-center font-cairo font-bold text-[24px] leading-[150%] text-[#FBFFFC]">الجنس</div>
-            <div className="flex-1 text-center font-cairo font-bold text-[24px] leading-[150%] text-[#FBFFFC]">الإجراءات</div>
+            <div className="flex-1 text-center font-cairo font-bold text-lg lg:text-[24px] leading-[150%] text-[#FBFFFC]">الأسم</div>
+            <div className="flex-1 text-center font-cairo font-bold text-lg lg:text-[24px] leading-[150%] text-[#FBFFFC]">ولي الأمر</div>
+            <div className="flex-1 text-center font-cairo font-bold text-lg lg:text-[24px] leading-[150%] text-[#FBFFFC]">رقم التواصل</div>
+            <div className="w-[120px] text-center font-cairo font-bold text-lg lg:text-[24px] leading-[150%] text-[#FBFFFC]">الجنس</div>
+            <div className="flex-1 text-center font-cairo font-bold text-lg lg:text-[24px] leading-[150%] text-[#FBFFFC]">الإجراءات</div>
           </div>
 
           {/* Rows */}
           {list.map((student, index) => (
             <div key={student.id} className={`flex flex-row justify-center items-center py-[16px] px-0 gap-[16px] w-full ${index % 2 === 0 ? "bg-[#FFFFFF]" : "bg-[#E3E6E3]"}`}>
-              <div className="flex-1 text-center font-cairo font-bold text-[18px] leading-[150%] text-[#000000] break-words">{student.full_name}</div>
-              <div className="flex-1 text-center font-cairo font-bold text-[18px] leading-[150%] text-[#000000] break-words">{student.guardian_name || "-"}</div>
-              <div className="flex-1 text-center font-cairo font-bold text-[18px] leading-[150%] text-[#000000]" dir="ltr">{student.guardian_phone || "-"}</div>
+              <div className="flex-1 text-center font-cairo font-bold text-base lg:text-[18px] leading-[150%] text-[#000000] break-words">{student.full_name}</div>
+              <div className="flex-1 text-center font-cairo font-bold text-base lg:text-[18px] leading-[150%] text-[#000000] break-words">{student.guardian_name || "-"}</div>
+              <div className="flex-1 text-center font-cairo font-bold text-base lg:text-[18px] leading-[150%] text-[#000000]" dir="ltr">{student.guardian_phone || "-"}</div>
               <div className="w-[120px] flex justify-center items-center">
                 <div className={`flex flex-row justify-center items-center py-[8px] px-[16px] gap-[10px] w-[72px] h-[37px] rounded-[48px] ${student.gender === "female" ? "bg-[#F7D9E4]" : "bg-[#D9EEF7]"}`}>
                   <span className={`font-cairo font-normal text-[14px] leading-[150%] text-center whitespace-nowrap ${student.gender === "female" ? "text-[#4E0027]" : "text-[#00354E]"}`}>
@@ -97,7 +97,7 @@ export default function AdminStudentsTab({
         {list.map((student) => (
           <div key={student.id} className="flex flex-col bg-white border border-[#A3C3D7] rounded-[16px] p-4 gap-4 shadow-sm">
             <div className="flex justify-between items-center w-full">
-              <span className="font-cairo font-bold text-[18px] text-[#000000]">{student.full_name}</span>
+              <span className="font-cairo font-bold text-base text-[#000000]">{student.full_name}</span>
               <div className={`flex flex-row justify-center items-center py-[4px] px-[12px] gap-[10px] rounded-[48px] ${student.gender === "female" ? "bg-[#F7D9E4]" : "bg-[#D9EEF7]"}`}>
                   <span className={`font-cairo font-normal text-[12px] text-center ${student.gender === "female" ? "text-[#4E0027]" : "text-[#00354E]"}`}>
                     {student.gender === "female" ? "أنثى" : "ذكر"}
@@ -105,22 +105,22 @@ export default function AdminStudentsTab({
               </div>
             </div>
             <div className="flex flex-col gap-1 w-full text-right">
-              {student.guardian_name && <span className="font-cairo text-[#79817A] text-[14px]">ولي الأمر: {student.guardian_name}</span>}
-              {student.guardian_phone && <span className="font-cairo text-[#79817A] text-[14px]" dir="ltr">{student.guardian_phone}</span>}
+              {student.guardian_name && <span className="font-cairo text-[#79817A] text-sm">ولي الأمر: {student.guardian_name}</span>}
+              {student.guardian_phone && <span className="font-cairo text-[#79817A] text-sm" dir="ltr">{student.guardian_phone}</span>}
             </div>
             <div className="flex justify-end gap-4 mt-2 pt-4 border-t border-gray-100">
                {deleteConfirm === student.id ? (
                   <div className="flex gap-2">
-                    <button onClick={() => onDeleteConfirm(student.id)} className="px-4 py-1.5 bg-[#930404] text-white rounded-[8px] font-cairo font-bold text-[14px]">تأكيد החذف</button>
-                    <button onClick={() => setDeleteConfirm(null)} className="px-4 py-1.5 bg-gray-400 text-white rounded-[8px] font-cairo font-bold text-[14px]">إلغاء</button>
+                    <button onClick={() => onDeleteConfirm(student.id)} className="px-4 py-1.5 bg-[#930404] text-white rounded-[8px] font-cairo font-bold text-sm">تأكيد החذف</button>
+                    <button onClick={() => setDeleteConfirm(null)} className="px-4 py-1.5 bg-gray-400 text-white rounded-[8px] font-cairo font-bold text-sm">إلغاء</button>
                   </div>
                 ) : (
                   <>
-                    <button onClick={() => onEditStudent(student)} className="flex items-center gap-2 px-3 py-1.5 rounded-[8px] bg-blue-50 text-[#035D86] font-cairo text-[14px] font-bold">
+                    <button onClick={() => onEditStudent(student)} className="flex items-center gap-2 px-3 py-1.5 rounded-[8px] bg-blue-50 text-[#035D86] font-cairo text-sm font-bold">
                        <Edit01 aria-hidden="true" size={18} />
                       تعديل
                     </button>
-                    <button onClick={() => setDeleteConfirm(student.id)} className="flex items-center gap-2 px-3 py-1.5 rounded-[8px] bg-red-50 text-[#930404] font-cairo text-[14px] font-bold">
+                    <button onClick={() => setDeleteConfirm(student.id)} className="flex items-center gap-2 px-3 py-1.5 rounded-[8px] bg-red-50 text-[#930404] font-cairo text-sm font-bold">
                        <Delete01 aria-hidden="true" size={18} />
                       حذف
                     </button>

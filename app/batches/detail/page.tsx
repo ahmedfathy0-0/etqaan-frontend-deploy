@@ -220,7 +220,7 @@ export default function BatchDetailsPage() {
 
               <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_450px]">
                 <section id="students" className="min-w-0 scroll-mt-32 px-1" aria-labelledby="students-title">
-                  <h2 id="students-title" className="mb-4 text-2xl font-bold">الطلاب ({filteredStudents.length})</h2>
+                  <h2 id="students-title" className="mb-4 text-xl lg:text-2xl font-bold">الطلاب ({filteredStudents.length})</h2>
                   
                   <div className="mb-6 flex h-12 w-full items-center gap-4 px-4 lg:px-0">
                     <label className="relative h-12 min-w-0 flex-1">
@@ -270,7 +270,7 @@ export default function BatchDetailsPage() {
 
                 <section className="rounded-2xl bg-white p-4 shadow-[0_2px_10px_5px_rgba(34,23,1,0.25)]" aria-labelledby="exams-title">
                   <div className="mb-4 flex items-center justify-between gap-3">
-                    <h2 id="exams-title" className="text-2xl font-bold">الاختبارات السابقة</h2>
+                    <h2 id="exams-title" className="text-xl lg:text-2xl font-bold">الاختبارات السابقة</h2>
                     <Link href={`/batches/exams?batchId=${batchId}`} className="flex items-center gap-1 font-medium text-secondary-700">
                       {new Date().getFullYear()} <ArrowDown01 aria-hidden="true" size={24} />
                     </Link>

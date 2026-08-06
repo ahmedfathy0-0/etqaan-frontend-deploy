@@ -104,7 +104,7 @@ export default function AdminUserModal({
           )}
 
           <div className="flex flex-col gap-2 w-full">
-            <label className="text-right text-success-800 font-bold text-lg w-full">أسم المستخدم</label>
+            <label className="text-right text-success-800 font-bold text-base lg:text-lg w-full">أسم المستخدم</label>
             <input
               type="text"
               value={newUser.name}
@@ -116,7 +116,7 @@ export default function AdminUserModal({
           </div>
 
           <div className="flex flex-col gap-2 w-full">
-            <label className="text-right text-success-800 font-bold text-lg w-full">البريد الإلكتروني</label>
+            <label className="text-right text-success-800 font-bold text-base lg:text-lg w-full">البريد الإلكتروني</label>
             <input
               type="email"
               value={newUser.email}
@@ -129,7 +129,7 @@ export default function AdminUserModal({
           </div>
 
           <div className="flex flex-col gap-2 w-full">
-            <label className="text-right text-success-800 font-bold text-lg w-full">
+            <label className="text-right text-success-800 font-bold text-base lg:text-lg w-full">
               كلمة المرور
             </label>
             <div className="flex flex-row w-full gap-2">
@@ -154,7 +154,7 @@ export default function AdminUserModal({
           </div>
 
           <div className="flex flex-col gap-2 w-full">
-            <label className="text-right text-success-800 font-bold text-lg w-full">دور المستخدم</label>
+            <label className="text-right text-success-800 font-bold text-base lg:text-lg w-full">دور المستخدم</label>
             <div className="w-full relative">
               <select
                 value={newUser.role}
@@ -183,7 +183,7 @@ export default function AdminUserModal({
             disabled={formLoading}
           >
             <FloppyDisk aria-hidden="true" size={24} className="text-white" />
-            <span className="font-bold text-lg text-white">
+            <span className="font-bold text-base lg:text-lg text-white">
                {formLoading ? "جاري الحفظ..." : "حفظ المستخدم"}
             </span>
           </button>
@@ -193,7 +193,7 @@ export default function AdminUserModal({
             onClick={onClose}
             className="flex-1 flex flex-row justify-center items-center h-14 bg-neutral-100 hover:bg-neutral-200 border-2 border-neutral-200 rounded-2xl transition-colors"
           >
-            <span className="font-bold text-lg text-neutral-700">
+            <span className="font-bold text-base lg:text-lg text-neutral-700">
               إلغاء
             </span>
           </button>
