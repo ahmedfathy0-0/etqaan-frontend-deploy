@@ -62,22 +62,24 @@ export default function Modal({
         role="dialog"
         aria-modal="true"
       >
-        <button
-          onClick={onClose}
-          className="absolute top-3 left-3 p-2 text-neutral-900 hover:text-neutral-700 bg-neutral-300 hover:bg-neutral-300 rounded-full transition-colors focus:outline-none z-[110]"
-          aria-label="Close modal"
-        >
-          <Cancel01 aria-hidden="true" size={20} />
-        </button>
-
-        {title && (
-          <div className="px-6 pt-6 pb-2">
-            <h2 className="text-xl font-bold font-arabic text-[#17481B]">{title}</h2>
-          </div>
-        )}
 
         {/* Body */}
-        <div className={`w-full p-4 lg:p-6 ${!title ? 'pt-12' : ''} ${overflowVisible ? 'overflow-visible' : 'max-h-[90vh] overflow-y-auto custom-scrollbar'}`}>
+        <div className={`w-full p-4 lg:p-6 ${overflowVisible ? 'overflow-visible' : 'max-h-[90vh] overflow-y-auto custom-scrollbar'}`}>
+          {/* Close button inside the content flow so dropdown can render above without overlap */}
+          <div className="flex justify-start mb-3">
+            <button
+              onClick={onClose}
+              className="p-2 text-neutral-900 hover:text-neutral-700 bg-neutral-300 hover:bg-neutral-300 rounded-full transition-colors focus:outline-none"
+              aria-label="Close modal"
+            >
+              <Cancel01 aria-hidden="true" size={20} />
+            </button>
+          </div>
+          {title && (
+            <div className="pb-2">
+              <h2 className="text-xl font-bold font-arabic text-[#17481B]">{title}</h2>
+            </div>
+          )}
           {children}
         </div>
       </div>

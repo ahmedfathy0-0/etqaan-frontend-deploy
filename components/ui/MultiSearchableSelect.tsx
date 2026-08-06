@@ -13,6 +13,7 @@ interface MultiSearchableSelectProps {
   onChange: (value: (number | string)[]) => void;
   placeholder?: string;
   className?: string;
+  dropdownPosition?: "top" | "bottom" | "auto"; // auto = top on mobile, bottom on desktop
 }
 
 export default function MultiSearchableSelect({
@@ -21,11 +22,23 @@ export default function MultiSearchableSelect({
   onChange,
   placeholder = "Select...",
   className = "",
+  dropdownPosition = "bottom",
 }: MultiSearchableSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [isMobile, setIsMobile] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 1024);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
+  const resolvedPosition =
+    dropdownPosition === "auto" ? (isMobile ? "top" : "bottom") : dropdownPosition;
 
   const selectedOptions = useMemo(
     () => options.filter((opt) => value.includes(opt.id)),
@@ -110,7 +123,11 @@ export default function MultiSearchableSelect({
       </div>
 
       {isOpen && (
-        <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+        <div className={`absolute z-50 w-full bg-white border border-gray-200 rounded-lg shadow-lg overflow-y-auto ${
+          resolvedPosition === "top"
+            ? "bottom-full mb-1 max-h-[300px]"
+            : "top-full mt-1 max-h-72"
+        }`}>
           {filteredOptions.length > 0 ? (
             filteredOptions.map((option) => {
               const isSelected = value.includes(option.id);

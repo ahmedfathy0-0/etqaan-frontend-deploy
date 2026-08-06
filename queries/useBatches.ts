@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getBatches, getPublicBatches, getBatchById, enrollStudentsInBatch, createBatch, deleteBatch, updateBatch } from '@/api/batches';
+import { getBatches, getPublicBatches, getBatchById, enrollStudentsInBatch, unenrollStudentFromBatch, createBatch, deleteBatch, updateBatch } from '@/api/batches';
 import type { Batch } from '@/api/batches';
 
 // Additional types for specific endpoints can be defined here or in the API module
@@ -54,6 +54,18 @@ export function useEnrollStudents() {
   return useMutation({
     mutationFn: ({ batchId, studentIds }: { batchId: string | number, studentIds: number[] }) => 
       enrollStudentsInBatch(batchId, studentIds),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['batch', String(variables.batchId)] });
+    },
+  });
+}
+
+export function useUnenrollStudent() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: ({ batchId, studentId }: { batchId: string | number, studentId: number }) => 
+      unenrollStudentFromBatch(batchId, studentId),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['batch', String(variables.batchId)] });
     },

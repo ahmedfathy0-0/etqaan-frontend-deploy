@@ -30,6 +30,11 @@ export const enrollStudentsInBatch = async (batchId: string | number, studentIds
   return response.data;
 };
 
+export const unenrollStudentFromBatch = async (batchId: string | number, studentId: number) => {
+  const response = await api.delete(`/batches/${batchId}/students/${studentId}`);
+  return response.data;
+};
+
 export const createBatch = async (data: any) => {
   const response = await api.post('/batches', data);
   return response.data;

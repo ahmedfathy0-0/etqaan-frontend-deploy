@@ -13,12 +13,13 @@ import {
   MoreVertical,
   Search01,
   TaskAdd01,
+  Delete01,
   Tv01,
   UserAdd01,
 } from "@dga-icons/react/duotone-rounded";
 import { toast } from "react-hot-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { useBatchDetails, useEnrollStudents } from "@/queries/useBatches";
+import { useBatchDetails, useEnrollStudents, useUnenrollStudent } from "@/queries/useBatches";
 import { useBatchExams } from "@/queries/useExams";
 import { useStudents } from "@/queries/useStudents";
 import { AdminSidebar, type TabId } from "@/components/admin/AdminSidebar";
@@ -85,6 +86,7 @@ export default function BatchDetailsPage() {
   const { data: exams = [], isLoading: examsLoading } = useBatchExams(batchId);
   const { data: allStudents } = useStudents();
   const { mutateAsync: enrollStudents } = useEnrollStudents();
+  const { mutateAsync: unenrollStudent } = useUnenrollStudent();
   const batch = data?.batch;
   const students: Student[] = (data?.students || []).map((student: Omit<Student, "rank">, index: number) => ({
     ...student,
@@ -113,6 +115,17 @@ export default function BatchDetailsPage() {
     }
     setSelectedStudent(student);
     setShowHistoryModal(true);
+  };
+
+  const handleRemoveStudent = async (student: Student, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!confirm(`هل أنت متأكد من إزالة الطالب ${student.name} من الحلقة؟`)) return;
+    try {
+      await unenrollStudent({ batchId, studentId: student.id });
+      toast.success("تم إزالة الطالب بنجاح");
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "حدث خطأ أثناء إزالة الطالب");
+    }
   };
 
   const handleEnrollStudent = async () => {
@@ -184,7 +197,7 @@ export default function BatchDetailsPage() {
           </div>
         </aside>
 
-        <main className="min-w-0 flex-1 overflow-x-hidden px-4 py-6 lg:px-4" aria-busy={isLoading}>
+        <main className="min-w-0 flex-1 overflow-x-hidden px-4 py-6 pb-[96px] lg:pb-6 lg:px-4" aria-busy={isLoading}>
           {isLoading ? (
             <PageLoader />
           ) : isError || !batch ? (
@@ -257,7 +270,17 @@ export default function BatchDetailsPage() {
                         <span className="rounded-full bg-success-200 px-3 py-1 text-[11px] text-success-800">{student.points} نقطة</span>
                         <span className="hidden rounded-full bg-warning-200 px-3 py-1 text-[11px] text-warning-800 sm:inline">الترتيب {student.rank}</span>
                         <span className="hidden rounded-full bg-danger-200 px-3 py-1 text-[11px] text-danger-800 sm:inline">طالب</span>
-                        <MoreVertical aria-hidden="true" size={24} className="text-neutral-800" />
+                        {canManage ? (
+                          <button
+                            onClick={(e) => handleRemoveStudent(student, e)}
+                            className="flex h-8 w-8 items-center justify-center rounded-full text-danger-600 hover:bg-danger-100 transition-colors"
+                            title="إزالة من الحلقة"
+                          >
+                            <Delete01 aria-hidden="true" size={22} />
+                          </button>
+                        ) : (
+                          <MoreVertical aria-hidden="true" size={24} className="text-neutral-800" />
+                        )}
                       </button>
                     ))}
                     {!filteredStudents.length && (

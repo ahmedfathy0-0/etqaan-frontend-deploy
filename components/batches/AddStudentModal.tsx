@@ -31,7 +31,7 @@ export default function AddStudentModal({
   const options = availableStudents.map((s) => ({
     id: s.id,
     label: s.full_name + (s.guardian_name ? ` (${s.guardian_name})` : ""),
-  }));
+  })).sort((a, b) => a.label.localeCompare(b.label, "ar"));
 
   return (
     <Modal
@@ -59,7 +59,8 @@ export default function AddStudentModal({
                 value={selectedStudentIds}
                 onChange={(val) => setSelectedStudentIds(val as number[])}
                 placeholder="ابحث عن اسم الطالب..."
-                className="mb-1 [&>div]:!h-12 [&>div]:!border-2 [&>div]:!border-success-200 [&>div]:!rounded-xl focus:[&>div]:!border-success-700 transition-all"
+                className="mb-1 [&>div:first-child]:!h-12 [&>div:first-child]:!border-2 [&>div:first-child]:!border-success-200 [&>div:first-child]:!rounded-xl focus:[&>div:first-child]:!border-success-700 transition-all"
+                dropdownPosition="auto"
               />
             </div>
           </div>
