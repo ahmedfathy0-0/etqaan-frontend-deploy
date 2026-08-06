@@ -204,7 +204,7 @@ export default function AdminStudentModal({
           </div>
 
           <div className="flex flex-col gap-2 w-full">
-            <label className="text-right text-success-800 font-bold text-lg w-full">اسم ولي الأمر</label>
+            <label className="text-right text-success-800 font-bold text-lg w-full">اسم ولي الأمر (اختياري)</label>
             <input
               type="text"
               value={newStudent.guardian_name}
@@ -217,7 +217,7 @@ export default function AdminStudentModal({
           </div>
 
           <div className="flex flex-col gap-2 w-full">
-            <label className="text-right text-success-800 font-bold text-lg w-full">رقم هاتف ولي الأمر</label>
+            <label className="text-right text-success-800 font-bold text-lg w-full">رقم هاتف ولي الأمر (اختياري)</label>
             <input
               type="text"
               value={newStudent.guardian_phone}

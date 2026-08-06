@@ -32,7 +32,7 @@ export default function AdminUserModal({
     name: "",
     email: "",
     password: "",
-    role: "student", // Changing default to student to match screenshot
+    role: "sheikh", // Defaulting to sheikh since students are managed in Students tab
   });
 
   useEffect(() => {
@@ -42,10 +42,10 @@ export default function AdminUserModal({
           name: initialData.name,
           email: initialData.email,
           password: initialData.password || "",
-          role: initialData.role || "student",
+          role: initialData.role || "sheikh",
         });
       } else {
-        setNewUser({ name: "", email: "", password: "", role: "student" });
+        setNewUser({ name: "", email: "", password: "", role: "sheikh" });
       }
       setFormError("");
     }
@@ -167,7 +167,6 @@ export default function AdminUserModal({
                 )}
                 <option value="admin">مدير</option>
                 <option value="sheikh">شيخ / معلمة</option>
-                <option value="student">طالب</option>
               </select>
               <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
                 <ArrowDown01 aria-hidden="true" size={20} className="text-neutral-500" />

@@ -196,6 +196,7 @@ function AdminDashboardContent() {
           onLogout={logout} 
           onAddUser={() => setShowUserModal(true)} 
           onAddBatch={() => setShowBatchModal(true)} 
+          onAddStudent={() => setShowStudentModal(true)}
           onToggleMenu={() => setMobileMenuOpen((open) => !open)}
           activeTab={activeTab}
         />
@@ -246,7 +247,7 @@ function AdminDashboardContent() {
                 {activeTab === "users" && (
                   <div className="animate-slide-up">
                     <AdminUsersTab
-                      users={users}
+                      users={users.filter(u => u.role !== "student")}
                       onDeleteConfirm={handleDeleteUser}
                       deleteConfirm={deleteConfirm}
                       setDeleteConfirm={setDeleteConfirm}

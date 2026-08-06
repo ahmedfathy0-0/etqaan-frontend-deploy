@@ -12,6 +12,7 @@ interface AdminHeaderProps {
   onLogout: () => void;
   onAddUser?: () => void;
   onAddBatch?: () => void;
+  onAddStudent?: () => void;
   onToggleMenu: () => void;
   activeTab: TabId;
   children?: ReactNode;
@@ -38,7 +39,7 @@ const titles: Record<TabId, string> = {
   leaderboard: "لوحة الشرف",
 };
 
-export default function AdminHeader({ onLogout, onAddUser, onAddBatch, onToggleMenu, activeTab, children, customTitle }: AdminHeaderProps) {
+export default function AdminHeader({ onLogout, onAddUser, onAddBatch, onAddStudent, onToggleMenu, activeTab, children, customTitle }: AdminHeaderProps) {
   const { user } = useAuth();
   const isAdmin = user?.role === "admin" || user?.role === "super_admin";
 
@@ -51,13 +52,17 @@ export default function AdminHeader({ onLogout, onAddUser, onAddBatch, onToggleM
         <div className="flex items-center gap-6">
           {children ? children : (
             <>
-              {isAdmin && activeTab !== "batches" && onAddUser && <button onClick={onAddUser} className="flex h-14 w-[195px] items-center justify-center gap-4 rounded-2xl bg-primary-600 px-4 text-base font-bold text-success-50 hover:bg-primary-700">
+              {isAdmin && activeTab !== "batches" && activeTab !== "students" && onAddUser && <button onClick={onAddUser} className="flex h-14 w-[195px] items-center justify-center gap-4 rounded-2xl bg-primary-600 px-4 text-base font-bold text-success-50 hover:bg-primary-700">
                 <UserAddIcon />
                 إضافة مستخدم
               </button>}
               {isAdmin && (activeTab === "overview" || activeTab === "batches") && onAddBatch && <button onClick={onAddBatch} className="flex h-14 w-[195px] items-center justify-center gap-4 rounded-2xl bg-warning-600 px-4 text-base font-bold text-warning-50 hover:bg-warning-700">
                 <BatchIcon />
                 إضافة حلقة
+              </button>}
+              {isAdmin && activeTab === "students" && onAddStudent && <button onClick={onAddStudent} className="flex h-14 w-[195px] items-center justify-center gap-4 rounded-2xl bg-[#B17C08] px-4 text-base font-bold text-success-50 hover:bg-[#966907]">
+                <UserAdd01 aria-hidden="true" size={24} />
+                إضافة طالب
               </button>}
             </>
           )}
