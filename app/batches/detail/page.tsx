@@ -96,9 +96,9 @@ export default function BatchDetailsPage() {
   // Determine if the current user "owns" this batch
   const batchSheikhIds: number[] = (batch?.batch_sheikhs || []).map((bs: any) => bs.sheikh_id ?? bs.sheikh?.id);
   const isOwnBatch = isSheikh
-    ? batchSheikhIds.includes(user?.id || 0)
+    ? batchSheikhIds.includes(Number(user?.id) || 0)
     : isStudent
-    ? (data?.students || []).some((s: any) => s.user_id === user?.id)
+    ? (data?.students || []).some((s: any) => Number(s.user_id) === Number(user?.id))
     : isAdmin;
 
   const canManage = isAdmin || (isSheikh && isOwnBatch);

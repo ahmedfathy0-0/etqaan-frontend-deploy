@@ -139,20 +139,14 @@ export default function Header() {
                 </button>
               </div>
             ) : (
-              <div className="flex items-center gap-3">
-                <Link
-                  href="/batches"
-                  className="px-4 py-2 bg-success-700 hover:bg-success-600 rounded-xl font-cairo transition-colors flex items-center gap-2 font-bold"
-                >
-                  <Search01 aria-hidden="true" size={20} />
-                  <span className="hidden sm:inline">ابحث عن حلقتك</span>
-                </Link>
+              <div className="flex items-center gap-2 sm:gap-3">
                 <Link
                   href="/login"
-                  className="px-4 py-2 bg-warning-600 text-warning-50 hover:bg-warning-700 rounded-xl font-cairo font-bold transition-colors flex items-center gap-2"
+                  className="flex h-10 sm:h-12 items-center justify-center gap-2 rounded-2xl bg-warning-600 px-3 sm:px-5 font-bold text-warning-50 transition-colors hover:bg-warning-700"
                 >
-                  <Login01 aria-hidden="true" size={20} />
-                  تسجيل الدخول
+                  <Login01 aria-hidden="true" size={20} className="sm:w-6 sm:h-6" />
+                  <span className="hidden sm:inline">دخول</span>
+                  <span className="sm:hidden">دخول</span>
                 </Link>
               </div>
             )}

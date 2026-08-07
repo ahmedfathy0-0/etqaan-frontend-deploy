@@ -34,6 +34,7 @@ export function useBatchDetails(batchId: string | number) {
       
       const studentsList = data.batch_students?.map((bs: any, index: number) => ({
         id: bs.student.id,
+        user_id: bs.student.user_id,
         batch_student_id: bs.id,
         name: bs.student.full_name,
         points: bs.league_points || 0,

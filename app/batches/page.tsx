@@ -7,7 +7,7 @@ import Link from "next/link";
 import PageLoader from "@/components/ui/PageLoader";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePublicBatches } from "@/queries/useBatches";
-import { BookOpen01, Search01, Login01, Alert02, User, Tv01 } from "@dga-icons/react/duotone-rounded";
+import { BookOpen01, Search01, Login01, Alert02, User, Tv01, Filter } from "@dga-icons/react/duotone-rounded";
 import { api } from "@/lib/api";
 
 export default function BatchesPage() {
@@ -62,80 +62,9 @@ export default function BatchesPage() {
           </p>
         </div>
 
-          {/* Loading State */}
-          {isLoading && <PageLoader />}
-
-          {/* Error State */}
-          {error && !isLoading && batches.length === 0 && (
-            <div className="text-center py-20 bg-white rounded-[24px] shadow-sm max-w-2xl mx-auto border-[1.5px] border-danger-200">
-              <div className="flex justify-center mb-6 text-danger-500">
-                <Alert02 aria-hidden="true" size={64} />
-              </div>
-              <p className="text-danger-800 text-lg font-bold mb-6">{error?.message || String(error)}</p>
-              <button
-                onClick={() => window.location.reload()}
-                className="px-8 py-3 bg-danger-600 text-white rounded-xl font-bold hover:bg-danger-700 transition-colors shadow-md"
-              >
-                حاول مرة أخرى
-              </button>
-            </div>
-          )}
-
-          {/* Search and Sort */}
-          {!isLoading && batches.length > 0 && (
-            <div className="flex flex-col md:flex-row gap-4 mb-12 max-w-3xl mx-auto">
-              <div className="relative flex-1">
-                <input
-                  type="text"
-                  placeholder="بحث عن حلقة..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full h-[52px] pl-12 pr-4 bg-white border-[1.5px] border-success-200 rounded-xl focus:outline-none focus:border-success-700 focus:ring-1 focus:ring-success-700 text-neutral-800 shadow-sm font-medium transition-all"
-                />
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-success-800">
-                  <Search01 aria-hidden="true" size={24} />
-                </span>
-              </div>
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="h-[52px] px-4 min-w-[200px] border-[1.5px] border-success-200 rounded-xl focus:outline-none focus:border-success-700 focus:ring-1 focus:ring-success-700 text-neutral-800 bg-white shadow-sm font-medium cursor-pointer transition-all"
-              >
-                <option value="name_asc">الاسم (أ-ي)</option>
-                <option value="name_desc">الاسم (ي-أ)</option>
-                <option value="students_desc">الأكثر طلاباً</option>
-                <option value="students_asc">الأقل طلاباً</option>
-              </select>
-            </div>
-          )}
-
-          {/* Batches Grid */}
-          {!isLoading && batches.length > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {batches
-                .filter((b) => b.name.toLowerCase().includes(searchTerm.toLowerCase()))
-                .sort((a, b) => {
-                  if (sortBy === "name_asc") return a.name.localeCompare(b.name, "ar");
-                  if (sortBy === "name_desc") return b.name.localeCompare(a.name, "ar");
-                  if (sortBy === "students_desc") return (b._count?.batch_students || 0) - (a._count?.batch_students || 0);
-                  if (sortBy === "students_asc") return (a._count?.batch_students || 0) - (b._count?.batch_students || 0);
-                  return 0;
-                })
-                .map((batch) => (
-                <BatchCard
-                  key={batch.id}
-                  id={batch.id}
-                  name={batch.name}
-                  description={batch.schedule_description || ""}
-                  studentCount={batch._count?.batch_students || 0}
-                />
-              ))}
-            </div>
-          )}
-
           {/* Student Lookup */}
           {!user && (
-            <div className="mt-16 max-w-xl mx-auto">
+            <div className="mb-16 max-w-xl mx-auto">
               <div className="bg-white rounded-[24px] p-6 shadow-[0_2px_10px_5px_rgba(0,10,1,0.15)] border-[1.5px] border-success-200">
                 <div className="flex items-center gap-3 mb-4">
                   <User aria-hidden="true" size={28} className="text-success-700" />
@@ -189,6 +118,80 @@ export default function BatchesPage() {
                   </div>
                 )}
               </div>
+            </div>
+          )}
+
+          {/* Loading State */}
+          {isLoading && <PageLoader />}
+
+          {/* Error State */}
+          {error && !isLoading && batches.length === 0 && (
+            <div className="text-center py-20 bg-white rounded-[24px] shadow-sm max-w-2xl mx-auto border-[1.5px] border-danger-200">
+              <div className="flex justify-center mb-6 text-danger-500">
+                <Alert02 aria-hidden="true" size={64} />
+              </div>
+              <p className="text-danger-800 text-lg font-bold mb-6">{error?.message || String(error)}</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="px-8 py-3 bg-danger-600 text-white rounded-xl font-bold hover:bg-danger-700 transition-colors shadow-md"
+              >
+                حاول مرة أخرى
+              </button>
+            </div>
+          )}
+
+          {/* Search and Sort */}
+          {!isLoading && batches.length > 0 && (
+            <div className="mb-8 flex h-12 w-full max-w-3xl mx-auto items-center gap-4 px-4 lg:px-0">
+              <label className="relative h-12 min-w-0 flex-1">
+                <span className="sr-only">البحث عن حلقة</span>
+                <input
+                  type="search"
+                  placeholder="أبحث عن حلقة..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="h-12 w-full rounded-2xl border-[1.5px] border-neutral-800 bg-white py-3 pr-11 pl-3 text-right text-base text-success-900 outline-none placeholder:text-success-900 focus:border-success-800 transition-all"
+                />
+                <Search01 aria-hidden="true" size={24} className="absolute right-3 top-1/2 -translate-y-1/2 text-success-800" />
+              </label>
+              <label className="relative flex h-12 w-12 shrink-0 cursor-pointer items-center justify-center text-neutral-800">
+                <span className="sr-only">ترتيب الحلقات</span>
+                <Filter aria-hidden="true" size={32} />
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="absolute inset-0 cursor-pointer opacity-0"
+                >
+                  <option value="name_asc">الاسم (أ-ي)</option>
+                  <option value="name_desc">الاسم (ي-أ)</option>
+                  <option value="students_desc">الأكثر طلاباً</option>
+                  <option value="students_asc">الأقل طلاباً</option>
+                </select>
+              </label>
+            </div>
+          )}
+
+          {/* Batches Grid */}
+          {!isLoading && batches.length > 0 && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {batches
+                .filter((b) => b.name.toLowerCase().includes(searchTerm.toLowerCase()))
+                .sort((a, b) => {
+                  if (sortBy === "name_asc") return a.name.localeCompare(b.name, "ar");
+                  if (sortBy === "name_desc") return b.name.localeCompare(a.name, "ar");
+                  if (sortBy === "students_desc") return (b._count?.batch_students || 0) - (a._count?.batch_students || 0);
+                  if (sortBy === "students_asc") return (a._count?.batch_students || 0) - (b._count?.batch_students || 0);
+                  return 0;
+                })
+                .map((batch) => (
+                <BatchCard
+                  key={batch.id}
+                  id={batch.id}
+                  name={batch.name}
+                  description={batch.schedule_description || ""}
+                  studentCount={batch._count?.batch_students || 0}
+                />
+              ))}
             </div>
           )}
 
