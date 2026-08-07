@@ -25,12 +25,11 @@ export default function AdminStudentModal({
   onClose,
   editStudentId,
   initialData,
-  hideAccountSection = false,
 }: AdminStudentModalProps) {
   const { token } = useAuth();
   const { mutateAsync: createStudentMutate } = useCreateStudent();
   const { mutateAsync: updateStudentMutate } = useUpdateStudent();
-  
+
   const { mutateAsync: createUserMutate } = useCreateUser();
   const { mutateAsync: updateUserMutate } = useUpdateUser();
   const { mutateAsync: deleteUserMutate } = useDeleteUser();
@@ -87,7 +86,7 @@ export default function AdminStudentModal({
       setFormError("يجب إدخال كلمة المرور للحساب الجديد");
       return;
     }
-    
+
     if (hasAccount && !initialData?.user_id && !newStudent.password) {
       setFormError("يجب إدخال كلمة المرور للحساب الجديد");
       return;
@@ -103,8 +102,8 @@ export default function AdminStudentModal({
         // User unlinked the account
         if (initialData?.user_id && !hasAccount) {
           // 1. Update student to remove user_id connection
-          await updateStudentMutate({ 
-            id: editStudentId, 
+          await updateStudentMutate({
+            id: editStudentId,
             data: { user_id: null } as any
           });
           // 2. Delete the user
@@ -134,8 +133,8 @@ export default function AdminStudentModal({
         }
 
         // Final student update
-        await updateStudentMutate({ 
-          id: editStudentId, 
+        await updateStudentMutate({
+          id: editStudentId,
           data: {
             full_name: newStudent.full_name,
             guardian_name: newStudent.guardian_name,
@@ -164,7 +163,7 @@ export default function AdminStudentModal({
           ...(finalUserId ? { user_id: finalUserId } : {})
         } as any);
       }
-      
+
       onClose();
     } catch (err: any) {
       console.error("Error saving student:", err);
@@ -251,20 +250,18 @@ export default function AdminStudentModal({
             </div>
           </div>
 
-          {!hideAccountSection && (
-            <div className="flex flex-row items-center justify-start gap-3 w-full mt-2 pt-4 border-t border-success-100">
-              <input 
-                type="checkbox" 
-                id="hasAccountToggle"
-                checked={hasAccount}
-                onChange={(e) => setHasAccount(e.target.checked)}
-                className="w-5 h-5 accent-success-700 cursor-pointer"
-              />
-              <label htmlFor="hasAccountToggle" className="text-right text-success-800 font-bold text-base lg:text-lg cursor-pointer select-none">
-                ربط/إنشاء حساب للمنصة لهذا الطالب
-              </label>
-            </div>
-          )}
+          <div className="flex flex-row items-center justify-start gap-3 w-full mt-2 pt-4 border-t border-success-100">
+            <input
+              type="checkbox"
+              id="hasAccountToggle"
+              checked={hasAccount}
+              onChange={(e) => setHasAccount(e.target.checked)}
+              className="w-5 h-5 accent-success-700 cursor-pointer"
+            />
+            <label htmlFor="hasAccountToggle" className="text-right text-success-800 font-bold text-base lg:text-lg cursor-pointer select-none">
+              ربط/إنشاء حساب للمنصة لهذا الطالب
+            </label>
+          </div>
 
           {hasAccount && (
             <div className="flex flex-col gap-4 bg-success-50 p-4 rounded-xl border border-success-100 mt-2">
@@ -308,10 +305,10 @@ export default function AdminStudentModal({
           >
             <FloppyDisk aria-hidden="true" size={24} className="text-white" />
             <span className="font-bold text-base lg:text-lg text-white">
-               {formLoading ? "جاري الحفظ..." : "حفظ الطالب"}
+              {formLoading ? "جاري الحفظ..." : "حفظ الطالب"}
             </span>
           </button>
-          
+
           <button
             type="button"
             onClick={onClose}

@@ -198,11 +198,9 @@ export default function BatchDetailsPage() {
                 <UserAdd01 aria-hidden="true" size={24} /> إضافة طالب
               </button>
             )}
-            {isAdmin && (
-              <Link href={`/batches/exams?batchId=${batchId}`} className="flex h-14 min-w-[190px] items-center justify-center gap-4 rounded-2xl bg-success-800 px-5 font-bold text-white hover:bg-success-900">
-                <Tv01 aria-hidden="true" size={24} /> إدارة الاختبارات
-              </Link>
-            )}
+            <Link href={`/batches/exams?batchId=${batchId}`} className="flex h-14 min-w-[190px] items-center justify-center gap-4 rounded-2xl bg-success-800 px-5 font-bold text-white hover:bg-success-900">
+              <Tv01 aria-hidden="true" size={24} /> إدارة الاختبارات
+            </Link>
           </>
         )}
       </AdminHeader>
